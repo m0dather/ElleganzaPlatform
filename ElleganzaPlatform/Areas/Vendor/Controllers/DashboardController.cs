@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ElleganzaPlatform.Areas.Vendor.Controllers;
 
 [Area("Vendor")]
-[Route("Vendor")]
+[Route("vendor")]
 [Authorize(Policy = AuthorizationPolicies.RequireVendor)]
 public class DashboardController : Controller
 {
