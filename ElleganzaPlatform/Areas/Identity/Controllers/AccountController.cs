@@ -358,7 +358,8 @@ public class AccountController : Controller
             }
         }
 
-        // Add VendorId claim for Vendor
+        // Add VendorId claim for Vendor role
+        // Note: VendorAdmin entity is a join table, separate from the Vendor role
         if (roles.Contains(Roles.Vendor))
         {
             var vendorAdmin = await _context.VendorAdmins

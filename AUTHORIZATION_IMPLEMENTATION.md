@@ -223,6 +223,8 @@ Roles are assigned during:
 2. **User Registration**: Customer and Vendor roles assigned during registration
 3. **Manual Assignment**: StoreAdmin role can be assigned by SuperAdmin
 
+**Important Note**: The `VendorAdmin` entity in the database is a join table that links users to vendors. This is separate from the `Vendor` **role** used for authorization. A user with the Vendor role will have a corresponding entry in the VendorAdmins table that stores their VendorId.
+
 ### Custom Claims
 
 Additional claims for store and vendor isolation:
