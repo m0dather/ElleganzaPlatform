@@ -28,7 +28,7 @@ public class CustomerAuthorizationHandler : AuthorizationHandler<CustomerRequire
         CustomerRequirement requirement)
     {
         // Check if user is authenticated
-        if (!context.User.Identity?.IsAuthenticated ?? true)
+        if (context.User.Identity?.IsAuthenticated != true)
         {
             return Task.CompletedTask;
         }

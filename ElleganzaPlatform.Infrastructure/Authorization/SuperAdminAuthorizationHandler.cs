@@ -28,7 +28,7 @@ public class SuperAdminAuthorizationHandler : AuthorizationHandler<SuperAdminReq
         SuperAdminRequirement requirement)
     {
         // Check if user is authenticated
-        if (!context.User.Identity?.IsAuthenticated ?? true)
+        if (context.User.Identity?.IsAuthenticated != true)
         {
             return Task.CompletedTask;
         }

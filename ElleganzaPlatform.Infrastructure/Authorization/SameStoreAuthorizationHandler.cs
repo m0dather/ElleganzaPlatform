@@ -34,7 +34,7 @@ public class SameStoreAuthorizationHandler : AuthorizationHandler<SameStoreRequi
         SameStoreRequirement requirement)
     {
         // Check if user is authenticated
-        if (!context.User.Identity?.IsAuthenticated ?? true)
+        if (context.User.Identity?.IsAuthenticated != true)
         {
             return;
         }

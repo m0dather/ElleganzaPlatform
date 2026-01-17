@@ -31,7 +31,7 @@ public class StoreAdminAuthorizationHandler : AuthorizationHandler<StoreAdminReq
         StoreAdminRequirement requirement)
     {
         // Check if user is authenticated
-        if (!context.User.Identity?.IsAuthenticated ?? true)
+        if (context.User.Identity?.IsAuthenticated != true)
         {
             return Task.CompletedTask;
         }
