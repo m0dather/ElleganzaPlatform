@@ -1,0 +1,28 @@
+@inject IStringLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Dashboard"];
+}
+
+<div class="container mt-4">
+    <h1>@SharedLocalizer["Dashboard"] - Store Admin</h1>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>@SharedLocalizer["Welcome"]</h3>
+                </div>
+                <div class="card-body">
+                    <p>This is the Store Admin dashboard. Manage your store settings, vendors, and orders.</p>
+                    <ul>
+                        <li><a asp-action="Settings">@SharedLocalizer["Settings"]</a></li>
+                        <li><a asp-action="Vendors">@SharedLocalizer["Vendors"]</a></li>
+                        <li><a asp-action="Products">@SharedLocalizer["Products"]</a></li>
+                        <li><a asp-action="Orders">@SharedLocalizer["Orders"]</a></li>
+                        <li><a asp-action="Reports">@SharedLocalizer["Reports"]</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
