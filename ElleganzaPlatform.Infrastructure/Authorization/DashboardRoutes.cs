@@ -34,10 +34,10 @@ public static class DashboardRoutes
     /// <summary>
     /// Login page route
     /// </summary>
-    public const string Login = "/Identity/Account/Login";
+    public const string Login = "/login";
 
     /// <summary>
     /// Access denied route
     /// </summary>
-    public const string AccessDenied = "/Identity/Account/AccessDenied";
+    public const string AccessDenied = "/access-denied";
 }
