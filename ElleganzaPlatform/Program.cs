@@ -56,17 +56,25 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 // Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(Policies.SuperAdminPolicy, policy =>
+    // SuperAdmin policy - requires SuperAdmin role
+    options.AddPolicy(AuthorizationPolicies.RequireSuperAdmin, policy =>
         policy.AddRequirements(new SuperAdminRequirement()));
 
-    options.AddPolicy(Policies.StoreAdminPolicy, policy =>
+    // StoreAdmin policy - requires StoreAdmin role with store isolation
+    options.AddPolicy(AuthorizationPolicies.RequireStoreAdmin, policy =>
         policy.AddRequirements(new StoreAdminRequirement()));
 
-    options.AddPolicy(Policies.VendorPolicy, policy =>
+    // Vendor policy - requires Vendor role with vendor isolation
+    options.AddPolicy(AuthorizationPolicies.RequireVendor, policy =>
         policy.AddRequirements(new VendorRequirement()));
 
-    options.AddPolicy(Policies.CustomerPolicy, policy =>
+    // Customer policy - requires Customer role
+    options.AddPolicy(AuthorizationPolicies.RequireCustomer, policy =>
         policy.AddRequirements(new CustomerRequirement()));
+
+    // Same Store policy - requires user's StoreId to match current store context
+    options.AddPolicy(AuthorizationPolicies.RequireSameStore, policy =>
+        policy.AddRequirements(new SameStoreRequirement()));
 });
 
 // Configure cookie settings

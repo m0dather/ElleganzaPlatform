@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,7 +6,7 @@ namespace ElleganzaPlatform.Areas.Admin.Store.Controllers;
 
 [Area("Admin")]
 [Route("admin")]
-[Authorize(Policy = "StoreAdminPolicy")]
+[Authorize(Policy = AuthorizationPolicies.RequireStoreAdmin)]
 public class DashboardController : Controller
 {
     [HttpGet("")]

@@ -39,7 +39,7 @@ public static class DbInitializer
             }
 
             // Seed roles
-            var roles = new[] { Roles.SuperAdmin, Roles.StoreAdmin, Roles.VendorAdmin, Roles.Customer };
+            var roles = new[] { Roles.SuperAdmin, Roles.StoreAdmin, Roles.Vendor, Roles.Customer };
             
             foreach (var roleName in roles)
             {

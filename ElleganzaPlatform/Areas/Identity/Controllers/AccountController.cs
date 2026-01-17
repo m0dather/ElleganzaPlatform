@@ -248,8 +248,8 @@ public class AccountController : Controller
                 return View(model);
             }
 
-            // Assign VendorAdmin role
-            await _userManager.AddToRoleAsync(user, Roles.VendorAdmin);
+            // Assign Vendor role
+            await _userManager.AddToRoleAsync(user, Roles.Vendor);
 
             // Create vendor entity
             var vendor = new Domain.Entities.Vendor
@@ -358,8 +358,9 @@ public class AccountController : Controller
             }
         }
 
-        // Add VendorId claim for VendorAdmin
-        if (roles.Contains(Roles.VendorAdmin))
+        // Add VendorId claim for Vendor role
+        // Note: VendorAdmin entity is a join table, separate from the Vendor role
+        if (roles.Contains(Roles.Vendor))
         {
             var vendorAdmin = await _context.VendorAdmins
                 .Where(va => va.UserId == user.Id && va.IsActive)

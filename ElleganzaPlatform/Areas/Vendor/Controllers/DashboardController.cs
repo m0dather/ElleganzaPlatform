@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,7 +6,7 @@ namespace ElleganzaPlatform.Areas.Vendor.Controllers;
 
 [Area("Vendor")]
 [Route("Vendor")]
-[Authorize(Policy = "VendorPolicy")]
+[Authorize(Policy = AuthorizationPolicies.RequireVendor)]
 public class DashboardController : Controller
 {
     [HttpGet("")]

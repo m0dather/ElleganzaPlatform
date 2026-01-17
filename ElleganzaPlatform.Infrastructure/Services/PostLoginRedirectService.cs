@@ -26,7 +26,7 @@ public class PostLoginRedirectService : IPostLoginRedirectService
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        // Role priority: SuperAdmin > StoreAdmin > VendorAdmin > Customer
+        // Role priority: SuperAdmin > StoreAdmin > Vendor > Customer
         // SuperAdmin → /super-admin
         if (roles.Contains(Roles.SuperAdmin))
             return "/super-admin";
@@ -35,8 +35,8 @@ public class PostLoginRedirectService : IPostLoginRedirectService
         if (roles.Contains(Roles.StoreAdmin))
             return "/admin";
 
-        // VendorAdmin → /vendor
-        if (roles.Contains(Roles.VendorAdmin))
+        // Vendor → /vendor
+        if (roles.Contains(Roles.Vendor))
             return "/vendor";
 
         // Customer → /account

@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationHandler, StoreAdminAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, VendorAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, CustomerAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, SameStoreAuthorizationHandler>();
 
         return services;
     }

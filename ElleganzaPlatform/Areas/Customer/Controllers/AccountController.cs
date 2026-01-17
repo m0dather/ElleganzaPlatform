@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,7 +6,7 @@ namespace ElleganzaPlatform.Areas.Customer.Controllers;
 
 [Area("Customer")]
 [Route("Account")]
-[Authorize(Policy = "CustomerPolicy")]
+[Authorize(Policy = AuthorizationPolicies.RequireCustomer)]
 public class AccountController : Controller
 {
     [HttpGet("")]
