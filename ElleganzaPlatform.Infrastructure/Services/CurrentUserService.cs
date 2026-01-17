@@ -42,7 +42,7 @@ public class CurrentUserService : ICurrentUserService
 
     public bool IsStoreAdmin => IsInRole("StoreAdmin");
 
-    public bool IsVendorAdmin => IsInRole("VendorAdmin");
+    public bool IsVendorAdmin => IsInRole("Vendor");
 
     public bool IsCustomer => IsInRole("Customer");
 }
