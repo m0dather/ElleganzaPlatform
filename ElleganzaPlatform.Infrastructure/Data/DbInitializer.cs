@@ -1,6 +1,7 @@
 using ElleganzaPlatform.Domain.Entities;
 using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -12,10 +13,31 @@ public static class DbInitializer
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var logger = serviceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
 
         try
         {
+            // Seed default store
+            if (!await context.Stores.AnyAsync())
+            {
+                var demoStore = new Store
+                {
+                    Code = "demo",
+                    Name = "Elleganza Demo Store",
+                    NameAr = "متجر إليجانزا التجريبي",
+                    Description = "The default Ecomus themed store for ElleganzaPlatform",
+                    DescriptionAr = "المتجر الافتراضي بتصميم Ecomus لمنصة إليجانزا",
+                    IsActive = true,
+                    IsDefault = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                context.Stores.Add(demoStore);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Demo store seeded successfully with code: demo");
+            }
+
             // Seed roles
             var roles = new[] { Roles.SuperAdmin, Roles.StoreAdmin, Roles.VendorAdmin, Roles.Customer };
             

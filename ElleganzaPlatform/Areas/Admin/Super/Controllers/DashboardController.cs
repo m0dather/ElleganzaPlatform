@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ElleganzaPlatform.Areas.Admin.Super.Controllers;
 
 [Area("Admin")]
-[Route("Admin/Super")]
+[Route("super-admin")]
 [Authorize(Policy = "SuperAdminPolicy")]
 public class DashboardController : Controller
 {

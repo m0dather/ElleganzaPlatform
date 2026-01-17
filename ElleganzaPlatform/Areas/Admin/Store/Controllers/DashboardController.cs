@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ElleganzaPlatform.Areas.Admin.Store.Controllers;
 
 [Area("Admin")]
-[Route("Admin/Store")]
+[Route("admin")]
 [Authorize(Policy = "StoreAdminPolicy")]
 public class DashboardController : Controller
 {

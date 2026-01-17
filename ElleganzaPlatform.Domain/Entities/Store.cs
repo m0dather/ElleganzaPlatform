@@ -4,6 +4,7 @@ namespace ElleganzaPlatform.Domain.Entities;
 
 public class Store : BaseEntity
 {
+    public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string NameAr { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -11,6 +12,7 @@ public class Store : BaseEntity
     public string? Logo { get; set; }
     public string? Domain { get; set; }
     public bool IsActive { get; set; }
+    public bool IsDefault { get; set; }
     public string? SeoTitle { get; set; }
     public string? SeoDescription { get; set; }
     public string? SeoKeywords { get; set; }
