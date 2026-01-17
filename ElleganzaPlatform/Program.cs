@@ -6,6 +6,7 @@ using ElleganzaPlatform.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.FileProviders;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews()
     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
     .AddDataAnnotationsLocalization();
+
+// Configure Razor view engine to use theme-based view locations
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+    options.ViewLocationExpanders.Add(new ThemeViewLocationExpander());
+});
 
 // Localization
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -113,7 +120,37 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Configure static files from default wwwroot
 app.UseStaticFiles();
+
+// Configure static files from theme folders
+// This allows serving assets from:
+// - /Themes/Store/Ecomus/wwwroot
+// - /Themes/Admin/Metronic/wwwroot
+var themesPath = Path.Combine(builder.Environment.ContentRootPath, "Themes");
+if (Directory.Exists(themesPath))
+{
+    var themeDirectories = new[]
+    {
+        Path.Combine(themesPath, "Store", "Ecomus", "wwwroot"),
+        Path.Combine(themesPath, "Admin", "Metronic", "wwwroot")
+    };
+
+    var fileProviders = themeDirectories
+        .Where(Directory.Exists)
+        .Select(path => new PhysicalFileProvider(path) as IFileProvider)
+        .ToList();
+
+    if (fileProviders.Any())
+    {
+        var compositeProvider = new CompositeFileProvider(fileProviders);
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = compositeProvider
+        });
+    }
+}
 
 // Localization middleware
 app.UseRequestLocalization();
