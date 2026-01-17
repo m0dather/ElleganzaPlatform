@@ -10,6 +10,13 @@ public class StoreConfiguration : IEntityTypeConfiguration<Store>
     {
         builder.HasKey(s => s.Id);
         
+        builder.Property(s => s.Code)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.HasIndex(s => s.Code)
+            .IsUnique();
+        
         builder.Property(s => s.Name)
             .IsRequired()
             .HasMaxLength(200);

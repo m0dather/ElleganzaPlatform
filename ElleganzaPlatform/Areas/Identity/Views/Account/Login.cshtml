@@ -1,0 +1,55 @@
+@model ElleganzaPlatform.Areas.Identity.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">Login to Elleganza</h2>
+                    
+                    <form asp-action="Login" method="post">
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="UserNameOrEmail" class="form-label"></label>
+                            <input asp-for="UserNameOrEmail" class="form-control" placeholder="Enter username or email" />
+                            <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" placeholder="Enter password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                            <label asp-for="RememberMe" class="form-check-label"></label>
+                        </div>
+                        
+                        <input type="hidden" asp-for="ReturnUrl" />
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-2">
+                                Don't have an account?
+                            </p>
+                            <a asp-action="RegisterCustomer" class="btn btn-outline-secondary btn-sm me-2">Register as Customer</a>
+                            <a asp-action="RegisterVendor" class="btn btn-outline-success btn-sm">Register as Vendor</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
