@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ElleganzaPlatform.Areas.Customer.Controllers;
 
 [Area("Customer")]
-[Route("Account")]
+[Route("account")]
 [Authorize(Policy = AuthorizationPolicies.RequireCustomer)]
 public class AccountController : Controller
 {
