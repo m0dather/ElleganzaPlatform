@@ -247,10 +247,22 @@ Claims are added after successful login in `AccountController.AddCustomClaimsAsy
 ### ❌ DON'T
 
 - Use `[Authorize(Roles = "...")]` attributes
-- Hardcode role checks in controllers or views
 - Implement authorization logic in controllers
-- Check roles directly in Razor views
 - Bypass policies with custom authorization logic
+
+### ⚠️ IMPORTANT: Views and UI Navigation
+
+**Authorization vs UI Display:**
+- **Authorization** (security): Enforced at controller level using policies - NEVER bypass
+- **UI Navigation** (UX): Role checks in views are acceptable ONLY for showing/hiding navigation links
+
+**Example**: The `_Layout.cshtml` contains `User.IsInRole()` checks to display appropriate dashboard links. This is acceptable because:
+1. It's for user experience only (showing relevant navigation)
+2. Actual authorization is enforced at the controller level
+3. Users cannot bypass authorization by manually navigating to URLs
+4. Controllers still enforce policies via `[Authorize(Policy = ...)]`
+
+**Security Principle**: Even if a user sees a link or manually navigates to a URL, the controller's policy enforcement will deny unauthorized access.
 
 ## Example Controller
 
