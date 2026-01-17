@@ -1,49 +1,119 @@
 using ElleganzaPlatform.Application.Common;
 using ElleganzaPlatform.Domain.Entities;
-using ElleganzaPlatform.Infrastructure.Authorization;
+using ElleganzaPlatform.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace ElleganzaPlatform.Infrastructure.Services;
 
 /// <summary>
-/// Centralized service for determining post-login redirect URLs based on user roles
-/// Implements role priority: SuperAdmin > StoreAdmin > VendorAdmin > Customer
+/// Centralized service for determining post-login redirect URLs based on user roles and store context.
+/// Implements role priority resolution: SuperAdmin > StoreAdmin > Vendor > Customer
 /// </summary>
 public class PostLoginRedirectService : IPostLoginRedirectService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IRolePriorityResolver _rolePriorityResolver;
+    private readonly IStoreContextService _storeContextService;
+    private readonly ILogger<PostLoginRedirectService> _logger;
 
-    public PostLoginRedirectService(UserManager<ApplicationUser> userManager)
+    public PostLoginRedirectService(
+        UserManager<ApplicationUser> userManager,
+        IRolePriorityResolver rolePriorityResolver,
+        IStoreContextService storeContextService,
+        ILogger<PostLoginRedirectService> logger)
     {
         _userManager = userManager;
+        _rolePriorityResolver = rolePriorityResolver;
+        _storeContextService = storeContextService;
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Determines redirect URL by userId. Loads user and roles, then delegates to overload.
+    /// </summary>
+    /// <param name="userId">The authenticated user ID</param>
+    /// <returns>The redirect URL based on user's primary role</returns>
     public async Task<string> GetRedirectUrlAsync(string userId)
     {
+        // Find user
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            return "/";
+        {
+            _logger.LogWarning("User with ID {UserId} not found during redirect resolution", userId);
+            return Authorization.DashboardRoutes.Default;
+        }
 
+        // Get user roles
         var roles = await _userManager.GetRolesAsync(user);
 
-        // Role priority: SuperAdmin > StoreAdmin > Vendor > Customer
-        // SuperAdmin → /super-admin
-        if (roles.Contains(Roles.SuperAdmin))
-            return "/super-admin";
+        // Delegate to overload with full context
+        return await GetRedirectUrlAsync(user, roles);
+    }
 
-        // StoreAdmin → /admin
-        if (roles.Contains(Roles.StoreAdmin))
-            return "/admin";
+    /// <summary>
+    /// Determines redirect URL with full user and role context.
+    /// Uses RolePriorityResolver to determine primary role, then maps to dashboard route.
+    /// Handles edge cases: inactive users, no roles, store context validation.
+    /// </summary>
+    /// <param name="user">The authenticated ApplicationUser</param>
+    /// <param name="roles">The user's roles collection</param>
+    /// <returns>The redirect URL based on user's primary role</returns>
+    public async Task<string> GetRedirectUrlAsync(ApplicationUser user, IEnumerable<string> roles)
+    {
+        // Edge Case: User not active
+        if (!user.IsActive)
+        {
+            _logger.LogWarning("Inactive user {UserId} attempted to login", user.Id);
+            return Authorization.DashboardRoutes.Login;
+        }
 
-        // Vendor → /vendor
-        if (roles.Contains(Roles.Vendor))
-            return "/vendor";
+        // Resolve primary role using RolePriorityResolver
+        var primaryRole = _rolePriorityResolver.ResolvePrimaryRole(roles);
 
-        // Customer → /account
-        if (roles.Contains(Roles.Customer))
-            return "/account";
+        // Edge Case: User authenticated but has no recognized roles
+        if (primaryRole == PrimaryRole.None)
+        {
+            _logger.LogWarning("User {UserId} has no recognized roles, denying access", user.Id);
+            return Authorization.DashboardRoutes.AccessDenied;
+        }
 
-        // Default fallback to storefront
-        return "/";
+        // SuperAdmin bypass: No store validation needed
+        if (primaryRole == PrimaryRole.SuperAdmin)
+        {
+            _logger.LogInformation("SuperAdmin {UserId} redirected to {Route}", user.Id, Authorization.DashboardRoutes.SuperAdmin);
+            return Authorization.DashboardRoutes.SuperAdmin;
+        }
+
+        // For StoreAdmin and Vendor: Validate store context
+        if (primaryRole == PrimaryRole.StoreAdmin || primaryRole == PrimaryRole.Vendor)
+        {
+            var currentStoreId = await _storeContextService.GetCurrentStoreIdAsync();
+            if (!currentStoreId.HasValue)
+            {
+                _logger.LogWarning("User {UserId} with role {Role} has no valid store context", user.Id, primaryRole);
+                return Authorization.DashboardRoutes.AccessDenied;
+            }
+        }
+
+        // Get dashboard route from resolver
+        var redirectUrl = _rolePriorityResolver.GetDashboardRouteForRole(primaryRole);
+
+        _logger.LogInformation("User {UserId} with primary role {PrimaryRole} redirected to {Route}", 
+            user.Id, primaryRole, redirectUrl);
+
+        return redirectUrl;
+    }
+
+    /// <summary>
+    /// Gets the redirect URL for a specific primary role.
+    /// Direct delegation to RolePriorityResolver for route mapping.
+    /// </summary>
+    /// <param name="primaryRole">The primary role</param>
+    /// <returns>The dashboard URL for the role</returns>
+    public string GetRedirectUrlForRole(PrimaryRole primaryRole)
+    {
+        return _rolePriorityResolver.GetDashboardRouteForRole(primaryRole);
     }
 }
+
