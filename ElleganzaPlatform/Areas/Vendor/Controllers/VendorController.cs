@@ -7,7 +7,11 @@ namespace ElleganzaPlatform.Areas.Vendor.Controllers;
 [Area("Vendor")]
 [Route("vendor")]
 [Authorize(Policy = AuthorizationPolicies.RequireVendor)]
-public class DashboardController : Controller
+/// <summary>
+/// Vendor dashboard controller.
+/// Enforces RequireVendor policy - accessible to Vendor (own vendor) and SuperAdmin (all vendors).
+/// </summary>
+public class VendorController : Controller
 {
     [HttpGet("")]
     [HttpGet("Dashboard")]
