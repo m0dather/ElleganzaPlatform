@@ -20,4 +20,8 @@
     <ProjectReference Include="..\ElleganzaPlatform.Domain\ElleganzaPlatform.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Themes\Admin\Metronic\wwwroot\assets\" />
+  </ItemGroup>
+
 </Project>
