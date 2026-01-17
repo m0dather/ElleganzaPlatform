@@ -43,8 +43,8 @@ public class VendorAuthorizationHandler : AuthorizationHandler<VendorRequirement
             return Task.CompletedTask;
         }
 
-        // Check if user has Vendor role (using IsInRole for flexibility)
-        if (_currentUserService.IsInRole(Roles.Vendor))
+        // Check if user has Vendor role (using IsVendorAdmin property which checks for Vendor role)
+        if (_currentUserService.IsVendorAdmin)
         {
             // Verify user has a VendorId claim
             if (_currentUserService.VendorId.HasValue)
