@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,7 +6,7 @@ namespace ElleganzaPlatform.Areas.Admin.Super.Controllers;
 
 [Area("Admin")]
 [Route("super-admin")]
-[Authorize(Policy = "SuperAdminPolicy")]
+[Authorize(Policy = AuthorizationPolicies.RequireSuperAdmin)]
 public class DashboardController : Controller
 {
     [HttpGet("")]
