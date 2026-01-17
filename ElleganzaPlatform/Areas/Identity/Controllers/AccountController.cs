@@ -13,7 +13,6 @@ using SystemClaim = System.Security.Claims.Claim;
 namespace ElleganzaPlatform.Areas.Identity.Controllers;
 
 [Area("Identity")]
-[Route("Identity/Account")]
 public class AccountController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -41,7 +40,7 @@ public class AccountController : Controller
 
     #region Login
 
-    [HttpGet("Login")]
+    [HttpGet("/login")]
     [AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
@@ -54,7 +53,7 @@ public class AccountController : Controller
         return View(model);
     }
 
-    [HttpPost("Login")]
+    [HttpPost("/login")]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
@@ -129,7 +128,7 @@ public class AccountController : Controller
 
     #region Customer Registration
 
-    [HttpGet("RegisterCustomer")]
+    [HttpGet("/register")]
     [AllowAnonymous]
     public IActionResult RegisterCustomer()
     {
@@ -141,7 +140,7 @@ public class AccountController : Controller
         return View();
     }
 
-    [HttpPost("RegisterCustomer")]
+    [HttpPost("/register")]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RegisterCustomer(CustomerRegisterViewModel model)
@@ -191,7 +190,7 @@ public class AccountController : Controller
 
     #region Vendor Registration
 
-    [HttpGet("RegisterVendor")]
+    [HttpGet("/register/vendor")]
     [AllowAnonymous]
     public IActionResult RegisterVendor()
     {
@@ -203,7 +202,7 @@ public class AccountController : Controller
         return View();
     }
 
-    [HttpPost("RegisterVendor")]
+    [HttpPost("/register/vendor")]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RegisterVendor(VendorRegisterViewModel model)
@@ -309,7 +308,7 @@ public class AccountController : Controller
 
     #region Logout
 
-    [HttpPost("Logout")]
+    [HttpPost("/logout")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
@@ -322,7 +321,7 @@ public class AccountController : Controller
 
     #region Access Denied
 
-    [HttpGet("AccessDenied")]
+    [HttpGet("/access-denied")]
     public IActionResult AccessDenied()
     {
         return View();
