@@ -1,3 +1,6 @@
 <Solution>
   <Project Path="ElleganzaPlatform/ElleganzaPlatform.csproj" />
+  <Project Path="ElleganzaPlatform.Domain/ElleganzaPlatform.Domain.csproj" />
+  <Project Path="ElleganzaPlatform.Application/ElleganzaPlatform.Application.csproj" />
+  <Project Path="ElleganzaPlatform.Infrastructure/ElleganzaPlatform.Infrastructure.csproj" />
 </Solution>
