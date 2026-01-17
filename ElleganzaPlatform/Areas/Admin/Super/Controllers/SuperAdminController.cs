@@ -7,7 +7,11 @@ namespace ElleganzaPlatform.Areas.Admin.Super.Controllers;
 [Area("Admin")]
 [Route("super-admin")]
 [Authorize(Policy = AuthorizationPolicies.RequireSuperAdmin)]
-public class DashboardController : Controller
+/// <summary>
+/// SuperAdmin dashboard controller.
+/// Enforces RequireSuperAdmin policy - only accessible to users with SuperAdmin role.
+/// </summary>
+public class SuperAdminController : Controller
 {
     [HttpGet("")]
     [HttpGet("Dashboard")]

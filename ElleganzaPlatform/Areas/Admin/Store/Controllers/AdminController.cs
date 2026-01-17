@@ -7,7 +7,11 @@ namespace ElleganzaPlatform.Areas.Admin.Store.Controllers;
 [Area("Admin")]
 [Route("admin")]
 [Authorize(Policy = AuthorizationPolicies.RequireStoreAdmin)]
-public class DashboardController : Controller
+/// <summary>
+/// Store Admin dashboard controller.
+/// Enforces RequireStoreAdmin policy - accessible to StoreAdmin (own store) and SuperAdmin (all stores).
+/// </summary>
+public class AdminController : Controller
 {
     [HttpGet("")]
     [HttpGet("Dashboard")]
