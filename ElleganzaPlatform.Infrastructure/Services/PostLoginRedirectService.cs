@@ -1,6 +1,7 @@
 using ElleganzaPlatform.Application.Common;
 using ElleganzaPlatform.Domain.Entities;
 using ElleganzaPlatform.Domain.Enums;
+using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -41,7 +42,7 @@ public class PostLoginRedirectService : IPostLoginRedirectService
         if (user == null)
         {
             _logger.LogWarning("User with ID {UserId} not found during redirect resolution", userId);
-            return Authorization.DashboardRoutes.Default;
+            return DashboardRoutes.Default;
         }
 
         // Get user roles
@@ -65,7 +66,7 @@ public class PostLoginRedirectService : IPostLoginRedirectService
         if (!user.IsActive)
         {
             _logger.LogWarning("Inactive user {UserId} attempted to login", user.Id);
-            return Authorization.DashboardRoutes.Login;
+            return DashboardRoutes.Login;
         }
 
         // Resolve primary role using RolePriorityResolver
@@ -75,14 +76,14 @@ public class PostLoginRedirectService : IPostLoginRedirectService
         if (primaryRole == PrimaryRole.None)
         {
             _logger.LogWarning("User {UserId} has no recognized roles, denying access", user.Id);
-            return Authorization.DashboardRoutes.AccessDenied;
+            return DashboardRoutes.AccessDenied;
         }
 
         // SuperAdmin bypass: No store validation needed
         if (primaryRole == PrimaryRole.SuperAdmin)
         {
-            _logger.LogInformation("SuperAdmin {UserId} redirected to {Route}", user.Id, Authorization.DashboardRoutes.SuperAdmin);
-            return Authorization.DashboardRoutes.SuperAdmin;
+            _logger.LogInformation("SuperAdmin {UserId} redirected to {Route}", user.Id, DashboardRoutes.SuperAdmin);
+            return DashboardRoutes.SuperAdmin;
         }
 
         // For StoreAdmin and Vendor: Validate store context
@@ -92,7 +93,7 @@ public class PostLoginRedirectService : IPostLoginRedirectService
             if (!currentStoreId.HasValue)
             {
                 _logger.LogWarning("User {UserId} with role {Role} has no valid store context", user.Id, primaryRole);
-                return Authorization.DashboardRoutes.AccessDenied;
+                return DashboardRoutes.AccessDenied;
             }
         }
 
