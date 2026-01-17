@@ -197,12 +197,12 @@ namespace ElleganzaPlatform.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StoreId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    OrderNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TaxAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ShippingAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TaxAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ShippingAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ShippingAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BillingAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -382,9 +382,9 @@ namespace ElleganzaPlatform.Infrastructure.Migrations
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductSku = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    VendorCommission = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    VendorCommission = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -454,9 +454,9 @@ namespace ElleganzaPlatform.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItems_OrderId",
+                name: "IX_OrderItems_OrderId_ProductId",
                 table: "OrderItems",
-                column: "OrderId");
+                columns: new[] { "OrderId", "ProductId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_ProductId",
@@ -469,9 +469,15 @@ namespace ElleganzaPlatform.Infrastructure.Migrations
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_StoreId",
+                name: "IX_Orders_OrderNumber",
                 table: "Orders",
-                column: "StoreId");
+                column: "OrderNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_StoreId_UserId",
+                table: "Orders",
+                columns: new[] { "StoreId", "UserId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",

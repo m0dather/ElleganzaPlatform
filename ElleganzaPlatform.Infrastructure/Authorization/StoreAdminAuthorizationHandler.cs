@@ -23,7 +23,7 @@ public class StoreAdminAuthorizationHandler : AuthorizationHandler<StoreAdminReq
         // StoreAdmin must have StoreId claim
         if (context.User.IsInRole(Roles.StoreAdmin))
         {
-            var storeIdClaim = context.User.FindFirst(ClaimTypes.StoreId);
+            var storeIdClaim = context.User.FindFirst(Authorization.ClaimTypes.StoreId);
             if (storeIdClaim != null && int.TryParse(storeIdClaim.Value, out var userStoreId))
             {
                 // If a specific store is required, check it matches

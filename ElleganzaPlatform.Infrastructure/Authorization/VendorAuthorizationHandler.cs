@@ -23,7 +23,7 @@ public class VendorAuthorizationHandler : AuthorizationHandler<VendorRequirement
         // VendorAdmin must have VendorId claim
         if (context.User.IsInRole(Roles.VendorAdmin))
         {
-            var vendorIdClaim = context.User.FindFirst(ClaimTypes.VendorId);
+            var vendorIdClaim = context.User.FindFirst(Authorization.ClaimTypes.VendorId);
             if (vendorIdClaim != null && int.TryParse(vendorIdClaim.Value, out var userVendorId))
             {
                 // If a specific vendor is required, check it matches
