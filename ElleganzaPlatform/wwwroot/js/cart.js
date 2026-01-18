@@ -164,7 +164,8 @@
                         const $row = $('[data-product-id="' + productId + '"]');
                         if ($row.length) {
                             const $priceElement = $row.find('.tf-cart-item_price .price');
-                            const priceText = $priceElement.text().replace(/[^0-9.]/g, ''); // Remove all non-numeric chars except decimal
+                            // Remove all non-numeric chars except decimal and comma, then remove commas for parsing
+                            const priceText = $priceElement.text().replace(/[^0-9.,-]/g, '').replace(/,/g, '');
                             const unitPrice = parseFloat(priceText) || 0;
                             const itemTotal = unitPrice * quantity;
                             const currencySymbol = $priceElement.text().match(/[^\d\s.,-]/)?.[0] || '$'; // Extract currency symbol
@@ -251,7 +252,11 @@
          * Update cart totals on page
          */
         updateCartTotals: function (data) {
-            const currencySymbol = '$'; // TODO: Make this configurable or read from page
+            // Try to extract currency symbol from existing price elements, fallback to $
+            const existingPriceElement = $('.price, .tf-totals-total-value').first();
+            const currencySymbol = existingPriceElement.length ? 
+                (existingPriceElement.text().match(/[^\d\s.,-]/)?.[0] || '$') : '$';
+            
             if (data.subTotal !== undefined) {
                 $('.tf-totals-total-value.subtotal').text(currencySymbol + data.subTotal.toFixed(2));
             }
