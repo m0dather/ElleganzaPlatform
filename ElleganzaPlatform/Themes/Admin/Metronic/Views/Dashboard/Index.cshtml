@@ -1,1 +1,286 @@
-@* Metronic Admin Dashboard Page Placeholder *@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageTitle"] = "Dashboard";
+    ViewData["Breadcrumb"] = @"
+        <ul class=""breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1"">
+            <li class=""breadcrumb-item text-muted"">
+                <a href=""" + Url.Action("Index", "Dashboard") + @""" class=""text-muted text-hover-primary"">Home</a>
+            </li>
+            <li class=""breadcrumb-item"">
+                <span class=""bullet bg-gray-500 w-5px h-2px""></span>
+            </li>
+            <li class=""breadcrumb-item text-muted"">Dashboards</li>
+        </ul>
+    ";
+}
+
+<!--begin::Row-->
+<div class="row g-5 gx-xl-10 mb-5 mb-xl-10">
+	<!--begin::Col-->
+	<div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+		<!--begin::Card widget 20-->
+		<div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-md-50 mb-5 mb-xl-10" style="background-color: #F1416C;background-image:url('~/assets/media/patterns/vector-1.png')">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Amount-->
+					<span class="fs-2hx fw-bold text-white me-2 lh-1 ls-n2">156</span>
+					<!--end::Amount-->
+					<!--begin::Subtitle-->
+					<span class="text-white opacity-75 pt-1 fw-semibold fs-6">Total Customers</span>
+					<!--end::Subtitle-->
+				</div>
+				<!--end::Title-->
+			</div>
+			<!--end::Header-->
+			<!--begin::Card body-->
+			<div class="card-body d-flex align-items-end pt-0">
+				<!--begin::Progress-->
+				<div class="d-flex align-items-center flex-column mt-3 w-100">
+					<div class="d-flex justify-content-between fw-bold fs-6 text-white opacity-75 w-100 mt-auto mb-2">
+						<span>43 New This Month</span>
+						<span>28%</span>
+					</div>
+					<div class="h-8px mx-3 w-100 bg-white bg-opacity-50 rounded">
+						<div class="bg-white rounded h-8px" role="progressbar" style="width: 28%;" aria-valuenow="28" aria-valuemin="0" aria-valuemax="100"></div>
+					</div>
+				</div>
+				<!--end::Progress-->
+			</div>
+			<!--end::Card body-->
+		</div>
+		<!--end::Card widget 20-->
+		<!--begin::Card widget 7-->
+		<div class="card card-flush h-md-50 mb-5 mb-xl-10">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Amount-->
+					<span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">89</span>
+					<!--end::Amount-->
+					<!--begin::Subtitle-->
+					<span class="text-gray-500 pt-1 fw-semibold fs-6">Active Orders</span>
+					<!--end::Subtitle-->
+				</div>
+				<!--end::Title-->
+			</div>
+			<!--end::Header-->
+			<!--begin::Card body-->
+			<div class="card-body d-flex flex-column justify-content-end pe-0">
+				<!--begin::Title-->
+				<span class="fs-6 fw-bolder text-gray-800 d-block mb-2">Recent Activity</span>
+				<!--end::Title-->
+				<!--begin::Stats-->
+				<div class="d-flex align-items-center">
+					<span class="text-gray-600 pt-1 fw-semibold fs-7">15 orders processed today</span>
+				</div>
+				<!--end::Stats-->
+			</div>
+			<!--end::Card body-->
+		</div>
+		<!--end::Card widget 7-->
+	</div>
+	<!--end::Col-->
+	<!--begin::Col-->
+	<div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
+		<!--begin::Card widget 17-->
+		<div class="card card-flush h-md-50 mb-5 mb-xl-10">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Info-->
+					<div class="d-flex align-items-center">
+						<!--begin::Currency-->
+						<span class="fs-4 fw-semibold text-gray-500 me-1 align-self-start">$</span>
+						<!--end::Currency-->
+						<!--begin::Amount-->
+						<span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">24,500</span>
+						<!--end::Amount-->
+						<!--begin::Badge-->
+						<span class="badge badge-light-success fs-base">
+						<i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
+							<span class="path1"></span>
+							<span class="path2"></span>
+						</i>12.5%</span>
+						<!--end::Badge-->
+					</div>
+					<!--end::Info-->
+					<!--begin::Subtitle-->
+					<span class="text-gray-500 pt-1 fw-semibold fs-6">Monthly Revenue</span>
+					<!--end::Subtitle-->
+				</div>
+				<!--end::Title-->
+			</div>
+			<!--end::Header-->
+			<!--begin::Card body-->
+			<div class="card-body pt-2 pb-4 d-flex flex-wrap align-items-center">
+				<!--begin::Labels-->
+				<div class="d-flex flex-column content-justify-center flex-row-fluid">
+					<!--begin::Label-->
+					<div class="d-flex fw-semibold align-items-center">
+						<!--begin::Bullet-->
+						<div class="bullet w-8px h-3px rounded-2 bg-success me-3"></div>
+						<!--end::Bullet-->
+						<!--begin::Label-->
+						<div class="text-gray-500 flex-grow-1 me-4">Subscriptions</div>
+						<!--end::Label-->
+						<!--begin::Stats-->
+						<div class="fw-bolder text-gray-700 text-xxl-end">$12,500</div>
+						<!--end::Stats-->
+					</div>
+					<!--end::Label-->
+					<!--begin::Label-->
+					<div class="d-flex fw-semibold align-items-center my-3">
+						<!--begin::Bullet-->
+						<div class="bullet w-8px h-3px rounded-2 bg-primary me-3"></div>
+						<!--end::Bullet-->
+						<!--begin::Label-->
+						<div class="text-gray-500 flex-grow-1 me-4">Orders</div>
+						<!--end::Label-->
+						<!--begin::Stats-->
+						<div class="fw-bolder text-gray-700 text-xxl-end">$8,200</div>
+						<!--end::Stats-->
+					</div>
+					<!--end::Label-->
+					<!--begin::Label-->
+					<div class="d-flex fw-semibold align-items-center">
+						<!--begin::Bullet-->
+						<div class="bullet w-8px h-3px rounded-2 me-3" style="background-color: #E4E6EF"></div>
+						<!--end::Bullet-->
+						<!--begin::Label-->
+						<div class="text-gray-500 flex-grow-1 me-4">Others</div>
+						<!--end::Label-->
+						<!--begin::Stats-->
+						<div class="fw-bolder text-gray-700 text-xxl-end">$3,800</div>
+						<!--end::Stats-->
+					</div>
+					<!--end::Label-->
+				</div>
+				<!--end::Labels-->
+			</div>
+			<!--end::Card body-->
+		</div>
+		<!--end::Card widget 17-->
+		<!--begin::Card widget 8-->
+		<div class="card card-flush h-md-50 mb-xl-10">
+			<!--begin::Header-->
+			<div class="card-header pt-5">
+				<!--begin::Title-->
+				<div class="card-title d-flex flex-column">
+					<!--begin::Amount-->
+					<span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">1,836</span>
+					<!--end::Amount-->
+					<!--begin::Subtitle-->
+					<span class="text-gray-500 pt-1 fw-semibold fs-6">Total Invoices</span>
+					<!--end::Subtitle-->
+				</div>
+				<!--end::Title-->
+			</div>
+			<!--end::Header-->
+			<!--begin::Card body-->
+			<div class="card-body d-flex align-items-end px-0 pb-0">
+				<!--begin::Stats-->
+				<div class="d-flex align-items-center flex-column mt-3 w-100">
+					<div class="d-flex justify-content-between w-100 mt-auto mb-2">
+						<span class="fw-bolder fs-6 text-gray-900">Paid</span>
+						<span class="fw-bold fs-6 text-gray-500">1,645</span>
+					</div>
+					<div class="d-flex justify-content-between w-100 mt-auto mb-2">
+						<span class="fw-bolder fs-6 text-gray-900">Pending</span>
+						<span class="fw-bold fs-6 text-gray-500">191</span>
+					</div>
+				</div>
+				<!--end::Stats-->
+			</div>
+			<!--end::Card body-->
+		</div>
+		<!--end::Card widget 8-->
+	</div>
+	<!--end::Col-->
+	<!--begin::Col-->
+	<div class="col-xxl-6">
+		<!--begin::Table Widget 5-->
+		<div class="card card-flush h-xl-100">
+			<!--begin::Card header-->
+			<div class="card-header pt-7">
+				<!--begin::Title-->
+				<h3 class="card-title align-items-start flex-column">
+					<span class="card-label fw-bold text-gray-800">Recent Orders</span>
+					<span class="text-gray-500 mt-1 fw-semibold fs-6">Latest customer orders</span>
+				</h3>
+				<!--end::Title-->
+				<!--begin::Actions-->
+				<div class="card-toolbar">
+					<a href="@Url.Action("Index", "Orders")" class="btn btn-sm btn-light">View All</a>
+				</div>
+				<!--end::Actions-->
+			</div>
+			<!--end::Card header-->
+			<!--begin::Card body-->
+			<div class="card-body">
+				<!--begin::Table-->
+				<table class="table align-middle table-row-dashed fs-6 gy-3" id="kt_table_widget_5_table">
+					<!--begin::Table head-->
+					<thead>
+						<!--begin::Table row-->
+						<tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+							<th class="min-w-100px">Order ID</th>
+							<th class="text-end min-w-100px">Customer</th>
+							<th class="text-end min-w-125px">Amount</th>
+							<th class="text-end min-w-100px">Status</th>
+							<th class="text-end min-w-100px">Date</th>
+						</tr>
+						<!--end::Table row-->
+					</thead>
+					<!--end::Table head-->
+					<!--begin::Table body-->
+					<tbody class="fw-bold text-gray-600">
+						<tr>
+							<td>
+								<a href="#" class="text-gray-900 text-hover-primary">#ORD-001234</a>
+							</td>
+							<td class="text-end">John Doe</td>
+							<td class="text-end">$250.00</td>
+							<td class="text-end">
+								<span class="badge badge-light-success">Completed</span>
+							</td>
+							<td class="text-end">@DateTime.Now.AddDays(-2).ToString("MMM dd, yyyy")</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#" class="text-gray-900 text-hover-primary">#ORD-001233</a>
+							</td>
+							<td class="text-end">Jane Smith</td>
+							<td class="text-end">$180.50</td>
+							<td class="text-end">
+								<span class="badge badge-light-warning">Pending</span>
+							</td>
+							<td class="text-end">@DateTime.Now.AddDays(-3).ToString("MMM dd, yyyy")</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#" class="text-gray-900 text-hover-primary">#ORD-001232</a>
+							</td>
+							<td class="text-end">Mike Johnson</td>
+							<td class="text-end">$425.75</td>
+							<td class="text-end">
+								<span class="badge badge-light-success">Completed</span>
+							</td>
+							<td class="text-end">@DateTime.Now.AddDays(-5).ToString("MMM dd, yyyy")</td>
+						</tr>
+					</tbody>
+					<!--end::Table body-->
+				</table>
+				<!--end::Table-->
+			</div>
+			<!--end::Card body-->
+		</div>
+		<!--end::Table Widget 5-->
+	</div>
+	<!--end::Col-->
+</div>
+<!--end::Row-->

@@ -14,10 +14,10 @@ namespace ElleganzaPlatform.Areas.Admin.Store.Controllers;
 public class AdminController : Controller
 {
     [HttpGet("")]
-    [HttpGet("Dashboard")]
     public IActionResult Index()
     {
-        return View();
+        // Redirect to Dashboard
+        return RedirectToAction("Index", "Dashboard");
     }
 
     [HttpGet("Settings")]
