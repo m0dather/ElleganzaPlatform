@@ -183,8 +183,8 @@
 						<!--end:Menu item-->
 					}
 
-					@* Vendor-specific menu (if user is a Vendor) *@
-					@if (MenuAuth.CanShowVendorDashboard && !MenuAuth.CanShowStoreAdminDashboard)
+					@* Vendor-specific menu (if user is a Vendor without admin privileges) *@
+					@if (MenuAuth.CanShowVendorOnlyDashboard)
 					{
 						<!--begin:Menu item-->
 						<div class="menu-item pt-5">

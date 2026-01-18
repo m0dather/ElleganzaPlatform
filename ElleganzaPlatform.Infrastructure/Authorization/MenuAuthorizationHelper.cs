@@ -22,6 +22,7 @@ public class MenuAuthorizationHelper
     private readonly Lazy<bool> _canShowAdminDashboard;
     private readonly Lazy<bool> _canShowStoreAdminDashboard;
     private readonly Lazy<bool> _canShowSuperAdminDashboard;
+    private readonly Lazy<bool> _canShowVendorOnlyDashboard;
 
     public MenuAuthorizationHelper(
         IAuthorizationService authorizationService,
@@ -37,6 +38,7 @@ public class MenuAuthorizationHelper
         _canShowAdminDashboard = new Lazy<bool>(CheckCanShowAdminDashboard);
         _canShowStoreAdminDashboard = new Lazy<bool>(CheckCanShowStoreAdminDashboard);
         _canShowSuperAdminDashboard = new Lazy<bool>(CheckCanShowSuperAdminDashboard);
+        _canShowVendorOnlyDashboard = new Lazy<bool>(CheckCanShowVendorOnlyDashboard);
     }
 
     /// <summary>
@@ -87,6 +89,13 @@ public class MenuAuthorizationHelper
     /// </summary>
     public bool CanShowSuperAdminDashboard => _canShowSuperAdminDashboard.Value;
 
+    /// <summary>
+    /// Checks if Vendor-only dashboard (without admin privileges) should be shown.
+    /// Returns true if user is a Vendor but NOT a StoreAdmin or SuperAdmin.
+    /// This encapsulates the logic for showing vendor-specific menus in isolation.
+    /// </summary>
+    public bool CanShowVendorOnlyDashboard => _canShowVendorOnlyDashboard.Value;
+
     private bool CheckIsAuthenticated()
     {
         return _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
@@ -94,22 +103,12 @@ public class MenuAuthorizationHelper
 
     private bool CheckCanShowCustomerMenu()
     {
-        if (!IsAuthenticated) return false;
-
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null) return false;
-
-        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireCustomer);
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireCustomer);
     }
 
     private bool CheckCanShowVendorDashboard()
     {
-        if (!IsAuthenticated) return false;
-
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null) return false;
-
-        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireVendor);
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireVendor);
     }
 
     private bool CheckCanShowAdminDashboard()
@@ -126,24 +125,34 @@ public class MenuAuthorizationHelper
 
     private bool CheckCanShowStoreAdminDashboard()
     {
-        if (!IsAuthenticated) return false;
-
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null) return false;
-
         // Check if user is StoreAdmin (SuperAdmin implicitly passes due to StoreAdminRequirement logic)
-        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireStoreAdmin);
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireStoreAdmin);
     }
 
     private bool CheckCanShowSuperAdminDashboard()
+    {
+        // Check if user is SuperAdmin ONLY
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireSuperAdmin);
+    }
+
+    private bool CheckCanShowVendorOnlyDashboard()
+    {
+        // Vendor-only dashboard should show only if user is Vendor but NOT an Admin
+        return CanShowVendorDashboard && !CanShowStoreAdminDashboard;
+    }
+
+    /// <summary>
+    /// Helper method that performs common authentication and context validation before checking a policy.
+    /// Reduces code duplication across check methods.
+    /// </summary>
+    private bool CheckPolicyWithValidation(string policyName)
     {
         if (!IsAuthenticated) return false;
 
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null) return false;
 
-        // Check if user is SuperAdmin ONLY
-        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireSuperAdmin);
+        return CheckPolicySync(httpContext.User, policyName);
     }
 
     /// <summary>
