@@ -1,6 +1,8 @@
+using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SysClaims = System.Security.Claims;
 
 namespace ElleganzaPlatform.Areas.Customer.Controllers;
 
@@ -13,31 +15,56 @@ namespace ElleganzaPlatform.Areas.Customer.Controllers;
 /// </summary>
 public class AccountController : Controller
 {
+    private readonly ICustomerService _customerService;
+
+    public AccountController(ICustomerService customerService)
+    {
+        _customerService = customerService;
+    }
+
     /// <summary>
     /// Customer account dashboard/overview
     /// </summary>
     [HttpGet("")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var userId = User.FindFirst(SysClaims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var model = await _customerService.GetCustomerAccountAsync(userId);
+        return View(model);
     }
 
     /// <summary>
     /// Customer order history
     /// </summary>
     [HttpGet("orders")]
-    public IActionResult Orders()
+    public async Task<IActionResult> Orders(int page = 1)
     {
-        return View();
+        var userId = User.FindFirst(SysClaims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var model = await _customerService.GetCustomerOrdersAsync(userId, page);
+        return View(model);
     }
 
     /// <summary>
     /// Customer order details
     /// </summary>
     [HttpGet("orders/{id}")]
-    public IActionResult OrderDetails(int id)
+    public async Task<IActionResult> OrderDetails(int id)
     {
-        return View();
+        var userId = User.FindFirst(SysClaims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var model = await _customerService.GetOrderDetailsAsync(id, userId);
+        if (model == null)
+            return NotFound();
+
+        return View(model);
     }
 
     /// <summary>

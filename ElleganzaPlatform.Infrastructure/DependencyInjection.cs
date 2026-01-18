@@ -1,9 +1,11 @@
 using ElleganzaPlatform.Application.Common;
+using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Domain.Interfaces;
 using ElleganzaPlatform.Infrastructure.Authorization;
 using ElleganzaPlatform.Infrastructure.Data;
 using ElleganzaPlatform.Infrastructure.Repositories;
 using ElleganzaPlatform.Infrastructure.Services;
+using ElleganzaPlatform.Infrastructure.Services.Application;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +35,14 @@ public static class DependencyInjection
         services.AddScoped<IRolePriorityResolver, RolePriorityResolver>();
         services.AddScoped<IPostLoginRedirectService, PostLoginRedirectService>();
         services.AddScoped<IThemeContext, ThemeContext>();
+
+        // Application Services
+        services.AddScoped<IStoreService, StoreService>();
+        services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+        services.AddScoped<IAdminCustomerService, AdminCustomerService>();
+        services.AddScoped<IAdminOrderService, AdminOrderService>();
+        services.AddScoped<IAdminProductService, AdminProductService>();
 
         // Authorization Handlers
         services.AddScoped<IAuthorizationHandler, SuperAdminAuthorizationHandler>();
