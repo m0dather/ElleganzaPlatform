@@ -24,7 +24,6 @@ public class DashboardController : Controller
     /// Main dashboard view with statistics and charts
     /// </summary>
     [HttpGet("")]
-    [HttpGet("index")]
     public IActionResult Index()
     {
         return View();
