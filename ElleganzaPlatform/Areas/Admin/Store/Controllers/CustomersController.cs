@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,18 +15,36 @@ namespace ElleganzaPlatform.Areas.Admin.Store.Controllers;
 public class CustomersController : Controller
 {
     private readonly ILogger<CustomersController> _logger;
+    private readonly IAdminCustomerService _customerService;
 
-    public CustomersController(ILogger<CustomersController> logger)
+    public CustomersController(
+        ILogger<CustomersController> logger,
+        IAdminCustomerService customerService)
     {
         _logger = logger;
+        _customerService = customerService;
     }
 
     /// <summary>
     /// Customer list view
     /// </summary>
     [HttpGet("")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        return View();
+        var model = await _customerService.GetCustomersAsync(page);
+        return View(model);
+    }
+
+    /// <summary>
+    /// Customer details view
+    /// </summary>
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Details(string id)
+    {
+        var model = await _customerService.GetCustomerDetailsAsync(id);
+        if (model == null)
+            return NotFound();
+
+        return View(model);
     }
 }

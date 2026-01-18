@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,18 +15,23 @@ namespace ElleganzaPlatform.Areas.Admin.Store.Controllers;
 public class DashboardController : Controller
 {
     private readonly ILogger<DashboardController> _logger;
+    private readonly IAdminDashboardService _dashboardService;
 
-    public DashboardController(ILogger<DashboardController> logger)
+    public DashboardController(
+        ILogger<DashboardController> logger,
+        IAdminDashboardService dashboardService)
     {
         _logger = logger;
+        _dashboardService = dashboardService;
     }
 
     /// <summary>
     /// Main dashboard view with statistics and charts
     /// </summary>
     [HttpGet("")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var model = await _dashboardService.GetDashboardDataAsync();
+        return View(model);
     }
 }

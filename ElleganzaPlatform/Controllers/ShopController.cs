@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ElleganzaPlatform.Controllers;
@@ -9,28 +10,40 @@ namespace ElleganzaPlatform.Controllers;
 public class ShopController : Controller
 {
     private readonly ILogger<ShopController> _logger;
+    private readonly IStoreService _storeService;
 
-    public ShopController(ILogger<ShopController> logger)
+    public ShopController(
+        ILogger<ShopController> logger,
+        IStoreService storeService)
     {
         _logger = logger;
+        _storeService = storeService;
     }
 
     /// <summary>
     /// Shop index page - Shows product listings/brands
     /// </summary>
     [HttpGet("/shop")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        return View();
+        var model = await _storeService.GetShopPageDataAsync(page);
+        return View(model);
     }
 
     /// <summary>
     /// Product details page
     /// </summary>
     [HttpGet("/shop/product/{id?}")]
-    public IActionResult Product(int? id)
+    public async Task<IActionResult> Product(int? id)
     {
-        return View();
+        if (!id.HasValue)
+            return NotFound();
+
+        var model = await _storeService.GetProductDetailsAsync(id.Value);
+        if (model == null)
+            return NotFound();
+
+        return View(model);
     }
 
     /// <summary>
