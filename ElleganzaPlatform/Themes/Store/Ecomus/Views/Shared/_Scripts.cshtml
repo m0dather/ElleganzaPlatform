@@ -28,4 +28,24 @@
         };
 
         var AUTOHIDE = Boolean(0);
+
+        // Initialize cart count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+
+        // Function to fetch and update cart count
+        function updateCartCount() {
+            fetch('/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    const cartCountElements = document.querySelectorAll('.nav-cart .count-box');
+                    cartCountElements.forEach(el => {
+                        el.textContent = data.count || 0;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching cart count:', error);
+                });
+        }
     </script>
