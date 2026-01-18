@@ -197,7 +197,8 @@ public class CartService : ICartService
             if (existingItem != null)
             {
                 // Update quantity (take the maximum or sum, depending on business rules)
-                // Here we sum the quantities
+                // Business Rule: Sum quantities from guest and user carts
+                // This allows users to continue shopping as guest and keep their progress
                 var product = await _context.Products
                     .Where(p => p.Id == guestItem.ProductId && !p.IsDeleted)
                     .FirstOrDefaultAsync();
@@ -205,7 +206,7 @@ public class CartService : ICartService
                 if (product != null)
                 {
                     var newQuantity = existingItem.Quantity + guestItem.Quantity;
-                    // Ensure we don't exceed stock
+                    // Business Rule: Never exceed available stock
                     existingItem.Quantity = Math.Min(newQuantity, product.StockQuantity);
                     existingItem.UpdatedAt = DateTime.UtcNow;
                 }
@@ -223,6 +224,7 @@ public class CartService : ICartService
                     {
                         CartId = userCart.Id,
                         ProductId = product.Id,
+                        // Business Rule: Cap quantity at available stock
                         Quantity = Math.Min(guestItem.Quantity, product.StockQuantity),
                         PriceSnapshot = product.Price,
                         VendorId = product.VendorId,
