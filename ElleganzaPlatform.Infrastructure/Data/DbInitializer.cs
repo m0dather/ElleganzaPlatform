@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using CustomClaimTypes = ElleganzaPlatform.Infrastructure.Authorization.ClaimTypes;
 
 namespace ElleganzaPlatform.Infrastructure.Data;
 
@@ -139,7 +140,7 @@ public static class DbInitializer
                     
                     // Add StoreId claim for Store Admin
                     await userManager.AddClaimAsync(storeAdminUser, 
-                        new Claim(ElleganzaPlatform.Infrastructure.Authorization.ClaimTypes.StoreId, demoStore.Id.ToString()));
+                        new Claim(CustomClaimTypes.StoreId, demoStore.Id.ToString()));
                     
                     // Create StoreAdmin entity to link user with store
                     var storeAdmin = new StoreAdmin
@@ -221,7 +222,7 @@ public static class DbInitializer
                     
                     // Add VendorId claim for Vendor user
                     await userManager.AddClaimAsync(vendorUser, 
-                        new Claim(ElleganzaPlatform.Infrastructure.Authorization.ClaimTypes.VendorId, demoVendor.Id.ToString()));
+                        new Claim(CustomClaimTypes.VendorId, demoVendor.Id.ToString()));
                     
                     logger.LogInformation($"✅ Vendor user created: {vendorEmail}");
                     logger.LogInformation($"✅ Vendor entity created with ID: {demoVendor.Id}");
