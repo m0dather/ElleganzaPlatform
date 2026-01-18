@@ -20,6 +20,9 @@ public class MenuAuthorizationHelper
     private readonly Lazy<bool> _canShowCustomerMenu;
     private readonly Lazy<bool> _canShowVendorDashboard;
     private readonly Lazy<bool> _canShowAdminDashboard;
+    private readonly Lazy<bool> _canShowStoreAdminDashboard;
+    private readonly Lazy<bool> _canShowSuperAdminDashboard;
+    private readonly Lazy<bool> _canShowVendorOnlyDashboard;
 
     public MenuAuthorizationHelper(
         IAuthorizationService authorizationService,
@@ -33,6 +36,9 @@ public class MenuAuthorizationHelper
         _canShowCustomerMenu = new Lazy<bool>(CheckCanShowCustomerMenu);
         _canShowVendorDashboard = new Lazy<bool>(CheckCanShowVendorDashboard);
         _canShowAdminDashboard = new Lazy<bool>(CheckCanShowAdminDashboard);
+        _canShowStoreAdminDashboard = new Lazy<bool>(CheckCanShowStoreAdminDashboard);
+        _canShowSuperAdminDashboard = new Lazy<bool>(CheckCanShowSuperAdminDashboard);
+        _canShowVendorOnlyDashboard = new Lazy<bool>(CheckCanShowVendorOnlyDashboard);
     }
 
     /// <summary>
@@ -41,10 +47,16 @@ public class MenuAuthorizationHelper
     public bool IsAuthenticated => _isAuthenticated.Value;
 
     /// <summary>
-    /// Checks if Login/Register links should be shown.
+    /// Checks if Login link should be shown.
     /// Returns true if user is NOT authenticated (guest user).
     /// </summary>
     public bool CanShowLogin => !IsAuthenticated;
+
+    /// <summary>
+    /// Checks if Register link should be shown.
+    /// Returns true if user is NOT authenticated (guest user).
+    /// </summary>
+    public bool CanShowRegister => !IsAuthenticated;
 
     /// <summary>
     /// Checks if Customer menu items (Account, Orders) should be shown.
@@ -59,10 +71,30 @@ public class MenuAuthorizationHelper
     public bool CanShowVendorDashboard => _canShowVendorDashboard.Value;
 
     /// <summary>
-    /// Checks if Admin Dashboard link should be shown.
+    /// Checks if Admin Dashboard link should be shown (generic - for both StoreAdmin and SuperAdmin).
     /// Returns true if user is authenticated and authorized with RequireStoreAdmin or RequireSuperAdmin policy.
     /// </summary>
     public bool CanShowAdminDashboard => _canShowAdminDashboard.Value;
+
+    /// <summary>
+    /// Checks if StoreAdmin-specific menu items should be shown.
+    /// Returns true if user is authenticated and authorized with RequireStoreAdmin policy.
+    /// SuperAdmin users will also pass this check (implicit bypass in StoreAdminRequirement).
+    /// </summary>
+    public bool CanShowStoreAdminDashboard => _canShowStoreAdminDashboard.Value;
+
+    /// <summary>
+    /// Checks if SuperAdmin-specific menu items should be shown.
+    /// Returns true ONLY if user is authenticated and authorized with RequireSuperAdmin policy.
+    /// </summary>
+    public bool CanShowSuperAdminDashboard => _canShowSuperAdminDashboard.Value;
+
+    /// <summary>
+    /// Checks if Vendor-only dashboard (without admin privileges) should be shown.
+    /// Returns true if user is a Vendor but NOT a StoreAdmin or SuperAdmin.
+    /// This encapsulates the logic for showing vendor-specific menus in isolation.
+    /// </summary>
+    public bool CanShowVendorOnlyDashboard => _canShowVendorOnlyDashboard.Value;
 
     private bool CheckIsAuthenticated()
     {
@@ -71,22 +103,12 @@ public class MenuAuthorizationHelper
 
     private bool CheckCanShowCustomerMenu()
     {
-        if (!IsAuthenticated) return false;
-
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null) return false;
-
-        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireCustomer);
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireCustomer);
     }
 
     private bool CheckCanShowVendorDashboard()
     {
-        if (!IsAuthenticated) return false;
-
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null) return false;
-
-        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireVendor);
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireVendor);
     }
 
     private bool CheckCanShowAdminDashboard()
@@ -99,6 +121,48 @@ public class MenuAuthorizationHelper
         // Check if user is StoreAdmin or SuperAdmin
         return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireStoreAdmin) ||
                CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireSuperAdmin);
+    }
+
+    private bool CheckCanShowStoreAdminDashboard()
+    {
+        // Check if user is StoreAdmin (SuperAdmin implicitly passes due to StoreAdminRequirement logic)
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireStoreAdmin);
+    }
+
+    private bool CheckCanShowSuperAdminDashboard()
+    {
+        // Check if user is SuperAdmin ONLY
+        return CheckPolicyWithValidation(AuthorizationPolicies.RequireSuperAdmin);
+    }
+
+    private bool CheckCanShowVendorOnlyDashboard()
+    {
+        // Vendor-only dashboard should show only if user is Vendor but NOT an Admin
+        // Perform direct policy checks to avoid circular lazy evaluation
+        if (!IsAuthenticated) return false;
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) return false;
+
+        // Must be a Vendor but not a StoreAdmin
+        bool isVendor = CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireVendor);
+        bool isStoreAdmin = CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireStoreAdmin);
+
+        return isVendor && !isStoreAdmin;
+    }
+
+    /// <summary>
+    /// Helper method that performs common authentication and context validation before checking a policy.
+    /// Reduces code duplication across check methods.
+    /// </summary>
+    private bool CheckPolicyWithValidation(string policyName)
+    {
+        if (!IsAuthenticated) return false;
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) return false;
+
+        return CheckPolicySync(httpContext.User, policyName);
     }
 
     /// <summary>
