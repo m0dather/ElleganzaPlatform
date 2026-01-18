@@ -51,6 +51,9 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationHandler, CustomerAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, SameStoreAuthorizationHandler>();
 
+        // Authorization Helpers (for Razor views)
+        services.AddScoped<MenuAuthorizationHelper>();
+
         return services;
     }
 }
