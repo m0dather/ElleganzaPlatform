@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
-using CustomClaimTypes = ElleganzaPlatform.Infrastructure.Authorization.ClaimTypes;
 
 namespace ElleganzaPlatform.Infrastructure.Data;
 
@@ -140,7 +139,7 @@ public static class DbInitializer
                     
                     // Add StoreId claim for Store Admin
                     await userManager.AddClaimAsync(storeAdminUser, 
-                        new Claim(CustomClaimTypes.StoreId, demoStore.Id.ToString()));
+                        new Claim(Authorization.ClaimTypes.StoreId, demoStore.Id.ToString()));
                     
                     // Create StoreAdmin entity to link user with store
                     var storeAdmin = new StoreAdmin
@@ -222,7 +221,7 @@ public static class DbInitializer
                     
                     // Add VendorId claim for Vendor user
                     await userManager.AddClaimAsync(vendorUser, 
-                        new Claim(CustomClaimTypes.VendorId, demoVendor.Id.ToString()));
+                        new Claim(Authorization.ClaimTypes.VendorId, demoVendor.Id.ToString()));
                     
                     logger.LogInformation($"✅ Vendor user created: {vendorEmail}");
                     logger.LogInformation($"✅ Vendor entity created with ID: {demoVendor.Id}");
@@ -281,7 +280,7 @@ public static class DbInitializer
             }
 
             // ==================================================
-            // 5️⃣ SEED PRODUCTS
+            // 4️⃣ SEED PRODUCTS
             // ==================================================
             // Only seed products if vendor exists and no products exist yet
             if (demoVendor != null && !await context.Products.AnyAsync())
@@ -376,7 +375,7 @@ public static class DbInitializer
             }
 
             // ==================================================
-            // 6️⃣ SEED SAMPLE ORDER (Optional but Recommended)
+            // 5️⃣ SEED SAMPLE ORDER (Optional but Recommended)
             // ==================================================
             // Only seed order if customer and products exist, and no orders exist yet
             if (customerUser != null && demoVendor != null)
