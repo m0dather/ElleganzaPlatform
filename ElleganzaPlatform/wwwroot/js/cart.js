@@ -27,7 +27,10 @@
                 e.preventDefault();
                 const $btn = $(this);
                 const productId = $btn.data('product-id');
-                const quantity = $btn.closest('form, .product-form').find('input[name="number"]').val() || 1;
+                // Try multiple selector patterns for quantity input
+                const $form = $btn.closest('form, .product-form, .tf-product-info-buy-button').parent();
+                const $quantityInput = $form.find('input[name="number"], input.quantity-product, input[type="text"]').first();
+                const quantity = $quantityInput.length ? parseInt($quantityInput.val()) || 1 : 1;
 
                 if (!productId) {
                     console.error('Product ID is required to add to cart');
@@ -160,9 +163,12 @@
                         // Update item total
                         const $row = $('[data-product-id="' + productId + '"]');
                         if ($row.length) {
-                            const unitPrice = parseFloat($row.find('.tf-cart-item_price .price').text().replace('$', ''));
+                            const $priceElement = $row.find('.tf-cart-item_price .price');
+                            const priceText = $priceElement.text().replace(/[^0-9.]/g, ''); // Remove all non-numeric chars except decimal
+                            const unitPrice = parseFloat(priceText) || 0;
                             const itemTotal = unitPrice * quantity;
-                            $row.find('.tf-cart-item_total .price').text('$' + itemTotal.toFixed(2));
+                            const currencySymbol = $priceElement.text().match(/[^\d\s.,-]/)?.[0] || '$'; // Extract currency symbol
+                            $row.find('.tf-cart-item_total .price').text(currencySymbol + itemTotal.toFixed(2));
                         }
                     } else {
                         self.showMessage(response.message || 'Failed to update cart', 'error');
@@ -245,17 +251,18 @@
          * Update cart totals on page
          */
         updateCartTotals: function (data) {
+            const currencySymbol = '$'; // TODO: Make this configurable or read from page
             if (data.subTotal !== undefined) {
-                $('.tf-totals-total-value.subtotal').text('$' + data.subTotal.toFixed(2));
+                $('.tf-totals-total-value.subtotal').text(currencySymbol + data.subTotal.toFixed(2));
             }
             if (data.taxAmount !== undefined) {
-                $('.tf-totals-total-value.tax').text('$' + data.taxAmount.toFixed(2));
+                $('.tf-totals-total-value.tax').text(currencySymbol + data.taxAmount.toFixed(2));
             }
             if (data.shippingAmount !== undefined) {
-                $('.tf-totals-total-value.shipping').text('$' + data.shippingAmount.toFixed(2));
+                $('.tf-totals-total-value.shipping').text(currencySymbol + data.shippingAmount.toFixed(2));
             }
             if (data.totalAmount !== undefined) {
-                $('.tf-totals-total-value.total').text('$' + data.totalAmount.toFixed(2));
+                $('.tf-totals-total-value.total').text(currencySymbol + data.totalAmount.toFixed(2));
             }
         },
 
