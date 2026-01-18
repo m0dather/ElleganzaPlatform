@@ -1,6 +1,20 @@
+@model ElleganzaPlatform.Application.ViewModels.Store.ProductDetailsViewModel
 @{
     Layout = "_Layout";
-    ViewBag.Title = "Product Details";
+    ViewBag.Title = Model?.Name ?? "Product Details";
+    
+    // Ensure model is not null
+    if (Model == null)
+    {
+        <div class="container mt-5 mb-5">
+            <div class="alert alert-warning">
+                <h4>Product not found</h4>
+                <p>The product you are looking for does not exist or has been removed.</p>
+                <a href="/shop" class="btn btn-primary">Return to Shop</a>
+            </div>
+        </div>
+        return;
+    }
 }
 
         <!-- /Header -->
@@ -355,19 +369,32 @@
                                 <div class="tf-zoom-main"></div>
                                 <div class="tf-product-info-list other-image-zoom">
                                     <div class="tf-product-info-title">
-                                        <h5>Cotton jersey top</h5>
+                                        <h5>@Model.Name</h5>
                                     </div>
                                     <div class="tf-product-info-badges">
-                                        <div class="badges">Best seller</div>
-                                        <div class="product-status-content">
-                                            <i class="icon-lightning"></i>
-                                            <p class="fw-6">Selling fast! 56 people have this in their carts.</p>
-                                        </div>
+                                        @if (Model.IsInStock)
+                                        {
+                                            <div class="badges">In Stock</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="badges bg-danger">Out of Stock</div>
+                                        }
                                     </div>
                                     <div class="tf-product-info-price">
-                                        <div class="price-on-sale">$8.00</div>
-                                        <div class="compare-at-price">$30.00</div>
-                                        <div class="badges-on-sale"><span>20</span>% OFF</div>
+                                        @if (Model.CompareAtPrice.HasValue && Model.CompareAtPrice > Model.Price)
+                                        {
+                                            <div class="price-on-sale">$@Model.Price.ToString("F2")</div>
+                                            <div class="compare-at-price">$@Model.CompareAtPrice.Value.ToString("F2")</div>
+                                            @if (Model.DiscountPercentage.HasValue)
+                                            {
+                                                <div class="badges-on-sale"><span>@Model.DiscountPercentage.Value</span>% OFF</div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="price-on-sale">$@Model.Price.ToString("F2")</div>
+                                        }
                                     </div>
                                     <div class="tf-product-info-liveview">
                                         <div class="liveview-count">20</div>
@@ -458,11 +485,11 @@
                                         </div>
                                     </div>
                                     <div class="tf-product-info-buy-button">
-                                        <form class="">
-                                            <a href="#"
+                                        <form class="product-form">
+                                            <a href="#" data-product-id="@Model.Id"
                                                 class="tf-btn btn-fill justify-content-center fw-6 fs-16 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Add
                                                     to cart -&nbsp;</span><span
-                                                    class="tf-qty-price total-price">$8.00</span></a>
+                                                    class="tf-qty-price total-price">$@Model.Price.ToString("F2")</span></a>
                                             <a href="#"
                                                 class="tf-product-btn-wishlist hover-tooltip box-icon bg_white wishlist btn-icon-action">
                                                 <span class="icon icon-heart"></span>
@@ -595,7 +622,7 @@
                                             <span class="btn-quantity plus-btn">+</span>
                                         </div>
                                     </div>
-                                    <a href="#"
+                                    <a href="#" data-product-id="@Model.Id"
                                         class="tf-btn btn-fill radius-3 justify-content-center fw-6 fs-14 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Add
                                             to cart</a>
                                 </div>
