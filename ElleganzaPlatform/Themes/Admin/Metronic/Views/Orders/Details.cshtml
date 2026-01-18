@@ -1,0 +1,248 @@
+@model ElleganzaPlatform.Application.ViewModels.Admin.AdminOrderDetailsViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Order Details";
+    ViewData["PageTitle"] = "Order Details";
+    ViewData["Breadcrumb"] = @"
+        <ul class=""breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1"">
+            <li class=""breadcrumb-item text-muted"">
+                <a href=""" + Url.Action("Index", "Dashboard") + @""" class=""text-muted text-hover-primary"">Home</a>
+            </li>
+            <li class=""breadcrumb-item"">
+                <span class=""bullet bg-gray-500 w-5px h-2px""></span>
+            </li>
+            <li class=""breadcrumb-item text-muted"">
+                <a href=""" + Url.Action("Index", "Orders") + @""" class=""text-muted text-hover-primary"">Orders</a>
+            </li>
+            <li class=""breadcrumb-item"">
+                <span class=""bullet bg-gray-500 w-5px h-2px""></span>
+            </li>
+            <li class=""breadcrumb-item text-muted"">" + Model.OrderNumber + @"</li>
+        </ul>
+    ";
+}
+
+<!--begin::Layout-->
+<div class="d-flex flex-column gap-7 gap-lg-10">
+    <!--begin::Order summary-->
+    <div class="card card-flush py-4">
+        <!--begin::Card header-->
+        <div class="card-header">
+            <div class="card-title">
+                <h2>Order @Model.OrderNumber</h2>
+            </div>
+            <div class="card-toolbar">
+                @{
+                    var statusClass = Model.Status switch
+                    {
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Pending => "badge-light-warning",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Processing => "badge-light-info",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Shipped => "badge-light-primary",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Delivered => "badge-light-success",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Cancelled => "badge-light-danger",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Refunded => "badge-light-dark",
+                        _ => "badge-light-secondary"
+                    };
+                }
+                <span class="badge @statusClass fs-5 fw-bold">@Model.StatusDisplay</span>
+            </div>
+        </div>
+        <!--end::Card header-->
+        <!--begin::Card body-->
+        <div class="card-body pt-0">
+            <div class="d-flex flex-column gap-5">
+                <!--begin::Order details-->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="fw-semibold text-gray-600 mb-2">Order Date:</div>
+                        <div class="fw-bold text-gray-800 fs-6">@Model.CreatedAt.ToString("MMMM dd, yyyy")</div>
+                        <div class="text-gray-600 fs-7">@Model.CreatedAt.ToString("hh:mm tt")</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="fw-semibold text-gray-600 mb-2">Customer:</div>
+                        <div class="fw-bold text-gray-800 fs-6">@Model.CustomerName</div>
+                        <div class="text-gray-600 fs-7">@Model.CustomerEmail</div>
+                    </div>
+                </div>
+                <!--end::Order details-->
+            </div>
+        </div>
+        <!--end::Card body-->
+    </div>
+    <!--end::Order summary-->
+
+    <!--begin::Order items-->
+    <div class="card card-flush py-4">
+        <!--begin::Card header-->
+        <div class="card-header">
+            <div class="card-title">
+                <h3>Order Items</h3>
+            </div>
+        </div>
+        <!--end::Card header-->
+        <!--begin::Card body-->
+        <div class="card-body pt-0">
+            <div class="table-responsive">
+                <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5">
+                    <thead>
+                        <tr class="border-bottom fs-6 fw-bold text-gray-600">
+                            <th class="min-w-175px">Product</th>
+                            <th class="min-w-100px">SKU</th>
+                            <th class="min-w-100px">Vendor</th>
+                            <th class="min-w-70px text-end">Qty</th>
+                            <th class="min-w-100px text-end">Unit Price</th>
+                            <th class="min-w-100px text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fw-semibold text-gray-600">
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="ms-0">
+                                            <div class="fw-bold text-gray-800">@item.ProductName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-gray-600">@item.ProductSku</span>
+                                </td>
+                                <td>
+                                    <span class="text-gray-600">@item.VendorName</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge badge-light-primary">@item.Quantity</span>
+                                </td>
+                                <td class="text-end">
+                                    $@item.UnitPrice.ToString("N2")
+                                </td>
+                                <td class="text-end fw-bold text-gray-800">
+                                    $@item.TotalPrice.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+                        <!--begin::Subtotal-->
+                        <tr>
+                            <td colspan="5" class="text-end fw-bold text-gray-700">Subtotal</td>
+                            <td class="text-end fw-bold text-gray-800">$@Model.SubTotal.ToString("N2")</td>
+                        </tr>
+                        <!--end::Subtotal-->
+                        <!--begin::Tax-->
+                        <tr>
+                            <td colspan="5" class="text-end fw-bold text-gray-700">Tax</td>
+                            <td class="text-end fw-bold text-gray-800">$@Model.TaxAmount.ToString("N2")</td>
+                        </tr>
+                        <!--end::Tax-->
+                        <!--begin::Shipping-->
+                        <tr>
+                            <td colspan="5" class="text-end fw-bold text-gray-700">Shipping</td>
+                            <td class="text-end fw-bold text-gray-800">$@Model.ShippingAmount.ToString("N2")</td>
+                        </tr>
+                        <!--end::Shipping-->
+                        <!--begin::Total-->
+                        <tr>
+                            <td colspan="5" class="text-end fw-bold text-gray-800 fs-4">Total</td>
+                            <td class="text-end fw-bold text-gray-800 fs-4">$@Model.TotalAmount.ToString("N2")</td>
+                        </tr>
+                        <!--end::Total-->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--end::Card body-->
+    </div>
+    <!--end::Order items-->
+
+    <!--begin::Addresses-->
+    <div class="row g-7">
+        <!--begin::Shipping address-->
+        <div class="col-md-6">
+            <div class="card card-flush py-4 h-100">
+                <!--begin::Card header-->
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3>Shipping Address</h3>
+                    </div>
+                </div>
+                <!--end::Card header-->
+                <!--begin::Card body-->
+                <div class="card-body pt-0">
+                    <div class="text-gray-600 fs-6 fw-semibold">@Html.Raw(Model.ShippingAddress.Replace("\n", "<br />"))</div>
+                </div>
+                <!--end::Card body-->
+            </div>
+        </div>
+        <!--end::Shipping address-->
+        <!--begin::Billing address-->
+        <div class="col-md-6">
+            <div class="card card-flush py-4 h-100">
+                <!--begin::Card header-->
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3>Billing Address</h3>
+                    </div>
+                </div>
+                <!--end::Card header-->
+                <!--begin::Card body-->
+                <div class="card-body pt-0">
+                    <div class="text-gray-600 fs-6 fw-semibold">@Html.Raw(Model.BillingAddress.Replace("\n", "<br />"))</div>
+                </div>
+                <!--end::Card body-->
+            </div>
+        </div>
+        <!--end::Billing address-->
+    </div>
+    <!--end::Addresses-->
+
+    @if (!string.IsNullOrWhiteSpace(Model.CustomerNotes))
+    {
+        <!--begin::Customer notes-->
+        <div class="card card-flush py-4">
+            <!--begin::Card header-->
+            <div class="card-header">
+                <div class="card-title">
+                    <h3>Customer Notes</h3>
+                </div>
+            </div>
+            <!--end::Card header-->
+            <!--begin::Card body-->
+            <div class="card-body pt-0">
+                <div class="text-gray-600 fs-6">@Model.CustomerNotes</div>
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Customer notes-->
+    }
+
+    <!--begin::Actions-->
+    <div class="d-flex justify-content-start">
+        <a href="@Url.Action("Index", "Orders")" class="btn btn-light btn-active-light-primary me-3">
+            <i class="ki-duotone ki-arrow-left fs-2">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </i>
+            Back to Orders
+        </a>
+        <button type="button" class="btn btn-primary me-3">
+            <i class="ki-duotone ki-printer fs-2">
+                <span class="path1"></span>
+                <span class="path2"></span>
+                <span class="path3"></span>
+                <span class="path4"></span>
+                <span class="path5"></span>
+            </i>
+            Print Invoice
+        </button>
+        <button type="button" class="btn btn-light-primary">
+            <i class="ki-duotone ki-send fs-2">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </i>
+            Email Customer
+        </button>
+    </div>
+    <!--end::Actions-->
+</div>
+<!--end::Layout-->

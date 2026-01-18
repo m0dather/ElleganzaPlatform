@@ -1,3 +1,4 @@
+@model ElleganzaPlatform.Application.ViewModels.Store.CustomerOrdersViewModel
 @{
     Layout = "_Layout";
     ViewBag.Title = "My Orders";
@@ -32,80 +33,84 @@
                     <div class="col-lg-9">
                         <div class="my-account-content account-order">
                             <div class="wrap-account-order">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th class="fw-6">Order</th>
-                                            <th class="fw-6">Date</th>
-                                            <th class="fw-6">Status</th>
-                                            <th class="fw-6">Total</th>
-                                            <th class="fw-6">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="tf-order-item">
-                                            <td>
-                                                #123
-                                            </td>
-                                            <td>
-                                                August 1, 2024
-                                            </td>
-                                            <td>
-                                                On hold
-                                            </td>
-                                            <td>
-                                                $200.0 for 1 items
-                                            </td>
-                                            <td>
-                                                <a href="@Url.Action("OrderDetails", "Account")"
-                                                    class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
-                                                    <span>View</span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr class="tf-order-item">
-                                            <td>
-                                                #345
-                                            </td>
-                                            <td>
-                                                August 2, 2024
-                                            </td>
-                                            <td>
-                                                On hold
-                                            </td>
-                                            <td>
-                                                $300.0 for 1 items
-                                            </td>
-                                            <td>
-                                                <a href="@Url.Action("OrderDetails", "Account")"
-                                                    class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
-                                                    <span>View</span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr class="tf-order-item">
-                                            <td>
-                                                #567
-                                            </td>
-                                            <td>
-                                                August 3, 2024
-                                            </td>
-                                            <td>
-                                                On hold
-                                            </td>
-                                            <td>
-                                                $400.0 for 1 items
-                                            </td>
-                                            <td>
-                                                <a href="@Url.Action("OrderDetails", "Account")"
-                                                    class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
-                                                    <span>View</span>
-                                                </a>
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-                                </table>
+                                @if (Model.Orders.Any())
+                                {
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th class="fw-6">Order</th>
+                                                <th class="fw-6">Date</th>
+                                                <th class="fw-6">Status</th>
+                                                <th class="fw-6">Total</th>
+                                                <th class="fw-6">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var order in Model.Orders)
+                                            {
+                                                <tr class="tf-order-item">
+                                                    <td>
+                                                        @order.OrderNumber
+                                                    </td>
+                                                    <td>
+                                                        @order.CreatedAt.ToString("MMM dd, yyyy")
+                                                    </td>
+                                                    <td>
+                                                        @order.Status
+                                                    </td>
+                                                    <td>
+                                                        $@order.TotalAmount.ToString("F2") for @order.ItemCount item@(order.ItemCount != 1 ? "s" : "")
+                                                    </td>
+                                                    <td>
+                                                        <a href="/account/orders/@order.Id"
+                                                            class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
+                                                            <span>View</span>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                    @if (Model.TotalPages > 1)
+                                    {
+                                        <div class="tf-pagination-wrap view-more-button text-center">
+                                            <ul class="tf-pagination-list">
+                                                @if (Model.CurrentPage > 1)
+                                                {
+                                                    <li>
+                                                        <a href="@Url.Action("Orders", "Account", new { page = Model.CurrentPage - 1 })" class="pagination-link">
+                                                            <i class="icon-arrow-left"></i>
+                                                        </a>
+                                                    </li>
+                                                }
+                                                @for (int i = 1; i <= Model.TotalPages; i++)
+                                                {
+                                                    <li>
+                                                        <a href="@Url.Action("Orders", "Account", new { page = i })" 
+                                                           class="pagination-link @(i == Model.CurrentPage ? "active" : "")">@i</a>
+                                                    </li>
+                                                }
+                                                @if (Model.CurrentPage < Model.TotalPages)
+                                                {
+                                                    <li>
+                                                        <a href="@Url.Action("Orders", "Account", new { page = Model.CurrentPage + 1 })" class="pagination-link">
+                                                            <i class="icon-arrow-right"></i>
+                                                        </a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center py-5">
+                                        <p class="fs-5 text-muted">You haven't placed any orders yet.</p>
+                                        <a href="/" class="tf-btn btn-fill animate-hover-btn rounded-0 mt-3">
+                                            <span>Start Shopping</span>
+                                        </a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

@@ -25,6 +25,15 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
 // Localization
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
+// Session support for cart
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var supportedCultures = new[]
 {
     new CultureInfo("en"),
@@ -166,6 +175,9 @@ if (Directory.Exists(themesPath))
 
 // Localization middleware
 app.UseRequestLocalization();
+
+// Session middleware (must be before routing)
+app.UseSession();
 
 app.UseRouting();
 

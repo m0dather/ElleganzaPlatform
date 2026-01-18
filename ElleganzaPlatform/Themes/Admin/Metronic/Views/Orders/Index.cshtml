@@ -1,3 +1,5 @@
+@model ElleganzaPlatform.Application.ViewModels.Admin.OrderListViewModel
+
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Orders";
@@ -17,24 +19,190 @@
 
 <!--begin::Card-->
 <div class="card">
-<!--begin::Card header-->
-<div class="card-header border-0 pt-6">
-<!--begin::Card title-->
-<div class="card-title">
-<h3>Order Management</h3>
-</div>
-<!--end::Card title-->
-<!--begin::Card toolbar-->
-<div class="card-toolbar">
-<a href="#" class="btn btn-sm btn-primary">Add Order</a>
-</div>
-<!--end::Card toolbar-->
-</div>
-<!--end::Card header-->
-<!--begin::Card body-->
-<div class="card-body pt-0">
-<p class="text-gray-600">Order listing will be displayed here.</p>
-</div>
-<!--end::Card body-->
+    <!--begin::Card header-->
+    <div class="card-header border-0 pt-6">
+        <!--begin::Card title-->
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-5">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                <input type="text" class="form-control form-control-solid w-250px ps-13" placeholder="Search orders..." />
+            </div>
+        </div>
+        <!--end::Card title-->
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <div class="d-flex justify-content-end" data-kt-customer-table-toolbar="base">
+                <button type="button" class="btn btn-light-primary me-3">
+                    <i class="ki-duotone ki-filter fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    Filter
+                </button>
+                <button type="button" class="btn btn-light-primary me-3">
+                    <i class="ki-duotone ki-exit-up fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    Export
+                </button>
+            </div>
+        </div>
+        <!--end::Card toolbar-->
+    </div>
+    <!--end::Card header-->
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        @if (Model.Orders.Any())
+        {
+            <!--begin::Table-->
+            <div class="table-responsive">
+                <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_orders_table">
+                    <!--begin::Table head-->
+                    <thead>
+                        <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                            <th class="min-w-125px">Order Number</th>
+                            <th class="min-w-125px">Date</th>
+                            <th class="min-w-125px">Customer</th>
+                            <th class="min-w-100px">Status</th>
+                            <th class="min-w-100px text-end">Total</th>
+                            <th class="min-w-70px">Items</th>
+                            <th class="text-end min-w-100px">Actions</th>
+                        </tr>
+                    </thead>
+                    <!--end::Table head-->
+                    <!--begin::Table body-->
+                    <tbody class="fw-semibold text-gray-600">
+                        @foreach (var order in Model.Orders)
+                        {
+                            <tr>
+                                <!--begin::Order Number-->
+                                <td>
+                                    <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="text-gray-800 text-hover-primary fw-bold">@order.OrderNumber</a>
+                                </td>
+                                <!--end::Order Number-->
+                                <!--begin::Date-->
+                                <td>
+                                    <div class="badge badge-light fw-bold">@order.CreatedAt.ToString("MMM dd, yyyy")</div>
+                                </td>
+                                <!--end::Date-->
+                                <!--begin::Customer-->
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-gray-800 fw-bold">@order.CustomerName</span>
+                                        <span class="text-gray-600 fs-7">@order.CustomerEmail</span>
+                                    </div>
+                                </td>
+                                <!--end::Customer-->
+                                <!--begin::Status-->
+                                <td>
+                                    @{
+                                        var statusClass = order.Status switch
+                                        {
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Pending => "badge-light-warning",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Processing => "badge-light-info",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Shipped => "badge-light-primary",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Delivered => "badge-light-success",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Cancelled => "badge-light-danger",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Refunded => "badge-light-dark",
+                                            _ => "badge-light-secondary"
+                                        };
+                                    }
+                                    <span class="badge @statusClass">@order.StatusDisplay</span>
+                                </td>
+                                <!--end::Status-->
+                                <!--begin::Total-->
+                                <td class="text-end">
+                                    <span class="text-gray-800 fw-bold">$@order.TotalAmount.ToString("N2")</span>
+                                </td>
+                                <!--end::Total-->
+                                <!--begin::Items-->
+                                <td>
+                                    <span class="badge badge-light-primary">@order.ItemCount</span>
+                                </td>
+                                <!--end::Items-->
+                                <!--begin::Actions-->
+                                <td class="text-end">
+                                    <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-sm btn-light btn-active-light-primary">
+                                        View Details
+                                    </a>
+                                </td>
+                                <!--end::Actions-->
+                            </tr>
+                        }
+                    </tbody>
+                    <!--end::Table body-->
+                </table>
+            </div>
+            <!--end::Table-->
+
+            @if (Model.TotalPages > 1)
+            {
+                <!--begin::Pagination-->
+                <div class="d-flex flex-stack flex-wrap pt-10">
+                    <div class="fs-6 fw-semibold text-gray-700">
+                        Showing page @Model.CurrentPage of @Model.TotalPages (@Model.TotalOrders total orders)
+                    </div>
+                    <ul class="pagination">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li class="page-item previous">
+                                <a href="@Url.Action("Index", "Orders", new { page = Model.CurrentPage - 1 })" class="page-link">
+                                    <i class="previous"></i>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item previous disabled">
+                                <span class="page-link"><i class="previous"></i></span>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a href="@Url.Action("Index", "Orders", new { page = i })" class="page-link">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item next">
+                                <a href="@Url.Action("Index", "Orders", new { page = Model.CurrentPage + 1 })" class="page-link">
+                                    <i class="next"></i>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item next disabled">
+                                <span class="page-link"><i class="next"></i></span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <!--end::Pagination-->
+            }
+        }
+        else
+        {
+            <!--begin::Empty state-->
+            <div class="text-center py-20">
+                <i class="ki-duotone ki-package fs-5x text-gray-400 mb-5">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                <h3 class="fw-bold text-gray-600">No orders found</h3>
+                <p class="text-gray-500">Start by creating your first order or wait for customer orders.</p>
+            </div>
+            <!--end::Empty state-->
+        }
+    </div>
+    <!--end::Card body-->
 </div>
 <!--end::Card-->
