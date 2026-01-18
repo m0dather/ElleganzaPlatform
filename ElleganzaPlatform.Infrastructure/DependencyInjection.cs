@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IStoreContextService, StoreContextService>();
         services.AddScoped<IRolePriorityResolver, RolePriorityResolver>();
         services.AddScoped<IPostLoginRedirectService, PostLoginRedirectService>();
+        services.AddScoped<IThemeContext, ThemeContext>();
 
         // Authorization Handlers
         services.AddScoped<IAuthorizationHandler, SuperAdminAuthorizationHandler>();
