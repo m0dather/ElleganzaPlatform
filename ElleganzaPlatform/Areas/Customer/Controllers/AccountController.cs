@@ -13,20 +13,55 @@ namespace ElleganzaPlatform.Areas.Customer.Controllers;
 /// </summary>
 public class AccountController : Controller
 {
+    /// <summary>
+    /// Customer account dashboard/overview
+    /// </summary>
     [HttpGet("")]
-    [HttpGet("Profile")]
-    public IActionResult Profile()
+    public IActionResult Index()
     {
         return View();
     }
 
-    [HttpGet("MyOrders")]
-    public IActionResult MyOrders()
+    /// <summary>
+    /// Customer order history
+    /// </summary>
+    [HttpGet("orders")]
+    public IActionResult Orders()
     {
         return View();
     }
 
-    [HttpGet("Wishlist")]
+    /// <summary>
+    /// Customer order details
+    /// </summary>
+    [HttpGet("orders/{id}")]
+    public IActionResult OrderDetails(int id)
+    {
+        return View();
+    }
+
+    /// <summary>
+    /// Customer address management
+    /// </summary>
+    [HttpGet("addresses")]
+    public IActionResult Addresses()
+    {
+        return View();
+    }
+
+    /// <summary>
+    /// Customer profile edit
+    /// </summary>
+    [HttpGet("edit-profile")]
+    public IActionResult EditProfile()
+    {
+        return View();
+    }
+
+    /// <summary>
+    /// Customer wishlist
+    /// </summary>
+    [HttpGet("wishlist")]
     public IActionResult Wishlist()
     {
         return View();
