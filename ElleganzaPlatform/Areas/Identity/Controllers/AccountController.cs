@@ -44,9 +44,11 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
+        // Redirect authenticated users to storefront (/)
+        // Using explicit Redirect("/") to avoid area resolution issues
         if (User.Identity?.IsAuthenticated == true)
         {
-            return RedirectToAction("Index", "Home");
+            return Redirect("/");
         }
 
         var model = new LoginViewModel { ReturnUrl = returnUrl };
@@ -102,14 +104,21 @@ public class AccountController : Controller
             // Add custom claims
             await AddCustomClaimsAsync(user);
 
-            // Get redirect URL based on role
+            // Get redirect URL based on role using PostLoginRedirectService
+            // This ensures centralized, role-based redirect logic
             var redirectUrl = await _redirectService.GetRedirectUrlAsync(user.Id);
 
-            if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+            // IMPORTANT: Only use ReturnUrl if it's explicitly provided AND safe
+            // Ignore any Identity default paths that may come from ASP.NET Identity internals
+            if (!string.IsNullOrEmpty(model.ReturnUrl) && 
+                Url.IsLocalUrl(model.ReturnUrl) &&
+                !model.ReturnUrl.StartsWith("/Identity", StringComparison.OrdinalIgnoreCase) &&
+                !model.ReturnUrl.StartsWith("/Account/Login", StringComparison.OrdinalIgnoreCase))
             {
                 return Redirect(model.ReturnUrl);
             }
 
+            // Always redirect to role-based dashboard, never to Identity routes
             return Redirect(redirectUrl);
         }
 
@@ -132,9 +141,11 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult RegisterCustomer()
     {
+        // Redirect authenticated users to storefront (/)
+        // Using explicit Redirect("/") to avoid area resolution issues
         if (User.Identity?.IsAuthenticated == true)
         {
-            return RedirectToAction("Index", "Home");
+            return Redirect("/");
         }
 
         return View();
@@ -194,9 +205,11 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult RegisterVendor()
     {
+        // Redirect authenticated users to storefront (/)
+        // Using explicit Redirect("/") to avoid area resolution issues
         if (User.Identity?.IsAuthenticated == true)
         {
-            return RedirectToAction("Index", "Home");
+            return Redirect("/");
         }
 
         return View();
@@ -312,9 +325,14 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        // Sign out the user using SignInManager (clears authentication cookie)
         await _signInManager.SignOutAsync();
         _logger.LogInformation("User logged out");
-        return RedirectToAction("Index", "Home");
+        
+        // ALWAYS redirect to storefront (/) after logout
+        // Using explicit Redirect("/") to avoid area resolution issues
+        // This ensures users are redirected to the public storefront, not Identity routes
+        return Redirect("/");
     }
 
     #endregion
