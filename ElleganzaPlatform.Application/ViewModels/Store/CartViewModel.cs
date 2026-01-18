@@ -20,6 +20,7 @@ public class CartItemViewModel
     public decimal TotalPrice => UnitPrice * Quantity;
     public string? ImageUrl { get; set; }
     public int VendorId { get; set; }
+    public int StoreId { get; set; }
     public int StockQuantity { get; set; }
 }
 

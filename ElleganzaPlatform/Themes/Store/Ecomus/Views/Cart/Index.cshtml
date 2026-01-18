@@ -207,35 +207,168 @@
 
 @section Scripts {
     <script>
-        // Cart interaction handlers
+        // Cart interaction handlers with AJAX
         document.addEventListener('DOMContentLoaded', function() {
+            
+            // Helper function to update cart totals in UI
+            function updateCartTotals(data) {
+                if (data.subTotal !== undefined) {
+                    document.querySelector('.tf-page-cart-checkout .d-flex.justify-content-between:nth-child(2) .total').textContent = '$' + data.subTotal.toFixed(2);
+                }
+                if (data.taxAmount !== undefined) {
+                    document.querySelector('.tf-page-cart-checkout .d-flex.justify-content-between:nth-child(3) .total').textContent = '$' + data.taxAmount.toFixed(2);
+                }
+                if (data.shippingAmount !== undefined) {
+                    const shippingElement = document.querySelector('.tf-page-cart-checkout .d-flex.justify-content-between:nth-child(4) .total');
+                    shippingElement.textContent = data.shippingAmount > 0 ? '$' + data.shippingAmount.toFixed(2) : 'Free';
+                }
+                if (data.totalAmount !== undefined) {
+                    document.querySelector('.tf-page-cart-checkout .d-flex.justify-content-between:nth-child(5) .total').textContent = '$' + data.totalAmount.toFixed(2);
+                }
+            }
+
+            // Helper function to update cart count in current page and header
+            function updateCartCountLocal(count) {
+                const cartCountElements = document.querySelectorAll('.count-box');
+                cartCountElements.forEach(el => {
+                    el.textContent = count;
+                });
+                // Also update global cart count if function exists
+                if (typeof updateCartCount === 'function') {
+                    updateCartCount();
+                }
+            }
+
             // Remove item from cart
             document.querySelectorAll('.remove-cart').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const productId = this.getAttribute('data-product-id');
-                    if (confirm('Are you sure you want to remove this item?')) {
-                        // Add your API call here to remove the item
-                        console.log('Remove product:', productId);
+                    
+                    if (!confirm('Are you sure you want to remove this item?')) {
+                        return;
                     }
+
+                    // Make AJAX call to remove item
+                    fetch(`/cart/remove/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the cart item row from UI
+                            const cartRow = document.querySelector(`.tf-cart-item[data-product-id="${productId}"]`);
+                            if (cartRow) {
+                                cartRow.remove();
+                            }
+
+                            // Update totals
+                            updateCartTotals(data);
+                            updateCartCountLocal(data.cartCount);
+
+                            // If cart is empty, reload page to show empty cart message
+                            if (data.cartCount === 0) {
+                                window.location.reload();
+                            }
+                        } else {
+                            alert(data.message || 'Failed to remove item from cart');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while removing the item');
+                    });
                 });
             });
 
-            // Update quantity
-            document.querySelectorAll('.btndecrease, .btnincrease').forEach(btn => {
-                btn.addEventListener('click', function() {
+            // Update quantity - decrease
+            document.querySelectorAll('.btndecrease').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const productId = this.getAttribute('data-product-id');
                     const input = document.querySelector(`input[data-product-id="${productId}"]`);
                     let quantity = parseInt(input.value);
                     
-                    if (this.classList.contains('btndecrease')) {
-                        quantity = Math.max(1, quantity - 1);
+                    if (quantity > 1) {
+                        quantity--;
+                        updateCartQuantity(productId, quantity, input);
+                    }
+                });
+            });
+
+            // Update quantity - increase
+            document.querySelectorAll('.btnincrease').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    const input = document.querySelector(`input[data-product-id="${productId}"]`);
+                    let quantity = parseInt(input.value);
+                    
+                    quantity++;
+                    updateCartQuantity(productId, quantity, input);
+                });
+            });
+
+            // Function to update cart quantity via AJAX
+            function updateCartQuantity(productId, quantity, inputElement) {
+                fetch('/cart/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({
+                        productId: parseInt(productId),
+                        quantity: quantity
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update input value
+                        inputElement.value = quantity;
+
+                        // Update item total price
+                        const cartRow = document.querySelector(`.tf-cart-item[data-product-id="${productId}"]`);
+                        if (cartRow) {
+                            const unitPrice = parseFloat(cartRow.querySelector('.tf-cart-item_price .price').textContent.replace('$', ''));
+                            const totalPrice = unitPrice * quantity;
+                            cartRow.querySelector('.tf-cart-item_total .price').textContent = '$' + totalPrice.toFixed(2);
+                        }
+
+                        // Update cart totals
+                        updateCartTotals(data);
+                        updateCartCountLocal(data.cartCount);
                     } else {
-                        quantity++;
+                        alert(data.message || 'Failed to update cart item');
+                        // Revert input value on error
+                        inputElement.value = inputElement.getAttribute('data-previous-value') || 1;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the cart');
+                    // Revert input value on error
+                    inputElement.value = inputElement.getAttribute('data-previous-value') || 1;
+                });
+            }
+
+            // Handle manual input changes
+            document.querySelectorAll('.wg-quantity input[type="text"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    let quantity = parseInt(this.value);
+                    
+                    if (isNaN(quantity) || quantity < 1) {
+                        quantity = 1;
+                        this.value = 1;
                     }
                     
-                    input.value = quantity;
-                    // Add your API call here to update the cart
-                    console.log('Update product:', productId, 'quantity:', quantity);
+                    updateCartQuantity(productId, quantity, this);
                 });
             });
         });
