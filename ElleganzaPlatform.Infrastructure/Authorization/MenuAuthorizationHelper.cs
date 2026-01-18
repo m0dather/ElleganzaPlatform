@@ -104,14 +104,15 @@ public class MenuAuthorizationHelper
     /// <summary>
     /// Performs synchronous policy authorization check.
     /// This is safe for Razor views as the authorization handlers are designed to be synchronous.
+    /// Uses Task.Run with ConfigureAwait(false) to minimize deadlock risk.
     /// </summary>
     private bool CheckPolicySync(ClaimsPrincipal user, string policyName)
     {
         try
         {
-            // Use Task.Run to avoid potential deadlocks in synchronous contexts
+            // Use Task.Run with ConfigureAwait(false) to avoid potential deadlocks
             var result = Task.Run(async () =>
-                await _authorizationService.AuthorizeAsync(user, policyName)
+                await _authorizationService.AuthorizeAsync(user, policyName).ConfigureAwait(false)
             ).GetAwaiter().GetResult();
 
             return result.Succeeded;
