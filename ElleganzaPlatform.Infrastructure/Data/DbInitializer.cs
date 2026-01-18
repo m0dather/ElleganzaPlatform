@@ -396,8 +396,8 @@ public static class DbInitializer
                         {
                             StoreId = demoStore.Id,
                             UserId = customerUser.Id,
-                            OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-001",
-                            Status = OrderStatus.Delivered, // Completed status
+                            OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMddHHmmss}",
+                            Status = OrderStatus.Delivered, // Demo order shows delivered/completed status
                             SubTotal = product.Price * 2,
                             TaxAmount = product.Price * 2 * 0.10m, // 10% tax
                             ShippingAmount = 10.00m,
