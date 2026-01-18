@@ -20,6 +20,8 @@ public class MenuAuthorizationHelper
     private readonly Lazy<bool> _canShowCustomerMenu;
     private readonly Lazy<bool> _canShowVendorDashboard;
     private readonly Lazy<bool> _canShowAdminDashboard;
+    private readonly Lazy<bool> _canShowStoreAdminDashboard;
+    private readonly Lazy<bool> _canShowSuperAdminDashboard;
 
     public MenuAuthorizationHelper(
         IAuthorizationService authorizationService,
@@ -33,6 +35,8 @@ public class MenuAuthorizationHelper
         _canShowCustomerMenu = new Lazy<bool>(CheckCanShowCustomerMenu);
         _canShowVendorDashboard = new Lazy<bool>(CheckCanShowVendorDashboard);
         _canShowAdminDashboard = new Lazy<bool>(CheckCanShowAdminDashboard);
+        _canShowStoreAdminDashboard = new Lazy<bool>(CheckCanShowStoreAdminDashboard);
+        _canShowSuperAdminDashboard = new Lazy<bool>(CheckCanShowSuperAdminDashboard);
     }
 
     /// <summary>
@@ -41,10 +45,16 @@ public class MenuAuthorizationHelper
     public bool IsAuthenticated => _isAuthenticated.Value;
 
     /// <summary>
-    /// Checks if Login/Register links should be shown.
+    /// Checks if Login link should be shown.
     /// Returns true if user is NOT authenticated (guest user).
     /// </summary>
     public bool CanShowLogin => !IsAuthenticated;
+
+    /// <summary>
+    /// Checks if Register link should be shown.
+    /// Returns true if user is NOT authenticated (guest user).
+    /// </summary>
+    public bool CanShowRegister => !IsAuthenticated;
 
     /// <summary>
     /// Checks if Customer menu items (Account, Orders) should be shown.
@@ -59,10 +69,23 @@ public class MenuAuthorizationHelper
     public bool CanShowVendorDashboard => _canShowVendorDashboard.Value;
 
     /// <summary>
-    /// Checks if Admin Dashboard link should be shown.
+    /// Checks if Admin Dashboard link should be shown (generic - for both StoreAdmin and SuperAdmin).
     /// Returns true if user is authenticated and authorized with RequireStoreAdmin or RequireSuperAdmin policy.
     /// </summary>
     public bool CanShowAdminDashboard => _canShowAdminDashboard.Value;
+
+    /// <summary>
+    /// Checks if StoreAdmin-specific menu items should be shown.
+    /// Returns true if user is authenticated and authorized with RequireStoreAdmin policy.
+    /// SuperAdmin users will also pass this check (implicit bypass in StoreAdminRequirement).
+    /// </summary>
+    public bool CanShowStoreAdminDashboard => _canShowStoreAdminDashboard.Value;
+
+    /// <summary>
+    /// Checks if SuperAdmin-specific menu items should be shown.
+    /// Returns true ONLY if user is authenticated and authorized with RequireSuperAdmin policy.
+    /// </summary>
+    public bool CanShowSuperAdminDashboard => _canShowSuperAdminDashboard.Value;
 
     private bool CheckIsAuthenticated()
     {
@@ -99,6 +122,28 @@ public class MenuAuthorizationHelper
         // Check if user is StoreAdmin or SuperAdmin
         return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireStoreAdmin) ||
                CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireSuperAdmin);
+    }
+
+    private bool CheckCanShowStoreAdminDashboard()
+    {
+        if (!IsAuthenticated) return false;
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) return false;
+
+        // Check if user is StoreAdmin (SuperAdmin implicitly passes due to StoreAdminRequirement logic)
+        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireStoreAdmin);
+    }
+
+    private bool CheckCanShowSuperAdminDashboard()
+    {
+        if (!IsAuthenticated) return false;
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) return false;
+
+        // Check if user is SuperAdmin ONLY
+        return CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireSuperAdmin);
     }
 
     /// <summary>
