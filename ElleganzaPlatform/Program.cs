@@ -47,6 +47,10 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Identity
+// NOTE: This project uses custom authentication controllers and views,
+// NOT the default ASP.NET Identity UI (no AddDefaultUI or MapRazorPages).
+// All authentication routes are explicitly defined in AccountController
+// using route attributes (/login, /logout, /register, etc.)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -85,10 +89,18 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Configure cookie settings
+// CRITICAL: These settings override ASP.NET Identity defaults to prevent
+// automatic redirects to /Identity/* routes. The application uses custom
+// authentication routes, not the default Identity UI.
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    // Custom login path - overrides Identity default (/Account/Login)
     options.LoginPath = "/login";
+    
+    // Custom logout path - overrides Identity default (/Account/Logout)
     options.LogoutPath = "/logout";
+    
+    // Custom access denied path - overrides Identity default (/Account/AccessDenied)
     options.AccessDeniedPath = "/access-denied";
 });
 
@@ -159,6 +171,11 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Route Configuration
+// NOTE: No MapRazorPages() is called, so ASP.NET Identity UI routes are NOT registered.
+// All authentication routes are handled by custom controllers with explicit route attributes.
+// This prevents any /Identity/* or /Account/* default routes from being accessible.
 
 // Area routes
 app.MapControllerRoute(
