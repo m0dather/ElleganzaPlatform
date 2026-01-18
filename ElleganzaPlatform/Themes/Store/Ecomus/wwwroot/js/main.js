@@ -477,9 +477,10 @@
     $(".btn-show-quickview").click(function () {
       $("#quick_view").modal("show");
     });
-    $(".btn-add-to-cart").click(function () {
-      $("#shoppingCart").modal("show");
-    });
+    // Note: btn-add-to-cart click handler moved to cart.js for proper cart functionality
+    // $(".btn-add-to-cart").click(function () {
+    //   $("#shoppingCart").modal("show");
+    // });
 
     $(".btn-add-note").click(function () {
       $(".add-note").addClass("open");
