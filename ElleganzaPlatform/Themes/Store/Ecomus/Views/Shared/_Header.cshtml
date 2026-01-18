@@ -1,3 +1,5 @@
+@inject ElleganzaPlatform.Infrastructure.Authorization.MenuAuthorizationHelper MenuAuth
+
 <header id="header" class="header-default header-absolute">
             <div class="px_15 lg-px_40">
                 <div class="row wrapper-header align-items-center">
@@ -929,8 +931,75 @@
                             <li class="nav-search"><a href="#canvasSearch" data-bs-toggle="offcanvas"
                                     aria-controls="offcanvasLeft" class="nav-icon-item"><i
                                         class="icon icon-search"></i></a></li>
-                            <li class="nav-account"><a href="#login" data-bs-toggle="modal" class="nav-icon-item"><i
-                                        class="icon icon-account"></i></a></li>
+                            
+                            @if (MenuAuth.CanShowLogin)
+                            {
+                                <!-- Guest: Show Login/Register -->
+                                <li class="nav-account">
+                                    <a href="/login" class="nav-icon-item" title="Login">
+                                        <i class="icon icon-account"></i>
+                                    </a>
+                                </li>
+                            }
+                            else if (MenuAuth.CanShowCustomerMenu)
+                            {
+                                <!-- Customer: Show Account Menu -->
+                                <li class="nav-account dropdown">
+                                    <a href="#" class="nav-icon-item dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="My Account">
+                                        <i class="icon icon-account"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="/account">My Account</a></li>
+                                        <li><a class="dropdown-item" href="/account/orders">My Orders</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" action="/logout" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="dropdown-item">Logout</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (MenuAuth.CanShowVendorDashboard)
+                            {
+                                <!-- Vendor: Show Vendor Dashboard -->
+                                <li class="nav-account dropdown">
+                                    <a href="#" class="nav-icon-item dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Vendor Dashboard">
+                                        <i class="icon icon-account"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="/vendor">Vendor Dashboard</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" action="/logout" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="dropdown-item">Logout</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (MenuAuth.CanShowAdminDashboard)
+                            {
+                                <!-- Admin/SuperAdmin: Show Admin Dashboard -->
+                                <li class="nav-account dropdown">
+                                    <a href="#" class="nav-icon-item dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Admin Dashboard">
+                                        <i class="icon icon-account"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" action="/logout" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="dropdown-item">Logout</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            
                             <li class="nav-wishlist"><a href="@Url.Action("Wishlist", "Account")" class="nav-icon-item"><i
                                         class="icon icon-heart"></i><span class="count-box">0</span></a></li>
                             <li class="nav-cart"><a href="#shoppingCart" data-bs-toggle="modal" class="nav-icon-item"><i
