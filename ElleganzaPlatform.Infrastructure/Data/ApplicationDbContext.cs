@@ -30,6 +30,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<StoreAdmin> StoreAdmins => Set<StoreAdmin>();
     public DbSet<VendorAdmin> VendorAdmins => Set<VendorAdmin>();
+    public DbSet<Cart> Carts => Set<Cart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -55,6 +57,20 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
              (_currentUserService.VendorId == null || e.VendorId == _currentUserService.VendorId)));
 
         builder.Entity<Order>().HasQueryFilter(e => 
+            !e.IsDeleted && 
+            (_currentUserService == null || 
+             _currentUserService.IsSuperAdmin || 
+             _currentUserService.StoreId == null || 
+             e.StoreId == _currentUserService.StoreId));
+
+        builder.Entity<Cart>().HasQueryFilter(e => 
+            !e.IsDeleted && 
+            (_currentUserService == null || 
+             _currentUserService.IsSuperAdmin || 
+             _currentUserService.StoreId == null || 
+             e.StoreId == _currentUserService.StoreId));
+
+        builder.Entity<CartItem>().HasQueryFilter(e => 
             !e.IsDeleted && 
             (_currentUserService == null || 
              _currentUserService.IsSuperAdmin || 

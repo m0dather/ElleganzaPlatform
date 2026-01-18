@@ -1,4 +1,5 @@
 using ElleganzaPlatform.Application.Common;
+using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Areas.Identity.Models;
 using ElleganzaPlatform.Domain.Entities;
 using ElleganzaPlatform.Infrastructure.Authorization;
@@ -104,6 +105,10 @@ public class AccountController : Controller
             // Add custom claims
             await AddCustomClaimsAsync(user);
 
+            // Merge guest cart into user cart after successful login
+            var cartService = HttpContext.RequestServices.GetRequiredService<ICartService>();
+            await cartService.MergeGuestCartAsync();
+
             // Get redirect URL based on role using PostLoginRedirectService
             // This ensures centralized, role-based redirect logic
             var redirectUrl = await _redirectService.GetRedirectUrlAsync(user.Id);
@@ -184,6 +189,10 @@ public class AccountController : Controller
 
             // Sign in the user
             await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Merge guest cart into user cart after registration
+            var cartService = HttpContext.RequestServices.GetRequiredService<ICartService>();
+            await cartService.MergeGuestCartAsync();
 
             // Redirect to customer dashboard
             return Redirect("/account");
@@ -304,6 +313,10 @@ public class AccountController : Controller
 
             // Sign in the user
             await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Merge guest cart into user cart after registration
+            var cartService = HttpContext.RequestServices.GetRequiredService<ICartService>();
+            await cartService.MergeGuestCartAsync();
 
             // Redirect to vendor dashboard
             return Redirect("/vendor");
