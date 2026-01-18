@@ -138,7 +138,17 @@ public class MenuAuthorizationHelper
     private bool CheckCanShowVendorOnlyDashboard()
     {
         // Vendor-only dashboard should show only if user is Vendor but NOT an Admin
-        return CanShowVendorDashboard && !CanShowStoreAdminDashboard;
+        // Perform direct policy checks to avoid circular lazy evaluation
+        if (!IsAuthenticated) return false;
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) return false;
+
+        // Must be a Vendor but not a StoreAdmin
+        bool isVendor = CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireVendor);
+        bool isStoreAdmin = CheckPolicySync(httpContext.User, AuthorizationPolicies.RequireStoreAdmin);
+
+        return isVendor && !isStoreAdmin;
     }
 
     /// <summary>
