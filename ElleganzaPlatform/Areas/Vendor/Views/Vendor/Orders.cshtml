@@ -1,0 +1,151 @@
+@model ElleganzaPlatform.Application.ViewModels.Admin.OrderListViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Orders";
+    ViewData["PageTitle"] = "My Orders";
+    ViewData["Breadcrumb"] = @"
+        <ul class=""breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1"">
+            <li class=""breadcrumb-item text-muted"">
+                <a href=""" + Url.Action("Index", "Vendor") + @""" class=""text-muted text-hover-primary"">Home</a>
+            </li>
+            <li class=""breadcrumb-item"">
+                <span class=""bullet bg-gray-500 w-5px h-2px""></span>
+            </li>
+            <li class=""breadcrumb-item text-muted"">Orders</li>
+        </ul>
+    ";
+}
+
+<!--begin::Card-->
+<div class="card">
+    <!--begin::Card header-->
+    <div class="card-header border-0 pt-6">
+        <!--begin::Card title-->
+        <div class="card-title">
+            <h3>Orders containing my products</h3>
+        </div>
+        <!--end::Card title-->
+    </div>
+    <!--end::Card header-->
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        @if (Model.Orders.Any())
+        {
+            <!--begin::Table-->
+            <div class="table-responsive">
+                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                    <!--begin::Table head-->
+                    <thead>
+                        <tr class="fw-bold text-muted">
+                            <th class="min-w-150px">Order Number</th>
+                            <th class="min-w-140px">Date</th>
+                            <th class="min-w-120px">Customer</th>
+                            <th class="min-w-100px">Status</th>
+                            <th class="min-w-100px">My Items Total</th>
+                            <th class="min-w-80px">My Items</th>
+                            <th class="min-w-100px text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <!--end::Table head-->
+                    <!--begin::Table body-->
+                    <tbody>
+                        @foreach (var order in Model.Orders)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="text-dark fw-bold text-hover-primary d-block fs-6">@order.OrderNumber</span>
+                                </td>
+                                <td>
+                                    <span class="text-dark fw-bold d-block fs-6">@order.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                    <span class="text-muted fw-semibold text-muted d-block fs-7">@order.CreatedAt.ToString("hh:mm tt")</span>
+                                </td>
+                                <td>
+                                    <span class="text-dark fw-bold d-block fs-6">@order.CustomerName</span>
+                                    <span class="text-muted fw-semibold text-muted d-block fs-7">@order.CustomerEmail</span>
+                                </td>
+                                <td>
+                                    @{
+                                        var badgeClass = order.Status switch
+                                        {
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Pending => "badge-light-warning",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Processing => "badge-light-info",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Shipped => "badge-light-primary",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Delivered => "badge-light-success",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Cancelled => "badge-light-danger",
+                                            ElleganzaPlatform.Domain.Enums.OrderStatus.Refunded => "badge-light-dark",
+                                            _ => "badge-light-secondary"
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@order.StatusDisplay</span>
+                                </td>
+                                <td>
+                                    <span class="text-dark fw-bold d-block fs-6">$@order.TotalAmount.ToString("F2")</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-light-primary">@order.ItemCount</span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="@Url.Action("OrderDetails", "Vendor", new { id = order.Id })" class="btn btn-sm btn-light btn-active-light-primary">View</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <!--end::Table body-->
+                </table>
+            </div>
+            <!--end::Table-->
+
+            @if (Model.TotalPages > 1)
+            {
+                <!--begin::Pagination-->
+                <div class="d-flex flex-stack flex-wrap pt-10">
+                    <div class="fs-6 fw-semibold text-gray-700">Showing @Model.Orders.Count() of @Model.TotalOrders orders</div>
+                    <ul class="pagination">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li class="page-item previous">
+                                <a href="@Url.Action("Orders", new { page = Model.CurrentPage - 1 })" class="page-link"><i class="previous"></i></a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item previous disabled">
+                                <span class="page-link"><i class="previous"></i></span>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a href="@Url.Action("Orders", new { page = i })" class="page-link">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item next">
+                                <a href="@Url.Action("Orders", new { page = Model.CurrentPage + 1 })" class="page-link"><i class="next"></i></a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item next disabled">
+                                <span class="page-link"><i class="next"></i></span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <!--end::Pagination-->
+            }
+        }
+        else
+        {
+            <div class="text-center py-10">
+                <div class="text-gray-600 fs-4 fw-semibold mb-4">No orders found</div>
+                <p class="text-gray-400">Orders containing your products will appear here.</p>
+            </div>
+        }
+    </div>
+    <!--end::Card body-->
+</div>
+<!--end::Card-->

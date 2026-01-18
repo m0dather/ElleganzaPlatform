@@ -1,0 +1,188 @@
+@model ElleganzaPlatform.Application.ViewModels.Admin.AdminOrderDetailsViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Order Details";
+    ViewData["PageTitle"] = $"Order #{Model.OrderNumber}";
+    ViewData["Breadcrumb"] = @"
+        <ul class=""breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1"">
+            <li class=""breadcrumb-item text-muted"">
+                <a href=""" + Url.Action("Index", "Vendor") + @""" class=""text-muted text-hover-primary"">Home</a>
+            </li>
+            <li class=""breadcrumb-item"">
+                <span class=""bullet bg-gray-500 w-5px h-2px""></span>
+            </li>
+            <li class=""breadcrumb-item text-muted"">
+                <a href=""" + Url.Action("Orders", "Vendor") + @""" class=""text-muted text-hover-primary"">Orders</a>
+            </li>
+            <li class=""breadcrumb-item"">
+                <span class=""bullet bg-gray-500 w-5px h-2px""></span>
+            </li>
+            <li class=""breadcrumb-item text-muted"">Order #" + Model.OrderNumber + @"</li>
+        </ul>
+    ";
+}
+
+<!--begin::Layout-->
+<div class="d-flex flex-column gap-7 gap-lg-10">
+    <!--begin::Order summary-->
+    <div class="card card-flush py-4">
+        <!--begin::Card header-->
+        <div class="card-header">
+            <div class="card-title">
+                <h2>Order #@Model.OrderNumber</h2>
+            </div>
+            <div class="card-toolbar">
+                @{
+                    var badgeClass = Model.Status switch
+                    {
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Pending => "badge-light-warning",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Processing => "badge-light-info",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Shipped => "badge-light-primary",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Delivered => "badge-light-success",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Cancelled => "badge-light-danger",
+                        ElleganzaPlatform.Domain.Enums.OrderStatus.Refunded => "badge-light-dark",
+                        _ => "badge-light-secondary"
+                    };
+                }
+                <span class="badge @badgeClass fs-5">@Model.StatusDisplay</span>
+            </div>
+        </div>
+        <!--end::Card header-->
+        <!--begin::Card body-->
+        <div class="card-body pt-0">
+            <div class="d-flex flex-column gap-5">
+                <div class="d-flex flex-wrap gap-5">
+                    <div class="flex-equal min-w-200px">
+                        <div class="fs-6 fw-bold text-gray-700 mb-2">Order Date</div>
+                        <div class="fs-5 fw-semibold text-gray-800">@Model.CreatedAt.ToString("MMMM dd, yyyy")</div>
+                        <div class="text-muted fs-7">@Model.CreatedAt.ToString("hh:mm tt")</div>
+                    </div>
+                    <div class="flex-equal min-w-200px">
+                        <div class="fs-6 fw-bold text-gray-700 mb-2">Customer</div>
+                        <div class="fs-5 fw-semibold text-gray-800">@Model.CustomerName</div>
+                        <div class="text-muted fs-7">@Model.CustomerEmail</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::Card body-->
+    </div>
+    <!--end::Order summary-->
+
+    <!--begin::Order items-->
+    <div class="card card-flush py-4">
+        <!--begin::Card header-->
+        <div class="card-header">
+            <div class="card-title">
+                <h2>My Items in this Order</h2>
+            </div>
+        </div>
+        <!--end::Card header-->
+        <!--begin::Card body-->
+        <div class="card-body pt-0">
+            <div class="table-responsive">
+                <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5 min-w-300px">
+                    <thead>
+                        <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                            <th class="min-w-300px">Product</th>
+                            <th class="min-w-100px">SKU</th>
+                            <th class="min-w-100px text-end">Qty</th>
+                            <th class="min-w-100px text-end">Unit Price</th>
+                            <th class="min-w-100px text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fw-semibold text-gray-600">
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="ms-5">
+                                            <div class="fw-bold">@item.ProductName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-gray-700">@item.ProductSku</td>
+                                <td class="text-end">@item.Quantity</td>
+                                <td class="text-end">$@item.UnitPrice.ToString("F2")</td>
+                                <td class="text-end text-dark fw-bolder">$@item.TotalPrice.ToString("F2")</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="4" class="text-end fw-bold text-gray-700">My Items Subtotal</td>
+                            <td class="text-end text-dark fw-bolder fs-4">$@Model.SubTotal.ToString("F2")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--end::Card body-->
+    </div>
+    <!--end::Order items-->
+
+    <!--begin::Addresses-->
+    <div class="row g-5">
+        <!--begin::Shipping address-->
+        <div class="col-lg-6">
+            <div class="card card-flush py-4 h-100">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3>Shipping Address</h3>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="fs-6 text-gray-800">@Model.ShippingAddress</div>
+                </div>
+            </div>
+        </div>
+        <!--end::Shipping address-->
+        <!--begin::Billing address-->
+        <div class="col-lg-6">
+            <div class="card card-flush py-4 h-100">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3>Billing Address</h3>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="fs-6 text-gray-800">@Model.BillingAddress</div>
+                </div>
+            </div>
+        </div>
+        <!--end::Billing address-->
+    </div>
+    <!--end::Addresses-->
+
+    @if (!string.IsNullOrWhiteSpace(Model.CustomerNotes))
+    {
+        <!--begin::Customer notes-->
+        <div class="card card-flush py-4">
+            <div class="card-header">
+                <div class="card-title">
+                    <h3>Customer Notes</h3>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div class="fs-6 text-gray-800">@Model.CustomerNotes</div>
+            </div>
+        </div>
+        <!--end::Customer notes-->
+    }
+
+    <!--begin::Actions-->
+    <div class="card card-flush py-4">
+        <div class="card-body pt-0">
+            <div class="d-flex justify-content-start gap-3">
+                <a href="@Url.Action("Orders", "Vendor")" class="btn btn-light">
+                    <i class="ki-duotone ki-arrow-left fs-3">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    Back to Orders
+                </a>
+            </div>
+        </div>
+    </div>
+    <!--end::Actions-->
+</div>
+<!--end::Layout-->
