@@ -16,6 +16,19 @@
             this.setupAjaxDefaults();
             this.bindEvents();
             this.updateCartCount();
+            this.initMiniCart();
+        },
+
+        /**
+         * Initialize mini cart functionality
+         */
+        initMiniCart: function () {
+            const self = this;
+            
+            // Load mini cart content when offcanvas is shown
+            $('#miniCart').on('show.bs.offcanvas', function () {
+                self.loadMiniCart();
+            });
         },
 
         /**
@@ -139,10 +152,11 @@
                         // Update cart count
                         self.updateCartCount(response.cartCount);
 
-                        // Show mini cart modal if exists
-                        const $modal = $('#shoppingCart');
-                        if ($modal.length) {
-                            $modal.modal('show');
+                        // Open mini cart if it exists
+                        const miniCartElement = document.getElementById('miniCart');
+                        if (miniCartElement) {
+                            const miniCart = new bootstrap.Offcanvas(miniCartElement);
+                            miniCart.show();
                         }
                     } else {
                         self.showMessage(response.message || 'Failed to add product to cart', 'error');
@@ -293,6 +307,271 @@
             if (data.totalAmount !== undefined) {
                 $('.tf-totals-total-value.total').text(currencySymbol + data.totalAmount.toFixed(2));
             }
+        },
+
+        /**
+         * Load mini cart data and render
+         */
+        loadMiniCart: function () {
+            const self = this;
+            const $content = $('#miniCartContent');
+
+            // Show loading state
+            $content.html('<div class="mini-cart-loading text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+
+            $.ajax({
+                url: '/cart/mini',
+                type: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        self.renderMiniCart(response);
+                    } else {
+                        self.showMessage('Failed to load cart', 'error');
+                    }
+                },
+                error: function () {
+                    $content.html('<div class="text-center py-5"><p class="text-danger">Failed to load cart</p></div>');
+                }
+            });
+        },
+
+        /**
+         * Render mini cart HTML
+         */
+        renderMiniCart: function (data) {
+            const $content = $('#miniCartContent');
+            const currencySymbol = '$';
+
+            if (!data.items || data.items.length === 0) {
+                // Empty cart state
+                $content.html(`
+                    <div class="empty-cart text-center py-5">
+                        <i class="icon icon-bag" style="font-size: 64px; color: #ccc;"></i>
+                        <p class="mt-3 mb-3">Your cart is empty</p>
+                        <a href="/shop" class="tf-btn btn-fill animate-hover-btn radius-3">
+                            <span>Continue Shopping</span>
+                        </a>
+                    </div>
+                `);
+                return;
+            }
+
+            // Build cart items HTML
+            let itemsHtml = '';
+            data.items.forEach(function (item) {
+                const imageUrl = item.imageUrl || '/images/products/default.jpg';
+                itemsHtml += `
+                    <div class="mini-cart-item d-flex gap-3 mb-3 pb-3 border-bottom" data-product-id="${item.productId}">
+                        <div class="mini-cart-item-image">
+                            <a href="/shop/product/${item.productId}">
+                                <img src="${imageUrl}" alt="${item.productName}" style="width: 80px; height: 80px; object-fit: cover;">
+                            </a>
+                        </div>
+                        <div class="mini-cart-item-info flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <a href="/shop/product/${item.productId}" class="mini-cart-item-name fw-semibold text-decoration-none">${item.productName}</a>
+                                <button class="btn btn-sm btn-link text-danger p-0 mini-cart-remove" data-product-id="${item.productId}" title="Remove">
+                                    <i class="icon icon-close"></i>
+                                </button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="mini-cart-quantity">
+                                    <div class="wg-quantity d-flex align-items-center">
+                                        <button class="btn btn-sm btn-outline-secondary mini-cart-qty-decrease" data-product-id="${item.productId}">-</button>
+                                        <input type="text" class="form-control form-control-sm text-center mx-1" style="width: 50px;" value="${item.quantity}" readonly>
+                                        <button class="btn btn-sm btn-outline-secondary mini-cart-qty-increase" data-product-id="${item.productId}">+</button>
+                                    </div>
+                                </div>
+                                <div class="mini-cart-item-price fw-semibold">${currencySymbol}${item.totalPrice.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Build complete HTML
+            const html = `
+                <div class="mini-cart-header mb-3">
+                    <h5 class="mb-0">Shopping Cart (${data.totalItems})</h5>
+                </div>
+                <div class="mini-cart-items mb-4" style="max-height: 400px; overflow-y: auto;">
+                    ${itemsHtml}
+                </div>
+                <div class="mini-cart-footer">
+                    <div class="mini-cart-totals mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span class="fw-semibold">${currencySymbol}${data.subTotal.toFixed(2)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax:</span>
+                            <span>${currencySymbol}${data.taxAmount.toFixed(2)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <span>Shipping:</span>
+                            <span>${data.shippingAmount > 0 ? currencySymbol + data.shippingAmount.toFixed(2) : 'Free'}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold">Total:</span>
+                            <span class="fw-bold fs-5">${currencySymbol}${data.totalAmount.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="mini-cart-actions d-grid gap-2">
+                        <a href="/cart" class="tf-btn btn-outline-dark animate-hover-btn radius-3">
+                            <span>View Cart</span>
+                        </a>
+                        <a href="/checkout" class="tf-btn btn-fill animate-hover-btn radius-3">
+                            <span>Checkout</span>
+                        </a>
+                        <button class="btn btn-link text-danger mini-cart-clear-all" style="text-decoration: none;">
+                            Clear Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            $content.html(html);
+
+            // Bind mini cart event handlers
+            this.bindMiniCartEvents();
+        },
+
+        /**
+         * Bind mini cart specific events
+         * Uses event delegation on document for dynamically created elements
+         */
+        bindMiniCartEvents: function () {
+            const self = this;
+            const miniCartId = '#miniCartContent';
+
+            // Use event delegation with more specific container
+            // Quantity increase
+            $(document).off('click.miniCart', '.mini-cart-qty-increase').on('click.miniCart', '.mini-cart-qty-increase', function (e) {
+                e.preventDefault();
+                const productId = $(this).data('product-id');
+                const $input = $(this).siblings('input');
+                const quantity = parseInt($input.val()) + 1;
+                $input.val(quantity);
+                self.updateMiniCartItem(productId, quantity);
+            });
+
+            // Quantity decrease
+            $(document).off('click.miniCart', '.mini-cart-qty-decrease').on('click.miniCart', '.mini-cart-qty-decrease', function (e) {
+                e.preventDefault();
+                const productId = $(this).data('product-id');
+                const $input = $(this).siblings('input');
+                const quantity = Math.max(1, parseInt($input.val()) - 1);
+                $input.val(quantity);
+                self.updateMiniCartItem(productId, quantity);
+            });
+
+            // Remove item
+            $(document).off('click.miniCart', '.mini-cart-remove').on('click.miniCart', '.mini-cart-remove', function (e) {
+                e.preventDefault();
+                const productId = $(this).data('product-id');
+                if (confirm('Remove this item from cart?')) {
+                    self.removeFromMiniCart(productId);
+                }
+            });
+
+            // Clear all
+            $(document).off('click.miniCart', '.mini-cart-clear-all').on('click.miniCart', '.mini-cart-clear-all', function (e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to clear your entire cart?')) {
+                    self.clearMiniCart();
+                }
+            });
+        },
+
+        /**
+         * Update item quantity in mini cart
+         */
+        updateMiniCartItem: function (productId, quantity) {
+            const self = this;
+
+            $.ajax({
+                url: '/cart/update',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    productId: parseInt(productId),
+                    quantity: parseInt(quantity)
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        // Reload mini cart
+                        self.loadMiniCart();
+                        // Update header count
+                        self.updateCartCount(response.cartCount);
+                    } else {
+                        self.showMessage(response.message || 'Failed to update item', 'error');
+                    }
+                },
+                error: function (xhr) {
+                    let errorMessage = 'Failed to update item';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    self.showMessage(errorMessage, 'error');
+                }
+            });
+        },
+
+        /**
+         * Remove item from mini cart
+         */
+        removeFromMiniCart: function (productId) {
+            const self = this;
+
+            $.ajax({
+                url: '/cart/remove/' + productId,
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        // Reload mini cart
+                        self.loadMiniCart();
+                        // Update header count
+                        self.updateCartCount(response.cartCount);
+                        self.showMessage('Item removed from cart', 'success');
+                    } else {
+                        self.showMessage(response.message || 'Failed to remove item', 'error');
+                    }
+                },
+                error: function (xhr) {
+                    let errorMessage = 'Failed to remove item';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    self.showMessage(errorMessage, 'error');
+                }
+            });
+        },
+
+        /**
+         * Clear all items from cart
+         */
+        clearMiniCart: function () {
+            const self = this;
+
+            $.ajax({
+                url: '/cart/clear',
+                type: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (response) {
+                    if (response && response.success) {
+                        // Reload mini cart to show empty state
+                        self.loadMiniCart();
+                        // Update header count
+                        self.updateCartCount(0);
+                        self.showMessage('Cart cleared successfully', 'success');
+                    }
+                },
+                error: function () {
+                    self.showMessage('Failed to clear cart', 'error');
+                }
+            });
         },
 
         /**

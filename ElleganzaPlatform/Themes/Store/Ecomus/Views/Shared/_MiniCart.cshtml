@@ -1,0 +1,27 @@
+@*
+    Mini Cart Off-Canvas Component
+    Displays cart items in a slide-out panel
+    Content is dynamically rendered via JavaScript (cart.js)
+*@
+
+<!-- Mini Cart Off-Canvas -->
+<div class="offcanvas offcanvas-end canvas-mb" id="miniCart">
+    <div class="canvas-wrapper">
+        <!-- Header -->
+        <header class="canvas-header">
+            <div class="close-popup">
+                <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
+            </div>
+        </header>
+
+        <!-- Canvas Content (dynamically populated by cart.js) -->
+        <div class="canvas-body" id="miniCartContent">
+            <!-- Loading state -->
+            <div class="mini-cart-loading text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
