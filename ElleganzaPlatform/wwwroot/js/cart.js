@@ -101,7 +101,12 @@
                 // Validate product ID exists
                 if (!productId) {
                     console.warn('Quick Add: Product ID not found. Please ensure data-product-id attribute is set on the button or parent element.');
-                    self.showMessage('Unable to add product. Product information is missing.', 'error');
+                    // Show themed error notification
+                    if (window.UI && window.UI.notify) {
+                        window.UI.notify.error('Unable to add product. Product information is missing.');
+                    } else {
+                        self.showMessage('Unable to add product. Product information is missing.', 'error');
+                    }
                     return;
                 }
                 
@@ -153,8 +158,18 @@
                     return;
                 }
 
-                if (confirm('Are you sure you want to remove this item from cart?')) {
-                    self.removeFromCart(productId, $btn);
+                // Use themed confirmation if available, otherwise fallback to browser confirm
+                if (window.UI && window.UI.notify && window.UI.notify.confirm) {
+                    window.UI.notify.confirm(
+                        'Are you sure you want to remove this item from cart?',
+                        function () {
+                            self.removeFromCart(productId, $btn);
+                        }
+                    );
+                } else {
+                    if (confirm('Are you sure you want to remove this item from cart?')) {
+                        self.removeFromCart(productId, $btn);
+                    }
                 }
             });
         },
@@ -502,16 +517,38 @@
             $(document).off('click.miniCart', '.mini-cart-remove').on('click.miniCart', '.mini-cart-remove', function (e) {
                 e.preventDefault();
                 const productId = $(this).data('product-id');
-                if (confirm('Remove this item from cart?')) {
-                    self.removeFromMiniCart(productId);
+                
+                // Use themed confirmation if available, otherwise fallback to browser confirm
+                if (window.UI && window.UI.notify && window.UI.notify.confirm) {
+                    window.UI.notify.confirm(
+                        'Remove this item from cart?',
+                        function () {
+                            self.removeFromMiniCart(productId);
+                        }
+                    );
+                } else {
+                    if (confirm('Remove this item from cart?')) {
+                        self.removeFromMiniCart(productId);
+                    }
                 }
             });
 
             // Clear all
             $(document).off('click.miniCart', '.mini-cart-clear-all').on('click.miniCart', '.mini-cart-clear-all', function (e) {
                 e.preventDefault();
-                if (confirm('Are you sure you want to clear your entire cart?')) {
-                    self.clearMiniCart();
+                
+                // Use themed confirmation if available, otherwise fallback to browser confirm
+                if (window.UI && window.UI.notify && window.UI.notify.confirm) {
+                    window.UI.notify.confirm(
+                        'Are you sure you want to clear your entire cart?',
+                        function () {
+                            self.clearMiniCart();
+                        }
+                    );
+                } else {
+                    if (confirm('Are you sure you want to clear your entire cart?')) {
+                        self.clearMiniCart();
+                    }
                 }
             });
         },
@@ -609,13 +646,29 @@
 
         /**
          * Show message to user
+         * Uses themed UI notifications if available, falls back to alert
          */
         showMessage: function (message, type) {
-            // Check if there's a notification system
-            if (typeof toastr !== 'undefined') {
+            // Use UI.notify if available (Ecomus themed notifications)
+            if (window.UI && window.UI.notify) {
+                switch (type) {
+                    case 'success':
+                        window.UI.notify.success(message);
+                        break;
+                    case 'error':
+                        window.UI.notify.error(message);
+                        break;
+                    case 'warning':
+                        window.UI.notify.warning(message);
+                        break;
+                    default:
+                        window.UI.notify.info(message);
+                }
+            } else if (typeof toastr !== 'undefined') {
+                // Fallback to toastr if available
                 toastr[type](message);
             } else {
-                // Fallback to alert
+                // Last resort: browser alert (should not happen with ui-notify.js loaded)
                 alert(message);
             }
         }
