@@ -258,6 +258,15 @@
         </section>
         <!-- /Categories -->
         <!-- Seller -->
+        <!-- 
+            NOTE: This section currently uses static/placeholder HTML for demonstration.
+            Product IDs (1-12), names, and prices are hard-coded placeholders.
+            
+            For production:
+            - Replace with dynamic data from backend (@foreach var product in Model.Products)
+            - Use @product.Id, @product.Name, @product.Price instead of hard-coded values
+            - See PRODUCT_BINDING_PATTERN.md for migration guide
+        -->
         <section class="flat-spacing-5 pt_0 flat-seller">
             <div class="container">
                 <div class="flat-title">
@@ -267,7 +276,9 @@
                 </div>
                 <div class="grid-layout loadmore-item wow fadeInUp" data-wow-delay="0s" data-grid="grid-4">
                     <!-- card product 1 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added to both card and quick-add button for compatibility -->
+                    <!-- In production, replace "1" with @product.Id from backend model -->
+                    <div class="card-product fl-item" data-product-id="1">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/orange-1.jpg"
@@ -277,7 +288,8 @@
                             </a>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="1" data-product-name="Ribbed Tank Top" data-product-price="16.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -331,7 +343,9 @@
                         </div>
                     </div>
                     <!-- card product 2 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added to both card and quick-add button for compatibility -->
+                    <!-- In production, replace "2" with @product.Id from backend model -->
+                    <div class="card-product fl-item" data-product-id="2">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/brown.jpg"
@@ -341,7 +355,8 @@
                             </a>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="2" data-product-name="Ribbed modal T-shirt" data-product-price="18.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -397,7 +412,8 @@
                         </div>
                     </div>
                     <!-- card product 3 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added to both card and quick-add button for compatibility -->
+                    <div class="card-product fl-item" data-product-id="3">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/white-3.jpg"
@@ -407,7 +423,8 @@
                             </a>
                             <div class="list-product-btn absolute-2">
                                 <a href="#shoppingCart" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="3" data-product-name="Oversized Printed T-shirt" data-product-price="10.00">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Add to cart</span>
                                 </a>
@@ -435,7 +452,8 @@
                         </div>
                     </div>
                     <!-- card product 4 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added to both card and quick-add button for compatibility -->
+                    <div class="card-product fl-item" data-product-id="4">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/white-2.jpg"
@@ -445,7 +463,8 @@
                             </a>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="4" data-product-name="Oversized Printed T-shirt" data-product-price="16.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -499,7 +518,8 @@
                         </div>
                     </div>
                     <!-- card product 5 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added to both card and quick-add button for compatibility -->
+                    <div class="card-product fl-item" data-product-id="5">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/brown-2.jpg"
@@ -515,7 +535,8 @@
                             </div>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="5" data-product-name="V-neck linen T-shirt" data-product-price="114.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -557,7 +578,8 @@
                         </div>
                     </div>
                     <!-- card product 6 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added for Quick Add functionality -->
+                    <div class="card-product fl-item" data-product-id="6">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/light-green-1.jpg"
@@ -567,7 +589,8 @@
                             </a>
                             <div class="list-product-btn absolute-2">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="6" data-product-name="Loose Fit Sweatshirt" data-product-price="10.00">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -633,7 +656,8 @@
                         </div>
                     </div>
                     <!-- card product 7 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added for Quick Add functionality -->
+                    <div class="card-product fl-item" data-product-id="7">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/black-4.jpg"
@@ -648,7 +672,8 @@
                             </div>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="7" data-product-name="Regular Fit Oxford Shirt" data-product-price="10.00">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -708,7 +733,8 @@
                         </div>
                     </div>
                     <!-- card product 8 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added for Quick Add functionality -->
+                    <div class="card-product fl-item" data-product-id="8">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/white-8.jpg"
@@ -724,7 +750,8 @@
                             </div>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="8" data-product-name="Loose Fit Hoodie" data-product-price="9.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -772,7 +799,8 @@
                         </div>
                     </div>
                     <!-- card product 9 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added for Quick Add functionality -->
+                    <div class="card-product fl-item" data-product-id="9">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/brown-4.jpg"
@@ -787,7 +815,8 @@
                             </div>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="9" data-product-name="Patterned scarf" data-product-price="14.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -829,7 +858,8 @@
                         </div>
                     </div>
                     <!-- card product 10 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added for Quick Add functionality -->
+                    <div class="card-product fl-item" data-product-id="10">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/black-9.jpg"
@@ -844,7 +874,8 @@
                             </div>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="10" data-product-name="Slim Fit Turtleneck Sweater Black" data-product-price="18.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -886,7 +917,8 @@
                         </div>
                     </div>
                     <!-- card product 11 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added for Quick Add functionality -->
+                    <div class="card-product fl-item" data-product-id="11">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/grey-2.jpg"
@@ -901,7 +933,8 @@
                             </div>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="11" data-product-name="Slim Fit Turtleneck Sweater Grey" data-product-price="18.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -949,7 +982,8 @@
                         </div>
                     </div>
                     <!-- card product 12 -->
-                    <div class="card-product fl-item">
+                    <!-- NOTE: data-product-id added for Quick Add functionality -->
+                    <div class="card-product fl-item" data-product-id="12">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
                                 <img class="lazyload img-product" data-src="images/products/black-11.jpg"
@@ -964,7 +998,8 @@
                             </div>
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
-                                    class="box-icon bg_white quick-add tf-btn-loading">
+                                    class="box-icon bg_white quick-add tf-btn-loading"
+                                    data-product-id="12" data-product-name="Slim Fit Turtleneck Sweater Dark" data-product-price="18.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
