@@ -56,8 +56,10 @@
                                     {
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Pending => "badge-light-warning",
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Processing => "badge-light-info",
-                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Completed => "badge-light-success",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Shipped => "badge-light-primary",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Delivered => "badge-light-success",
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Cancelled => "badge-light-danger",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Refunded => "badge-light-secondary",
                                         _ => "badge-light-secondary"
                                     };
                                 }
