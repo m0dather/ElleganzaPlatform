@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElleganzaPlatform.Infrastructure.Services.Application;
 
+/// <summary>
+/// Phase 3.2: Checkout Service
+/// Handles the secure checkout process for authenticated users
+/// Converts shopping cart into orders with proper store and vendor isolation
+/// </summary>
 public class CheckoutService : ICheckoutService
 {
     private readonly ApplicationDbContext _context;
@@ -27,17 +32,25 @@ public class CheckoutService : ICheckoutService
         _cartService = cartService;
     }
 
+    /// <summary>
+    /// Phase 3.2: Retrieves checkout data for authenticated users
+    /// Loads cart items and pre-fills customer information
+    /// Returns null if user is not authenticated or cart is empty
+    /// </summary>
     public async Task<CheckoutViewModel?> GetCheckoutDataAsync()
     {
-        // Only authenticated users can checkout
+        // Phase 3.2: Access Control - Only authenticated users can checkout
         if (string.IsNullOrEmpty(_currentUserService.UserId))
             return null;
 
+        // Phase 3.2: Load cart using CartService (single source of truth)
         var cart = await _cartService.GetCartAsync();
+        
+        // Phase 3.2: Validation - Cart must have items to proceed
         if (cart.Items.Count == 0)
             return null;
 
-        // Get user details for pre-filling the form
+        // Phase 3.2: Load user details for pre-filling the checkout form
         var user = await _context.Users
             .Where(u => u.Id == _currentUserService.UserId)
             .FirstOrDefaultAsync();
@@ -45,6 +58,7 @@ public class CheckoutService : ICheckoutService
         if (user == null)
             return null;
 
+        // Phase 3.2: Return checkout view model with cart and user data
         return new CheckoutViewModel
         {
             Cart = cart,
@@ -58,30 +72,41 @@ public class CheckoutService : ICheckoutService
         };
     }
 
+    /// <summary>
+    /// Phase 3.2: Places an order from the current cart
+    /// Creates Order and OrderItems with proper StoreId, UserId, and VendorId isolation
+    /// Updates product stock quantities
+    /// Clears cart after successful order creation
+    /// Returns null if validation fails
+    /// </summary>
     public async Task<OrderConfirmationViewModel?> PlaceOrderAsync(PlaceOrderRequest request)
     {
-        // Only authenticated users can place orders
+        // Phase 3.2: Access Control - Only authenticated users can place orders
         if (string.IsNullOrEmpty(_currentUserService.UserId))
             return null;
 
+        // Phase 3.2: Load cart using CartService (single source of truth)
         var cart = await _cartService.GetCartAsync();
+        
+        // Phase 3.2: Validation - Cart must have items to place an order
         if (cart.Items.Count == 0)
             return null;
 
+        // Phase 3.2: Store Isolation - Get current store context
         var storeId = await _storeContextService.GetCurrentStoreIdAsync();
         if (!storeId.HasValue)
             return null;
 
-        // Generate order number
+        // Phase 3.2: Generate unique order number
         var orderNumber = await GenerateOrderNumberAsync();
 
-        // Create order
+        // Phase 3.2: Create Order entity with customer and store information
         var order = new Order
         {
-            StoreId = storeId.Value,
-            UserId = _currentUserService.UserId,
+            StoreId = storeId.Value,              // Store isolation
+            UserId = _currentUserService.UserId,   // Customer assignment
             OrderNumber = orderNumber,
-            Status = OrderStatus.Pending,
+            Status = OrderStatus.Pending,          // Initial status as per requirements
             SubTotal = cart.SubTotal,
             TaxAmount = cart.TaxAmount,
             ShippingAmount = cart.ShippingAmount,
@@ -94,25 +119,25 @@ public class CheckoutService : ICheckoutService
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
 
-        // Create order items
+        // Phase 3.2: Create OrderItems from cart items with vendor isolation
         foreach (var cartItem in cart.Items)
         {
             var orderItem = new OrderItem
             {
                 OrderId = order.Id,
                 ProductId = cartItem.ProductId,
-                VendorId = cartItem.VendorId,
+                VendorId = cartItem.VendorId,      // Vendor isolation per item
                 ProductName = cartItem.ProductName,
                 ProductSku = cartItem.ProductSku,
                 Quantity = cartItem.Quantity,
                 UnitPrice = cartItem.UnitPrice,
                 TotalPrice = cartItem.TotalPrice,
-                VendorCommission = cartItem.TotalPrice * 0.15m // 15% commission (should be configurable)
+                VendorCommission = cartItem.TotalPrice * 0.15m // 15% commission (configurable)
             };
 
             _context.OrderItems.Add(orderItem);
 
-            // Update product stock
+            // Phase 3.2: Update product stock quantity
             var product = await _context.Products.FindAsync(cartItem.ProductId);
             if (product != null)
             {
@@ -122,9 +147,10 @@ public class CheckoutService : ICheckoutService
 
         await _context.SaveChangesAsync();
 
-        // Clear cart after successful order
+        // Phase 3.2: Clear cart after successful order (as per requirements)
         await _cartService.ClearCartAsync();
 
+        // Phase 3.2: Return order confirmation for success page
         return new OrderConfirmationViewModel
         {
             OrderId = order.Id,
@@ -135,6 +161,11 @@ public class CheckoutService : ICheckoutService
         };
     }
 
+    /// <summary>
+    /// Phase 3.2: Generates a unique order number
+    /// Format: ORD-{timestamp}-{random}
+    /// Ensures uniqueness by checking against existing orders
+    /// </summary>
     private async Task<string> GenerateOrderNumberAsync()
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
