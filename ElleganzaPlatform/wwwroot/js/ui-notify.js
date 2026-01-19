@@ -93,11 +93,14 @@
 
             $('body').append(modalHtml);
             const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            
+            // Track confirmation state before modal interactions
+            let isConfirmed = false;
 
             // Handle confirm button
             $('#confirmButton').on('click', function () {
-                // Mark as confirmed before hiding modal
-                $('#confirmationModal').data('confirmed', true);
+                // Set confirmed flag BEFORE hiding modal to avoid race condition
+                isConfirmed = true;
                 modal.hide();
                 if (typeof onConfirm === 'function') {
                     onConfirm();
@@ -106,8 +109,8 @@
 
             // Handle cancel (modal close)
             $('#confirmationModal').on('hidden.bs.modal', function () {
-                const wasConfirmed = $(this).data('confirmed');
-                if (!wasConfirmed && typeof onCancel === 'function') {
+                // Check if user confirmed or cancelled
+                if (!isConfirmed && typeof onCancel === 'function') {
                     onCancel();
                 }
                 $(this).remove();

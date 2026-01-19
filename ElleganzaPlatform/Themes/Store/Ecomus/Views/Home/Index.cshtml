@@ -258,6 +258,15 @@
         </section>
         <!-- /Categories -->
         <!-- Seller -->
+        <!-- 
+            NOTE: This section currently uses static/placeholder HTML for demonstration.
+            Product IDs (1-12), names, and prices are hard-coded placeholders.
+            
+            For production:
+            - Replace with dynamic data from backend (@foreach var product in Model.Products)
+            - Use @product.Id, @product.Name, @product.Price instead of hard-coded values
+            - See PRODUCT_BINDING_PATTERN.md for migration guide
+        -->
         <section class="flat-spacing-5 pt_0 flat-seller">
             <div class="container">
                 <div class="flat-title">
@@ -866,7 +875,7 @@
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
                                     class="box-icon bg_white quick-add tf-btn-loading"
-                                    data-product-id="10" data-product-name="Slim Fit Turtleneck Sweater" data-product-price="18.95">
+                                    data-product-id="10" data-product-name="Slim Fit Turtleneck Sweater Black" data-product-price="18.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -925,7 +934,7 @@
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
                                     class="box-icon bg_white quick-add tf-btn-loading"
-                                    data-product-id="11" data-product-name="Slim Fit Turtleneck Sweater" data-product-price="18.95">
+                                    data-product-id="11" data-product-name="Slim Fit Turtleneck Sweater Grey" data-product-price="18.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
@@ -990,7 +999,7 @@
                             <div class="list-product-btn">
                                 <a href="#quick_add" data-bs-toggle="modal"
                                     class="box-icon bg_white quick-add tf-btn-loading"
-                                    data-product-id="12" data-product-name="Slim Fit Turtleneck Sweater" data-product-price="18.95">
+                                    data-product-id="12" data-product-name="Slim Fit Turtleneck Sweater Dark" data-product-price="18.95">
                                     <span class="icon icon-bag"></span>
                                     <span class="tooltip">Quick Add</span>
                                 </a>
