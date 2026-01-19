@@ -1,0 +1,228 @@
+@model ElleganzaPlatform.Application.ViewModels.Admin.AdminOrderDetailsViewModel
+@{
+    ViewData["Title"] = $"Order {Model.OrderNumber}";
+    Layout = "~/Themes/Admin/Metronic/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex flex-column flex-column-fluid">
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <!--begin::Page title-->
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Order Details</h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="text-muted text-hover-primary">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">
+                        <a asp-action="Index" class="text-muted text-hover-primary">Orders</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">@Model.OrderNumber</li>
+                </ul>
+            </div>
+            <!--end::Page title-->
+            <!--begin::Actions-->
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+                <a asp-action="Index" class="btn btn-sm btn-light">
+                    <i class="bi bi-arrow-left fs-5"></i> Back to Orders
+                </a>
+            </div>
+            <!--end::Actions-->
+        </div>
+    </div>
+    <!--end::Toolbar-->
+    
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <div class="row g-5 g-xl-10">
+                <!--begin::Order Summary-->
+                <div class="col-xl-8">
+                    <div class="card card-flush mb-5 mb-xl-10">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h2>Order #@Model.OrderNumber</h2>
+                            </div>
+                            <div class="card-toolbar">
+                                @{
+                                    var badgeClass = Model.Status switch
+                                    {
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Pending => "badge-light-warning",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Processing => "badge-light-info",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Shipped => "badge-light-primary",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Delivered => "badge-light-success",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Cancelled => "badge-light-danger",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Refunded => "badge-light-secondary",
+                                        _ => "badge-light-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass fs-6">@Model.StatusDisplay</span>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0">
+                                    <thead>
+                                        <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                            <th class="min-w-200px">Product</th>
+                                            <th class="min-w-100px">Vendor</th>
+                                            <th class="min-w-70px text-end">Qty</th>
+                                            <th class="min-w-100px text-end">Unit Price</th>
+                                            <th class="min-w-100px text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fw-semibold text-gray-600">
+                                        @foreach (var item in Model.Items)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <span class="text-gray-800 fw-bold">@item.ProductName</span>
+                                                        <span class="text-muted fs-7">SKU: @item.ProductSku</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-light">@item.VendorName</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    @item.Quantity
+                                                </td>
+                                                <td class="text-end">
+                                                    $@item.UnitPrice.ToString("F2")
+                                                </td>
+                                                <td class="text-end text-gray-800 fw-bold">
+                                                    $@item.TotalPrice.ToString("F2")
+                                                </td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td colspan="4" class="text-end">Subtotal</td>
+                                            <td class="text-end">$@Model.SubTotal.ToString("F2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" class="text-end">Tax</td>
+                                            <td class="text-end">$@Model.TaxAmount.ToString("F2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" class="text-end">Shipping</td>
+                                            <td class="text-end">$@Model.ShippingAmount.ToString("F2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" class="fs-4 text-end text-dark fw-bold">Total</td>
+                                            <td class="text-end fs-4 text-dark fw-bold">$@Model.TotalAmount.ToString("F2")</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Order Summary-->
+                
+                <!--begin::Order Details-->
+                <div class="col-xl-4">
+                    <!--begin::Customer Details-->
+                    <div class="card card-flush mb-5">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h3>Customer</h3>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="mb-4">
+                                <div class="fw-bold text-gray-600 mb-1">Name</div>
+                                <div class="text-gray-800">@(Model.CustomerName ?? "N/A")</div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="fw-bold text-gray-600 mb-1">Email</div>
+                                <div class="text-gray-800">@Model.CustomerEmail</div>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-gray-600 mb-1">Order Date</div>
+                                <div class="text-gray-800">@Model.CreatedAt.ToString("MMMM dd, yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Customer Details-->
+                    
+                    <!--begin::Shipping Address-->
+                    <div class="card card-flush mb-5">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h3>Shipping Address</h3>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="text-gray-800">
+                                @if (!string.IsNullOrEmpty(Model.ShippingAddress))
+                                {
+                                    @foreach (var line in Model.ShippingAddress.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        @line<br />
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No shipping address provided</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Shipping Address-->
+                    
+                    <!--begin::Billing Address-->
+                    <div class="card card-flush mb-5">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h3>Billing Address</h3>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="text-gray-800">
+                                @if (!string.IsNullOrEmpty(Model.BillingAddress))
+                                {
+                                    @foreach (var line in Model.BillingAddress.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        @line<br />
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No billing address provided</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Billing Address-->
+                    
+                    @if (!string.IsNullOrEmpty(Model.CustomerNotes))
+                    {
+                        <!--begin::Customer Notes-->
+                        <div class="card card-flush">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <h3>Customer Notes</h3>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="text-gray-800">
+                                    @Model.CustomerNotes
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::Customer Notes-->
+                    }
+                </div>
+                <!--end::Order Details-->
+            </div>
+        </div>
+    </div>
+    <!--end::Content-->
+</div>

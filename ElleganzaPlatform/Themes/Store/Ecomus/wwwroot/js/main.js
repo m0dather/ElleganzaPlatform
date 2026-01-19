@@ -313,8 +313,10 @@
   /* button wishlist
   -------------------------------------------------------------------------*/
   var btnWishlist = function () {
-    if ($(".btn-icon-action").length) {
-      $(".btn-icon-action").on("click", function (e) {
+    // Only handle compare buttons here, not wishlist
+    // Wishlist is now handled by dedicated wishlist.js module
+    if ($(".btn-icon-action.compare").length) {
+      $(".btn-icon-action.compare").on("click", function (e) {
         $(this).toggleClass("active");
       });
     }
