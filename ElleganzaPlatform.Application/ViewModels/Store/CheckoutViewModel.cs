@@ -34,7 +34,7 @@ public class AddressViewModel
     public string Email { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Phone number is required")]
-    [RegularExpression(@"^\+?[\d\s\-\(\)]{10,20}$", ErrorMessage = "Please enter a valid phone number (10-20 digits)")]
+    [RegularExpression(@"^\+?[\d\s\-\(\)]{10,20}$", ErrorMessage = "Please enter a valid phone number (10-20 characters including formatting)")]
     public string Phone { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Address is required")]
