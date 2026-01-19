@@ -225,7 +225,17 @@
             
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    // Prevent double submit
+                    // Check if jQuery validation is available and validate the form
+                    if (typeof $.fn.valid === 'function') {
+                        var isValid = $(form).valid();
+                        if (!isValid) {
+                            // Form is invalid, don't submit and don't lock the button
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                    
+                    // Prevent double submit only if validation passed
                     if (isSubmitting) {
                         e.preventDefault();
                         return false;
