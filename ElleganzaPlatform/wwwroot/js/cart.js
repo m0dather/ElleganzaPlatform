@@ -360,13 +360,13 @@
                 itemsHtml += `
                     <div class="mini-cart-item d-flex gap-3 mb-3 pb-3 border-bottom" data-product-id="${item.productId}">
                         <div class="mini-cart-item-image">
-                            <a href="/shop/product/${item.productSlug}">
+                            <a href="/shop/product/${item.productId}">
                                 <img src="${imageUrl}" alt="${item.productName}" style="width: 80px; height: 80px; object-fit: cover;">
                             </a>
                         </div>
                         <div class="mini-cart-item-info flex-grow-1">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <a href="/shop/product/${item.productSlug}" class="mini-cart-item-name fw-semibold text-decoration-none">${item.productName}</a>
+                                <a href="/shop/product/${item.productId}" class="mini-cart-item-name fw-semibold text-decoration-none">${item.productName}</a>
                                 <button class="btn btn-sm btn-link text-danger p-0 mini-cart-remove" data-product-id="${item.productId}" title="Remove">
                                     <i class="icon icon-close"></i>
                                 </button>
@@ -379,7 +379,7 @@
                                         <button class="btn btn-sm btn-outline-secondary mini-cart-qty-increase" data-product-id="${item.productId}">+</button>
                                     </div>
                                 </div>
-                                <div class="mini-cart-item-price fw-semibold">${currencySymbol}${item.total.toFixed(2)}</div>
+                                <div class="mini-cart-item-price fw-semibold">${currencySymbol}${item.totalPrice.toFixed(2)}</div>
                             </div>
                         </div>
                     </div>

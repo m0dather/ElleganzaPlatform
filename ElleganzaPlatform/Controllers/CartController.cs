@@ -196,11 +196,11 @@ public class CartController : Controller
                 {
                     productId = item.ProductId,
                     productName = item.ProductName,
-                    productSlug = item.ProductSlug,
+                    productSku = item.ProductSku,
                     imageUrl = item.ImageUrl,
-                    price = item.Price,
+                    unitPrice = item.UnitPrice,
                     quantity = item.Quantity,
-                    total = item.Total
+                    totalPrice = item.TotalPrice
                 }),
                 subTotal = cart.SubTotal,
                 taxAmount = cart.TaxAmount,
