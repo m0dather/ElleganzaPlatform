@@ -410,6 +410,12 @@ All success criteria from requirements met:
 
 ## 🔮 Future Enhancements
 
+### Code Quality Improvements
+- **Order Number Generation**: Consider using GUID-based approach or database sequence for better concurrency handling
+- **Random Number Generation**: Replace new Random() instances with a static instance or IRandomNumberGenerator service
+- **Configuration Externalization**: Move commission rate (0.15m) to IConfiguration for runtime configurability
+- **Transaction Handling**: Add database transactions for order creation to ensure atomicity
+
 ### Payment Integration (Phase 4)
 - Integrate payment gateway (Stripe, PayPal, etc.)
 - Handle payment failures gracefully
