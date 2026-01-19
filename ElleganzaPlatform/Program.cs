@@ -16,6 +16,14 @@ builder.Services.AddControllersWithViews()
     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
     .AddDataAnnotationsLocalization();
 
+// Phase 3.1.1: Configure Anti-Forgery for AJAX requests
+// This allows anti-forgery tokens to be sent via custom headers from JavaScript
+builder.Services.AddAntiforgery(options =>
+{
+    // Read token from header for AJAX requests
+    options.HeaderName = "RequestVerificationToken";
+});
+
 // Configure Razor view engine to use theme-based view locations
 builder.Services.Configure<RazorViewEngineOptions>(options =>
 {

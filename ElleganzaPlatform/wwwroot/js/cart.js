@@ -36,7 +36,7 @@
                     }
                 });
             } else {
-                console.warn('CSRF token not found. Cart operations may fail.');
+                console.warn('CSRF token not found. Ensure @Html.AntiForgeryToken() is present in _Layout.cshtml. Cart operations may fail.');
             }
         },
 

@@ -42,8 +42,8 @@ public class CartController : Controller
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Invalid AddToCart request: {Errors}", 
-                string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
+            var errors = string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            _logger.LogWarning("Invalid AddToCart request: {Errors}", errors);
             return BadRequest(new { success = false, message = "Invalid request" });
         }
 
@@ -84,8 +84,8 @@ public class CartController : Controller
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Invalid UpdateCartItem request: {Errors}", 
-                string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
+            var errors = string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            _logger.LogWarning("Invalid UpdateCartItem request: {Errors}", errors);
             return BadRequest(new { success = false, message = "Invalid request" });
         }
 
