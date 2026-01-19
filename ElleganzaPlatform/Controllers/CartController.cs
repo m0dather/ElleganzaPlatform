@@ -219,6 +219,7 @@ public class CartController : Controller
     /// <summary>
     /// Clear cart
     /// Phase 3.1.1: Protected with anti-forgery token validation
+    /// Supports both page redirect (form submit) and AJAX (mini cart)
     /// </summary>
     [HttpPost("/cart/clear")]
     [ValidateAntiForgeryToken]
@@ -228,11 +229,29 @@ public class CartController : Controller
         {
             await _cartService.ClearCartAsync();
             _logger.LogInformation("Cart cleared successfully");
+            
+            // If AJAX request, return JSON
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || 
+                Request.ContentType?.Contains("application/json") == true)
+            {
+                return Ok(new { success = true, message = "Cart cleared successfully" });
+            }
+            
+            // Otherwise redirect (form post from cart page)
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error clearing cart");
+            
+            // If AJAX request, return JSON error
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || 
+                Request.ContentType?.Contains("application/json") == true)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while clearing the cart" });
+            }
+            
+            // Otherwise redirect with error message
             TempData["Error"] = "An error occurred while clearing the cart";
             return RedirectToAction(nameof(Index));
         }

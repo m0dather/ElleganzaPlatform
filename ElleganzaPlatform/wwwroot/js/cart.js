@@ -550,12 +550,17 @@
             $.ajax({
                 url: '/cart/clear',
                 type: 'POST',
-                success: function () {
-                    // Reload mini cart to show empty state
-                    self.loadMiniCart();
-                    // Update header count
-                    self.updateCartCount(0);
-                    self.showMessage('Cart cleared successfully', 'success');
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (response) {
+                    if (response && response.success) {
+                        // Reload mini cart to show empty state
+                        self.loadMiniCart();
+                        // Update header count
+                        self.updateCartCount(0);
+                        self.showMessage('Cart cleared successfully', 'success');
+                    }
                 },
                 error: function () {
                     self.showMessage('Failed to clear cart', 'error');
