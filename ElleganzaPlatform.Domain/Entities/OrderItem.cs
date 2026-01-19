@@ -7,6 +7,7 @@ public class OrderItem : BaseEntity
     public int OrderId { get; set; }
     public int ProductId { get; set; }
     public int VendorId { get; set; }
+    public int StoreId { get; set; }  // Phase 3.2: Store isolation per order item
     public string ProductName { get; set; } = string.Empty;
     public string ProductSku { get; set; } = string.Empty;
     public int Quantity { get; set; }
