@@ -51,12 +51,14 @@ Add to both the card and the button for maximum compatibility:
 ## Files Requiring Updates
 
 ### Static Demo Views (Using Placeholder IDs)
-These views currently use static HTML and should be updated with placeholder IDs (1, 2, 3, etc.):
+These views exist in the codebase and currently use static HTML. They should be updated with placeholder IDs (1, 2, 3, etc.) for demonstration:
 
-1. `/Themes/Store/Ecomus/Views/Home/Index.cshtml` - 12 products
-2. `/Themes/Store/Ecomus/Views/Shop/Product.cshtml` - Related products section
-3. `/Themes/Store/Ecomus/Views/Shared/_Header.cshtml` - Header product carousel
-4. `/Themes/Store/Ecomus/Views/Account/Wishlist.cshtml` - Wishlist products
+1. **✅ COMPLETED**: `/Themes/Store/Ecomus/Views/Home/Index.cshtml` - 12 products (all updated)
+2. **Remaining**: `/Themes/Store/Ecomus/Views/Shop/Product.cshtml` - Related products section (exists, has product cards)
+3. **Remaining**: `/Themes/Store/Ecomus/Views/Shared/_Header.cshtml` - Header product carousel (exists, has product cards)
+4. **Remaining**: `/Themes/Store/Ecomus/Views/Account/Wishlist.cshtml` - Wishlist products (exists, has product cards)
+
+**Note**: All files listed above exist in the codebase and contain product card markup that follows the same `.card-product` structure. The same pattern used for Home/Index.cshtml can be applied to these files.
 
 ### Dynamic Views (Using Real Data from Backend)
 When the backend provides product data through Models, use:

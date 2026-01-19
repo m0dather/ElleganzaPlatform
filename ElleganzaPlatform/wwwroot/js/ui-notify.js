@@ -96,6 +96,8 @@
 
             // Handle confirm button
             $('#confirmButton').on('click', function () {
+                // Mark as confirmed before hiding modal
+                $('#confirmationModal').data('confirmed', true);
                 modal.hide();
                 if (typeof onConfirm === 'function') {
                     onConfirm();
@@ -109,11 +111,6 @@
                     onCancel();
                 }
                 $(this).remove();
-            });
-
-            // Mark as confirmed when button is clicked
-            $('#confirmButton').on('click', function () {
-                $('#confirmationModal').data('confirmed', true);
             });
 
             modal.show();
