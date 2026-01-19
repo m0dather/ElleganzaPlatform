@@ -34,11 +34,11 @@ public class AddressViewModel
     public string Email { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Phone number is required")]
-    [Phone(ErrorMessage = "Please enter a valid phone number")]
+    [RegularExpression(@"^\+?[\d\s\-\(\)]+$", ErrorMessage = "Please enter a valid phone number")]
     public string Phone { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Address is required")]
-    [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters")]
+    [StringLength(200, MinimumLength = 10, ErrorMessage = "Address must be between 10 and 200 characters")]
     public string AddressLine1 { get; set; } = string.Empty;
     
     [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters")]

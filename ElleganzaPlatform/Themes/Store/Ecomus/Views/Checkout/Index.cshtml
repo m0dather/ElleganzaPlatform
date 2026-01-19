@@ -18,7 +18,7 @@
         <div class="tf-page-cart-wrap layout-2">
             <div class="tf-page-cart-item">
                 <h5 class="fw-5 mb_20">Billing details</h5>
-                <form class="form-checkout" method="post" action="/checkout/place-order">
+                <form class="form-checkout" method="post" action="/checkout/place-order" id="checkoutForm">
                     @Html.AntiForgeryToken()
                     
                     <div class="box grid-2">
@@ -133,8 +133,12 @@
                         <textarea name="CustomerNotes" id="CustomerNotes" rows="4">@Model.CustomerNotes</textarea>
                     </fieldset>
                     
-                    <button type="submit" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn justify-content-center">
-                        Continue to Payment
+                    <button type="submit" id="submitBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn justify-content-center">
+                        <span id="btnText">Continue to Payment</span>
+                        <span id="btnSpinner" style="display:none;">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Processing...
+                        </span>
                     </button>
                 </form>
             </div>
@@ -207,3 +211,38 @@
     </div>
 </section>
 <!-- /page-cart -->
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Double submit prevention and loading state
+        (function() {
+            var form = document.getElementById('checkoutForm');
+            var submitBtn = document.getElementById('submitBtn');
+            var btnText = document.getElementById('btnText');
+            var btnSpinner = document.getElementById('btnSpinner');
+            var isSubmitting = false;
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Prevent double submit
+                    if (isSubmitting) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    isSubmitting = true;
+                    
+                    // Disable button to prevent double submit
+                    submitBtn.disabled = true;
+                    
+                    // Show loading state
+                    btnText.style.display = 'none';
+                    btnSpinner.style.display = 'inline';
+                    
+                    return true;
+                });
+            }
+        })();
+    </script>
+}
