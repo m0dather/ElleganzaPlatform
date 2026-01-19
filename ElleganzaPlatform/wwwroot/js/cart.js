@@ -152,9 +152,12 @@
                         // Update cart count
                         self.updateCartCount(response.cartCount);
 
-                        // Open mini cart
-                        const miniCart = new bootstrap.Offcanvas(document.getElementById('miniCart'));
-                        miniCart.show();
+                        // Open mini cart if it exists
+                        const miniCartElement = document.getElementById('miniCart');
+                        if (miniCartElement) {
+                            const miniCart = new bootstrap.Offcanvas(miniCartElement);
+                            miniCart.show();
+                        }
                     } else {
                         self.showMessage(response.message || 'Failed to add product to cart', 'error');
                     }
@@ -435,12 +438,15 @@
 
         /**
          * Bind mini cart specific events
+         * Uses event delegation on document for dynamically created elements
          */
         bindMiniCartEvents: function () {
             const self = this;
+            const miniCartId = '#miniCartContent';
 
+            // Use event delegation with more specific container
             // Quantity increase
-            $(document).off('click', '.mini-cart-qty-increase').on('click', '.mini-cart-qty-increase', function (e) {
+            $(document).off('click.miniCart', '.mini-cart-qty-increase').on('click.miniCart', '.mini-cart-qty-increase', function (e) {
                 e.preventDefault();
                 const productId = $(this).data('product-id');
                 const $input = $(this).siblings('input');
@@ -450,7 +456,7 @@
             });
 
             // Quantity decrease
-            $(document).off('click', '.mini-cart-qty-decrease').on('click', '.mini-cart-qty-decrease', function (e) {
+            $(document).off('click.miniCart', '.mini-cart-qty-decrease').on('click.miniCart', '.mini-cart-qty-decrease', function (e) {
                 e.preventDefault();
                 const productId = $(this).data('product-id');
                 const $input = $(this).siblings('input');
@@ -460,7 +466,7 @@
             });
 
             // Remove item
-            $(document).off('click', '.mini-cart-remove').on('click', '.mini-cart-remove', function (e) {
+            $(document).off('click.miniCart', '.mini-cart-remove').on('click.miniCart', '.mini-cart-remove', function (e) {
                 e.preventDefault();
                 const productId = $(this).data('product-id');
                 if (confirm('Remove this item from cart?')) {
@@ -469,7 +475,7 @@
             });
 
             // Clear all
-            $(document).off('click', '.mini-cart-clear-all').on('click', '.mini-cart-clear-all', function (e) {
+            $(document).off('click.miniCart', '.mini-cart-clear-all').on('click.miniCart', '.mini-cart-clear-all', function (e) {
                 e.preventDefault();
                 if (confirm('Are you sure you want to clear your entire cart?')) {
                     self.clearMiniCart();
