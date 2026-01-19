@@ -180,6 +180,43 @@ public class CartController : Controller
     }
 
     /// <summary>
+    /// Get mini cart data (AJAX)
+    /// Returns cart items and summary for off-canvas mini cart
+    /// </summary>
+    [HttpGet("/cart/mini")]
+    public async Task<IActionResult> GetMiniCart()
+    {
+        try
+        {
+            var cart = await _cartService.GetCartAsync();
+            return Ok(new
+            {
+                success = true,
+                items = cart.Items.Select(item => new
+                {
+                    productId = item.ProductId,
+                    productName = item.ProductName,
+                    productSlug = item.ProductSlug,
+                    imageUrl = item.ImageUrl,
+                    price = item.Price,
+                    quantity = item.Quantity,
+                    total = item.Total
+                }),
+                subTotal = cart.SubTotal,
+                taxAmount = cart.TaxAmount,
+                shippingAmount = cart.ShippingAmount,
+                totalAmount = cart.TotalAmount,
+                totalItems = cart.TotalItems
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting mini cart");
+            return StatusCode(500, new { success = false, message = "An error occurred while loading the cart" });
+        }
+    }
+
+    /// <summary>
     /// Clear cart
     /// Phase 3.1.1: Protected with anti-forgery token validation
     /// </summary>
