@@ -1,3 +1,11 @@
+@*
+    RAZOR SYNTAX COMPLIANCE NOTES:
+    - This file has been audited for ASP.NET Core 8 Razor compliance
+    - NEVER use @ symbols in HTML comments - Razor will try to parse them as code
+    - Keep HTML tags properly matched (div with /div, span with /span)
+    - For Razor comments use this block style for multiline notes
+    - For HTML comments use standard HTML comment syntax
+*@
 @{
     Layout = "_Layout";
     ViewBag.Title = "Home";
@@ -263,8 +271,8 @@
             Product IDs (1-12), names, and prices are hard-coded placeholders.
             
             For production:
-            - Replace with dynamic data from backend (@foreach var product in Model.Products)
-            - Use @product.Id, @product.Name, @product.Price instead of hard-coded values
+            - Replace with dynamic data from backend (foreach var product in Model.Products)
+            - Use product.Id, product.Name, product.Price instead of hard-coded values
             - See PRODUCT_BINDING_PATTERN.md for migration guide
         -->
         <section class="flat-spacing-5 pt_0 flat-seller">
@@ -277,7 +285,7 @@
                 <div class="grid-layout loadmore-item wow fadeInUp" data-wow-delay="0s" data-grid="grid-4">
                     <!-- card product 1 -->
                     <!-- NOTE: data-product-id added to both card and quick-add button for compatibility -->
-                    <!-- In production, replace "1" with @product.Id from backend model -->
+                    <!-- In production, replace "1" with product.Id from backend model -->
                     <div class="card-product fl-item" data-product-id="1">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
@@ -344,7 +352,7 @@
                     </div>
                     <!-- card product 2 -->
                     <!-- NOTE: data-product-id added to both card and quick-add button for compatibility -->
-                    <!-- In production, replace "2" with @product.Id from backend model -->
+                    <!-- In production, replace "2" with product.Id from backend model -->
                     <div class="card-product fl-item" data-product-id="2">
                         <div class="card-product-wrapper">
                             <a href="@Url.Action("Product", "Shop")" class="product-img">
@@ -1211,7 +1219,7 @@
                                     </div>
                                     <div class="author">
                                         <div class="name">Allen Lyn</div>
-                                        <div class="metas">Customer from France</span></div>
+                                        <div class="metas">Customer from France</div>
                                     </div>
                                     <div class="product">
                                         <div class="image">
@@ -1281,7 +1289,7 @@
                                     </div>
                                     <div class="author">
                                         <div class="name">Hellen Ase</div>
-                                        <div class="metas">Customer from Japan</span></div>
+                                        <div class="metas">Customer from Japan</div>
                                     </div>
                                     <div class="product">
                                         <div class="image">
