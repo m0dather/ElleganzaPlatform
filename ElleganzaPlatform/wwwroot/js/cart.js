@@ -87,12 +87,13 @@
                 const $btn = $(this);
                 
                 // Try to get product ID from multiple sources:
-                // 1. Direct data attribute on button
-                // 2. Data attribute on parent card
+                // 1. Direct data attribute on button (kebab-case and camelCase)
+                // 2. Data attribute on parent card (kebab-case and camelCase)
                 // 3. Data attribute on closest product container
                 let productId = $btn.data('product-id') || 
                                $btn.data('productId') ||
-                               $btn.closest('.card-product, .product-item, [data-product-id]').data('product-id');
+                               $btn.closest('.card-product, .product-item, [data-product-id]').data('product-id') ||
+                               $btn.closest('.card-product, .product-item, [data-product-id]').data('productId');
                 
                 // Get quantity from data attribute or default to 1
                 const quantity = parseInt($btn.data('product-qty') || $btn.data('qty') || 1);
@@ -103,12 +104,9 @@
                     self.showMessage('Unable to add product. Product information is missing.', 'error');
                     return;
                 }
-
-                // Add visual feedback - disable button temporarily
-                const originalHtml = $btn.html();
-                $btn.prop('disabled', true);
                 
                 // Use the existing addToCart method which handles all the cart logic
+                // including button state management (disable/enable, loading text, etc.)
                 self.addToCart(productId, quantity, $btn);
             });
 
