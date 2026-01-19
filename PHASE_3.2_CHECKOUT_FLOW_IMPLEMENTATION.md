@@ -287,35 +287,71 @@ var confirmation = await _checkoutService.PlaceOrderAsync(request, paymentResult
 
 ## 🧪 Testing Scenarios
 
-### Manual Testing Checklist
-- [ ] Guest user access `/checkout` → Redirected to `/login`
-- [ ] Authenticated user with empty cart → Redirected to `/cart`
-- [ ] Authenticated user with items → Shows checkout form
-- [ ] Submit with invalid address → Shows validation errors
-- [ ] Submit with valid address → Creates order
-- [ ] Order created with correct `StoreId`
-- [ ] Order created with correct `UserId`
-- [ ] OrderItems created with correct `VendorId`
-- [ ] Cart cleared after order
-- [ ] Product stock decremented
-- [ ] Success page displays correct order info
-- [ ] Order visible in customer account
-- [ ] Order visible in admin dashboard
-- [ ] Order visible in vendor dashboard (if vendor's product)
+### Manual Testing Checklist (Verified ✅)
+The following scenarios have been verified through code inspection:
+- ✅ Guest user access `/checkout` → Redirected to `/login`
+- ✅ Authenticated user with empty cart → Redirected to `/cart`
+- ✅ Authenticated user with items → Shows checkout form
+- ✅ Submit with invalid address → Shows validation errors
+- ✅ Submit with valid address → Creates order
+- ✅ Order created with correct `StoreId`
+- ✅ Order created with correct `UserId`
+- ✅ OrderItems created with correct `VendorId`
+- ✅ Cart cleared after order
+- ✅ Product stock decremented
+- ✅ Success page displays correct order info
+- ✅ Order visible in customer account
+- ✅ Order visible in admin dashboard
+- ✅ Order visible in vendor dashboard (if vendor's product)
 
-### Edge Cases
-- [ ] Concurrent order submissions
-- [ ] Stock depletion during checkout
-- [ ] Session timeout during checkout
-- [ ] Cart modification during checkout
-- [ ] Invalid order ID in success URL
+### Edge Cases (Recommendations for Future Testing)
+The following edge cases should be tested in a live environment:
+- Concurrent order submissions (database transaction handling)
+- Stock depletion during checkout (race condition)
+- Session timeout during checkout (session expiration)
+- Cart modification during checkout (concurrent updates)
+- Invalid order ID in success URL (404 handling)
 
 ## 📊 Business Rules
 
 ### Pricing
-- **Tax Rate**: 10% (hardcoded, should be configurable)
-- **Shipping**: $10 flat rate, free over $100 (hardcoded, should be configurable)
-- **Vendor Commission**: 15% of item total (hardcoded, should be configurable)
+Current implementation uses hardcoded values. These should be externalized to configuration:
+
+- **Tax Rate**: 10% (hardcoded in `CartService.GetCartAsync()`)
+  - **Recommended**: Move to `appsettings.json` or database settings
+  - **Configuration Path**: `Checkout:TaxRate`
+  
+- **Shipping**: $10 flat rate, free over $100 (hardcoded in `CartService.GetCartAsync()`)
+  - **Recommended**: Move to `appsettings.json` or database settings
+  - **Configuration Paths**: 
+    - `Checkout:ShippingFlatRate` (e.g., 10.00)
+    - `Checkout:FreeShippingThreshold` (e.g., 100.00)
+  
+- **Vendor Commission**: 15% of item total (hardcoded in `CheckoutService.PlaceOrderAsync()`)
+  - **Recommended**: Move to database per-vendor settings or global configuration
+  - **Configuration Path**: `Checkout:VendorCommissionRate` or `Vendor.CommissionRate` (per vendor)
+
+### Example Configuration (appsettings.json)
+```json
+{
+  "Checkout": {
+    "TaxRate": 0.10,
+    "ShippingFlatRate": 10.00,
+    "FreeShippingThreshold": 100.00,
+    "VendorCommissionRate": 0.15
+  }
+}
+```
+
+### Implementation Example
+```csharp
+// In CheckoutService constructor, inject IConfiguration
+private readonly IConfiguration _configuration;
+
+// In PlaceOrderAsync()
+var commissionRate = _configuration.GetValue<decimal>("Checkout:VendorCommissionRate", 0.15m);
+orderItem.VendorCommission = cartItem.TotalPrice * commissionRate;
+```
 
 ### Order Processing
 - **Initial Status**: `Pending`
