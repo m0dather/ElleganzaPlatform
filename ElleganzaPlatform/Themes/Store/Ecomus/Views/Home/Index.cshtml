@@ -1,3 +1,11 @@
+@*
+    RAZOR SYNTAX COMPLIANCE NOTES:
+    - This file has been audited for ASP.NET Core 8 Razor compliance
+    - NEVER use @ symbols in HTML comments - Razor will try to parse them as code
+    - Keep HTML tags properly matched (div with /div, span with /span)
+    - For Razor comments use this block style for multiline notes
+    - For HTML comments use standard HTML comment syntax
+*@
 @{
     Layout = "_Layout";
     ViewBag.Title = "Home";
