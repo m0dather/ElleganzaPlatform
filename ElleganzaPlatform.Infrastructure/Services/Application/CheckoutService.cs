@@ -75,9 +75,10 @@ public class CheckoutService : ICheckoutService
     /// <summary>
     /// Phase 3.2: Places an order from the current cart
     /// Creates Order and OrderItems with proper StoreId, UserId, and VendorId isolation
-    /// Updates product stock quantities
+    /// Validates stock availability and prevents negative stock
+    /// Updates product stock quantities atomically within a transaction
     /// Clears cart after successful order creation
-    /// Returns null if validation fails
+    /// Returns null if validation fails or stock is insufficient
     /// </summary>
     public async Task<OrderConfirmationViewModel?> PlaceOrderAsync(PlaceOrderRequest request)
     {
@@ -97,68 +98,108 @@ public class CheckoutService : ICheckoutService
         if (!storeId.HasValue)
             return null;
 
-        // Phase 3.2: Generate unique order number
-        var orderNumber = await GenerateOrderNumberAsync();
-
-        // Phase 3.2: Create Order entity with customer and store information
-        var order = new Order
+        // Phase 3.2: CRITICAL - Use transaction to ensure atomicity
+        // All operations (order creation, stock update, cart clear) must succeed or fail together
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
         {
-            StoreId = storeId.Value,              // Store isolation
-            UserId = _currentUserService.UserId,   // Customer assignment
-            OrderNumber = orderNumber,
-            Status = OrderStatus.Pending,          // Initial status as per requirements
-            SubTotal = cart.SubTotal,
-            TaxAmount = cart.TaxAmount,
-            ShippingAmount = cart.ShippingAmount,
-            TotalAmount = cart.TotalAmount,
-            ShippingAddress = request.ShippingAddress.FormattedAddress,
-            BillingAddress = (request.BillingAddress ?? request.ShippingAddress).FormattedAddress,
-            CustomerNotes = request.CustomerNotes
-        };
-
-        _context.Orders.Add(order);
-        await _context.SaveChangesAsync();
-
-        // Phase 3.2: Create OrderItems from cart items with vendor isolation
-        foreach (var cartItem in cart.Items)
-        {
-            var orderItem = new OrderItem
+            // Phase 3.2: Stock Validation - Re-validate stock availability before creating order
+            // This prevents overselling as stock could have changed since cart was loaded
+            foreach (var cartItem in cart.Items)
             {
-                OrderId = order.Id,
-                ProductId = cartItem.ProductId,
-                VendorId = cartItem.VendorId,      // Vendor isolation per item
-                ProductName = cartItem.ProductName,
-                ProductSku = cartItem.ProductSku,
-                Quantity = cartItem.Quantity,
-                UnitPrice = cartItem.UnitPrice,
-                TotalPrice = cartItem.TotalPrice,
-                VendorCommission = cartItem.TotalPrice * 0.15m // 15% commission (configurable)
+                var product = await _context.Products.FindAsync(cartItem.ProductId);
+                if (product == null)
+                {
+                    // Product no longer exists - abort order
+                    return null;
+                }
+
+                // Phase 3.2: Prevent negative stock - Validate sufficient quantity available
+                if (product.StockQuantity < cartItem.Quantity)
+                {
+                    // Insufficient stock - abort order
+                    return null;
+                }
+            }
+
+            // Phase 3.2: Generate unique order number
+            var orderNumber = await GenerateOrderNumberAsync();
+
+            // Phase 3.2: Create Order entity with customer and store information
+            var order = new Order
+            {
+                StoreId = storeId.Value,              // Store isolation
+                UserId = _currentUserService.UserId,   // Customer assignment
+                OrderNumber = orderNumber,
+                Status = OrderStatus.Pending,          // Initial status as per requirements
+                SubTotal = cart.SubTotal,
+                TaxAmount = cart.TaxAmount,
+                ShippingAmount = cart.ShippingAmount,
+                TotalAmount = cart.TotalAmount,
+                ShippingAddress = request.ShippingAddress.FormattedAddress,
+                BillingAddress = (request.BillingAddress ?? request.ShippingAddress).FormattedAddress,
+                CustomerNotes = request.CustomerNotes
             };
 
-            _context.OrderItems.Add(orderItem);
+            _context.Orders.Add(order);
+            
+            // Phase 3.2: Flush Order to get OrderId for OrderItems
+            await _context.SaveChangesAsync();
 
-            // Phase 3.2: Update product stock quantity
-            var product = await _context.Products.FindAsync(cartItem.ProductId);
-            if (product != null)
+            // Phase 3.2: Create OrderItems from cart items with vendor and store isolation
+            foreach (var cartItem in cart.Items)
             {
-                product.StockQuantity -= cartItem.Quantity;
+                var orderItem = new OrderItem
+                {
+                    OrderId = order.Id,
+                    ProductId = cartItem.ProductId,
+                    VendorId = cartItem.VendorId,      // Vendor isolation per item
+                    StoreId = cartItem.StoreId,        // Store isolation per item
+                    ProductName = cartItem.ProductName,
+                    ProductSku = cartItem.ProductSku,
+                    Quantity = cartItem.Quantity,
+                    UnitPrice = cartItem.UnitPrice,
+                    TotalPrice = cartItem.TotalPrice,
+                    VendorCommission = cartItem.TotalPrice * 0.15m // 15% commission (configurable)
+                };
+
+                _context.OrderItems.Add(orderItem);
+
+                // Phase 3.2: Update product stock quantity atomically
+                // Stock validation already passed above, now decrease safely
+                var product = await _context.Products.FindAsync(cartItem.ProductId);
+                if (product != null)
+                {
+                    product.StockQuantity -= cartItem.Quantity;
+                }
             }
+
+            // Phase 3.2: Persist all changes in ONE atomic operation
+            await _context.SaveChangesAsync();
+
+            // Phase 3.2: Commit transaction - All operations successful
+            await transaction.CommitAsync();
+
+            // Phase 3.2: Clear cart after successful order (outside transaction for safety)
+            await _cartService.ClearCartAsync();
+
+            // Phase 3.2: Return order confirmation for success page
+            return new OrderConfirmationViewModel
+            {
+                OrderId = order.Id,
+                OrderNumber = order.OrderNumber,
+                OrderDate = order.CreatedAt,
+                TotalAmount = order.TotalAmount,
+                Status = order.Status.ToString()
+            };
         }
-
-        await _context.SaveChangesAsync();
-
-        // Phase 3.2: Clear cart after successful order (as per requirements)
-        await _cartService.ClearCartAsync();
-
-        // Phase 3.2: Return order confirmation for success page
-        return new OrderConfirmationViewModel
+        catch (Exception)
         {
-            OrderId = order.Id,
-            OrderNumber = order.OrderNumber,
-            OrderDate = order.CreatedAt,
-            TotalAmount = order.TotalAmount,
-            Status = order.Status.ToString()
-        };
+            // Phase 3.2: Rollback transaction on any error
+            // Ensures no partial orders or incorrect stock levels
+            await transaction.RollbackAsync();
+            return null;
+        }
     }
 
     /// <summary>
