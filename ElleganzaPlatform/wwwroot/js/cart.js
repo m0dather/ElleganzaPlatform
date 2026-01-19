@@ -62,6 +62,7 @@
             // Add to cart button (on product pages)
             $(document).on('click', '.btn-add-to-cart', function (e) {
                 e.preventDefault();
+                e.stopPropagation();
                 const $btn = $(this);
                 const productId = $btn.data('product-id');
                 // Try multiple selector patterns for quantity input
@@ -200,12 +201,18 @@
                         // Update cart count
                         self.updateCartCount(response.cartCount);
 
-                        // Open mini cart if it exists
-                        const miniCartElement = document.getElementById('miniCart');
-                        if (miniCartElement) {
-                            const miniCart = new bootstrap.Offcanvas(miniCartElement);
-                            miniCart.show();
+                        // Check CartUIConfig to determine behavior
+                        // Phase 3.3: Configurable Add To Cart UI Behavior
+                        if (window.CartUIConfig && window.CartUIConfig.openMiniCartOnAdd) {
+                            // MODE B: Open mini cart slider
+                            const miniCartElement = document.getElementById('miniCart');
+                            if (miniCartElement) {
+                                const miniCart = new bootstrap.Offcanvas(miniCartElement);
+                                miniCart.show();
+                            }
                         }
+                        // MODE A: Only update count (default behavior when openMiniCartOnAdd is false)
+                        // Count is already updated above
                     } else {
                         self.showMessage(response.message || 'Failed to add product to cart', 'error');
                     }
