@@ -105,6 +105,9 @@ public class CheckoutService : ICheckoutService
         {
             // Phase 3.2: Stock Validation - Re-validate stock availability before creating order
             // This prevents overselling as stock could have changed since cart was loaded
+            // Store product references to avoid duplicate database calls during stock update
+            var productsMap = new Dictionary<int, Product>();
+            
             foreach (var cartItem in cart.Items)
             {
                 var product = await _context.Products.FindAsync(cartItem.ProductId);
@@ -120,6 +123,9 @@ public class CheckoutService : ICheckoutService
                     // Insufficient stock - abort order
                     return null;
                 }
+                
+                // Store product reference for later use
+                productsMap[cartItem.ProductId] = product;
             }
 
             // Phase 3.2: Generate unique order number
@@ -166,9 +172,8 @@ public class CheckoutService : ICheckoutService
                 _context.OrderItems.Add(orderItem);
 
                 // Phase 3.2: Update product stock quantity atomically
-                // Stock validation already passed above, now decrease safely
-                var product = await _context.Products.FindAsync(cartItem.ProductId);
-                if (product != null)
+                // Reuse product reference from validation to avoid duplicate database call
+                if (productsMap.TryGetValue(cartItem.ProductId, out var product))
                 {
                     product.StockQuantity -= cartItem.Quantity;
                 }
@@ -180,8 +185,18 @@ public class CheckoutService : ICheckoutService
             // Phase 3.2: Commit transaction - All operations successful
             await transaction.CommitAsync();
 
-            // Phase 3.2: Clear cart after successful order (outside transaction for safety)
-            await _cartService.ClearCartAsync();
+            // Phase 3.2: Clear cart after successful order (outside transaction)
+            // Cart clearing is non-critical - order is already persisted
+            // If this fails, user can manually clear cart later
+            try
+            {
+                await _cartService.ClearCartAsync();
+            }
+            catch
+            {
+                // Log error but don't fail the order - order is already created
+                // User can still view and manage their order
+            }
 
             // Phase 3.2: Return order confirmation for success page
             return new OrderConfirmationViewModel
