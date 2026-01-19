@@ -77,6 +77,41 @@
                 self.addToCart(productId, quantity, $btn);
             });
 
+            // Quick Add to cart button (on product cards)
+            // Handles both #quick_add and .quick-add selectors
+            // Prevents modal popup and directly adds product to cart
+            $(document).on('click', '#quick_add, .quick-add, a[href="#quick_add"]', function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent modal from opening
+                
+                const $btn = $(this);
+                
+                // Try to get product ID from multiple sources:
+                // 1. Direct data attribute on button
+                // 2. Data attribute on parent card
+                // 3. Data attribute on closest product container
+                let productId = $btn.data('product-id') || 
+                               $btn.data('productId') ||
+                               $btn.closest('.card-product, .product-item, [data-product-id]').data('product-id');
+                
+                // Get quantity from data attribute or default to 1
+                const quantity = parseInt($btn.data('product-qty') || $btn.data('qty') || 1);
+
+                // Validate product ID exists
+                if (!productId) {
+                    console.warn('Quick Add: Product ID not found. Please ensure data-product-id attribute is set on the button or parent element.');
+                    self.showMessage('Unable to add product. Product information is missing.', 'error');
+                    return;
+                }
+
+                // Add visual feedback - disable button temporarily
+                const originalHtml = $btn.html();
+                $btn.prop('disabled', true);
+                
+                // Use the existing addToCart method which handles all the cart logic
+                self.addToCart(productId, quantity, $btn);
+            });
+
             // Update quantity in cart page
             $(document).on('click', '.btn-quantity', function (e) {
                 e.preventDefault();
