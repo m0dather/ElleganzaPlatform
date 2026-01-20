@@ -1,72 +1,91 @@
 @model ElleganzaPlatform.Application.ViewModels.Store.CheckoutSessionViewModel
 @{
     Layout = "_Layout";
-    ViewBag.Title = "Payment Method";
+    ViewBag.Title = "Review Order";
 }
 
 <!-- page-title -->
 <div class="tf-page-title">
     <div class="container-full">
-        <div class="heading text-center">Payment Method</div>
-        <p class="text-center text-2 text_black-2 mt_5">Step 3 of 4</p>
+        <div class="heading text-center">Review Your Order</div>
+        <p class="text-center text-2 text_black-2 mt_5">Step 4 of 4</p>
     </div>
 </div>
 <!-- /page-title -->
 
-<!-- page-payment -->
+<!-- page-review -->
 <section class="flat-spacing-11">
     <div class="container">
         <div class="tf-page-cart-wrap layout-2">
             <div class="tf-page-cart-item">
-                <h5 class="fw-5 mb_20">Choose Payment Method</h5>
-                <form class="form-payment-method" method="post" action="/checkout/update-payment" id="paymentForm">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
-                    
-                    <div class="box-checkbox">
-                        <div class="fieldset-radio mb_20">
-                            <input type="radio" name="PaymentMethod" id="payment_online" 
-                                   value="@((int)ElleganzaPlatform.Domain.Enums.PaymentMethod.Online)" 
-                                   class="tf-check payment-radio" required checked>
-                            <label for="payment_online" class="text_black-2">
-                                <div class="d-flex align-items-start">
-                                    <div>
-                                        <span class="fw-6 d-block mb_5">Pay Online (Credit/Debit Card)</span>
-                                        <span class="text-muted">Pay securely with credit or debit card via Stripe</span>
-                                        <br />
-                                        <small class="text-muted">✓ Secure payment gateway</small>
-                                        <br />
-                                        <small class="text-muted">✓ Instant order confirmation</small>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                        
-                        <div class="fieldset-radio mb_20">
-                            <input type="radio" name="PaymentMethod" id="payment_cod" 
-                                   value="@((int)ElleganzaPlatform.Domain.Enums.PaymentMethod.CashOnDelivery)" 
-                                   class="tf-check payment-radio" required>
-                            <label for="payment_cod" class="text_black-2">
-                                <div class="d-flex align-items-start">
-                                    <div>
-                                        <span class="fw-6 d-block mb_5">Cash on Delivery (COD)</span>
-                                        <span class="text-muted">Pay with cash when your order is delivered</span>
-                                        <br />
-                                        <small class="text-muted">✓ Pay when you receive</small>
-                                        <br />
-                                        <small class="text-muted">✓ No online payment required</small>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
+                <h5 class="fw-5 mb_20">Order Details</h5>
+                
+                <!-- Shipping Address -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Shipping Address</h6>
+                    <p class="text_black-2 mb_0">@Model.ShippingAddress</p>
+                </div>
+                
+                <!-- Billing Address -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Billing Address</h6>
+                    <p class="text_black-2 mb_0">@Model.BillingAddress</p>
+                </div>
+                
+                <!-- Shipping Method -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Shipping Method</h6>
+                    <p class="text_black-2 mb_0">
+                        <strong>@Model.ShippingMethod</strong> - $@Model.ShippingCost.ToString("F2")
+                    </p>
+                </div>
+                
+                <!-- Payment Method -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Payment Method</h6>
+                    <p class="text_black-2 mb_0">
+                        @if (Model.PaymentMethod == ElleganzaPlatform.Domain.Enums.PaymentMethod.Online)
+                        {
+                            <strong>Pay Online (Credit/Debit Card)</strong>
+                            <br />
+                            <small class="text-muted">You will be redirected to secure payment gateway</small>
+                        }
+                        else
+                        {
+                            <strong>Cash on Delivery (COD)</strong>
+                            <br />
+                            <small class="text-muted">Pay with cash when your order is delivered</small>
+                        }
+                    </p>
+                </div>
+                
+                <!-- Customer Notes -->
+                @if (!string.IsNullOrEmpty(Model.CustomerNotes))
+                {
+                    <div class="box-info-order mb_20">
+                        <h6 class="fw-5 mb_10">Order Notes</h6>
+                        <p class="text_black-2 mb_0">@Model.CustomerNotes</p>
                     </div>
+                }
+                
+                <!-- Confirmation Form -->
+                <form class="form-confirm-order" method="post" action="/checkout/confirm-order" id="confirmForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="checkoutSessionId" value="@Model.Id" />
                     
                     <div class="d-flex gap-3 justify-content-between mt_30">
-                        <a href="/checkout/select-shipping/@Model.Id" class="tf-btn btn-outline-dark radius-3 btn-icon animate-hover-btn">
-                            <i class="icon icon-arrow-left"></i> Back to Shipping
+                        <a href="/checkout/select-payment/@Model.Id" class="tf-btn btn-outline-dark radius-3 btn-icon animate-hover-btn">
+                            <i class="icon icon-arrow-left"></i> Back to Payment
                         </a>
                         <button type="submit" id="submitBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn">
-                            <span id="btnText">Continue to Review</span>
+                            @if (Model.PaymentMethod == ElleganzaPlatform.Domain.Enums.PaymentMethod.Online)
+                            {
+                                <span id="btnText">Proceed to Payment</span>
+                            }
+                            else
+                            {
+                                <span id="btnText">Confirm Order</span>
+                            }
                             <span id="btnSpinner" style="display:none;">
                                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                 Processing...
@@ -143,12 +162,12 @@
         </div>
     </div>
 </section>
-<!-- /page-payment -->
+<!-- /page-review -->
 
 @section Scripts {
     <script>
         (function() {
-            var form = document.getElementById('paymentForm');
+            var form = document.getElementById('confirmForm');
             var submitBtn = document.getElementById('submitBtn');
             var btnText = document.getElementById('btnText');
             var btnSpinner = document.getElementById('btnSpinner');
@@ -157,14 +176,6 @@
             // Form submission handling
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    // Check if a payment method is selected
-                    var selectedPayment = document.querySelector('.payment-radio:checked');
-                    if (!selectedPayment) {
-                        e.preventDefault();
-                        alert('Please select a payment method');
-                        return false;
-                    }
-                    
                     // Prevent double submit
                     if (isSubmitting) {
                         e.preventDefault();

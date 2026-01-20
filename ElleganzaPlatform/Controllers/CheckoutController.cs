@@ -178,16 +178,55 @@ public class CheckoutController : Controller
             return RedirectToAction(nameof(SelectPayment), new { sessionId = request.CheckoutSessionId });
         }
 
+        // Redirect to review step for final confirmation
+        return RedirectToAction(nameof(ReviewOrder), new { sessionId = request.CheckoutSessionId });
+    }
+
+    /// <summary>
+    /// GET /checkout/review/{sessionId}
+    /// Displays order review page with all details before final confirmation
+    /// Step 4: Review & Confirm
+    /// </summary>
+    [HttpGet("/checkout/review/{sessionId}")]
+    public async Task<IActionResult> ReviewOrder(int sessionId)
+    {
+        var checkoutSession = await _checkoutSessionService.GetCheckoutSessionAsync(sessionId);
+        
+        if (checkoutSession == null)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        return View(checkoutSession);
+    }
+
+    /// <summary>
+    /// POST /checkout/confirm-order
+    /// Confirms the order and proceeds to payment (Online) or creates order (COD)
+    /// Final step: Execute payment or create order
+    /// </summary>
+    [HttpPost("/checkout/confirm-order")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmOrder(int checkoutSessionId)
+    {
+        var checkoutSession = await _checkoutSessionService.GetCheckoutSessionAsync(checkoutSessionId);
+        
+        if (checkoutSession == null)
+        {
+            TempData["Error"] = "Invalid checkout session.";
+            return RedirectToAction(nameof(Index));
+        }
+
         // Branch based on payment method
-        if (request.PaymentMethod == PaymentMethod.CashOnDelivery)
+        if (checkoutSession.PaymentMethod == PaymentMethod.CashOnDelivery)
         {
             // COD: Create order immediately without payment
-            return RedirectToAction(nameof(ConfirmCOD), new { sessionId = request.CheckoutSessionId });
+            return RedirectToAction(nameof(ConfirmCOD), new { sessionId = checkoutSessionId });
         }
         else
         {
             // Online: Redirect to payment
-            return RedirectToAction("CreatePayment", "Payment", new { checkoutSessionId = request.CheckoutSessionId });
+            return RedirectToAction("CreatePayment", "Payment", new { checkoutSessionId = checkoutSessionId });
         }
     }
 

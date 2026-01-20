@@ -1,58 +1,201 @@
 @model ElleganzaPlatform.Application.ViewModels.Store.CheckoutSessionViewModel
-
 @{
-    ViewData["Title"] = "Select Shipping Method";
+    Layout = "_Layout";
+    ViewBag.Title = "Shipping Method";
 }
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h2 class="mb-4">Select Shipping Method</h2>
-            
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Order Summary</h5>
-                    <p>Total Items: @Model.Cart.TotalItems</p>
-                    <p>Subtotal: $@Model.Cart.SubTotal.ToString("F2")</p>
-                </div>
-            </div>
-
-            <form asp-action="UpdateShipping" asp-controller="Checkout" method="post">
-                <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
-                
-                <div class="mb-4">
-                    <h5>Choose Shipping Method</h5>
-                    @foreach (var method in ViewBag.ShippingMethods as List<ElleganzaPlatform.Application.ViewModels.Store.ShippingMethodOption>)
-                    {
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="radio" name="ShippingMethod" 
-                                   id="shipping_@method.Name" value="@method.Name" 
-                                   data-cost="@method.Cost" required>
-                            <label class="form-check-label" for="shipping_@method.Name">
-                                <strong>@method.Name</strong> - $@method.Cost.ToString("F2")
-                                <br />
-                                <small class="text-muted">@method.Description</small>
-                            </label>
-                        </div>
-                    }
-                    <input type="hidden" name="ShippingCost" id="shippingCost" value="0" />
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <a asp-action="Index" asp-controller="Checkout" class="btn btn-secondary">Back</a>
-                    <button type="submit" class="btn btn-primary">Continue to Payment</button>
-                </div>
-            </form>
-        </div>
+<!-- page-title -->
+<div class="tf-page-title">
+    <div class="container-full">
+        <div class="heading text-center">Shipping Method</div>
+        <p class="text-center text-2 text_black-2 mt_5">Step 2 of 4</p>
     </div>
 </div>
+<!-- /page-title -->
+
+<!-- page-shipping -->
+<section class="flat-spacing-11">
+    <div class="container">
+        <div class="tf-page-cart-wrap layout-2">
+            <div class="tf-page-cart-item">
+                <h5 class="fw-5 mb_20">Choose Shipping Method</h5>
+                <form class="form-shipping-method" method="post" action="/checkout/update-shipping" id="shippingForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
+                    <input type="hidden" name="ShippingCost" id="shippingCost" value="0" />
+                    
+                    @if (ViewBag.ShippingMethods != null)
+                    {
+                        var shippingMethods = ViewBag.ShippingMethods as List<ElleganzaPlatform.Application.ViewModels.Store.ShippingMethodOption>;
+                        if (shippingMethods != null && shippingMethods.Any())
+                        {
+                            <div class="box-checkbox">
+                                @foreach (var method in shippingMethods)
+                                {
+                                    var methodId = method.Name.Replace(" ", "_").Replace("-", "_");
+                                    <div class="fieldset-radio mb_20">
+                                        <input type="radio" name="ShippingMethod" id="shipping_@methodId" 
+                                               value="@method.Name" data-cost="@method.Cost" 
+                                               class="tf-check shipping-radio" required>
+                                        <label for="shipping_@methodId" class="text_black-2">
+                                            <div class="d-flex justify-content-between align-items-start w-100">
+                                                <div>
+                                                    <span class="fw-6 d-block mb_5">@method.Name</span>
+                                                    <span class="text-muted">@method.Description</span>
+                                                    @if (!string.IsNullOrEmpty(method.EstimatedDelivery))
+                                                    {
+                                                        <br />
+                                                        <small class="text-muted">Estimated delivery: @method.EstimatedDelivery</small>
+                                                    }
+                                                </div>
+                                                <span class="fw-6 ms-3" id="cost_@methodId">$@method.Cost.ToString("F2")</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                No shipping methods available at this time.
+                            </div>
+                        }
+                    }
+                    
+                    <div class="d-flex gap-3 justify-content-between mt_30">
+                        <a href="/checkout" class="tf-btn btn-outline-dark radius-3 btn-icon animate-hover-btn">
+                            <i class="icon icon-arrow-left"></i> Back to Address
+                        </a>
+                        <button type="submit" id="submitBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn">
+                            <span id="btnText">Continue to Payment</span>
+                            <span id="btnSpinner" style="display:none;">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="tf-page-cart-footer">
+                <div class="tf-cart-footer-inner">
+                    <h5 class="fw-5 mb_20">Order Summary</h5>
+                    <div class="tf-page-cart-checkout widget-wrap-checkout">
+                        @if (Model.Cart.Items != null && Model.Cart.Items.Any())
+                        {
+                            <ul class="wrap-checkout-product">
+                                @foreach (var item in Model.Cart.Items)
+                                {
+                                    <li class="checkout-product-item">
+                                        <figure class="img-product">
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.ProductName">
+                                            }
+                                            else
+                                            {
+                                                <img src="~/images/products/default.jpg" alt="@item.ProductName">
+                                            }
+                                            <span class="quantity">@item.Quantity</span>
+                                        </figure>
+                                        <div class="content">
+                                            <div class="info">
+                                                <p class="name">@item.ProductName</p>
+                                                @if (!string.IsNullOrEmpty(item.ProductSku))
+                                                {
+                                                    <span class="variant">SKU: @item.ProductSku</span>
+                                                }
+                                            </div>
+                                            <span class="price">$@item.TotalPrice.ToString("F2")</span>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Subtotal</span>
+                                <span class="text_black-2 fw-6">$@Model.Cart.SubTotal.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Shipping</span>
+                                <span class="text_black-2 fw-6" id="shippingDisplay">Select method</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Tax</span>
+                                <span class="text_black-2 fw-6">$@Model.Cart.TaxAmount.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_20">
+                                <h6 class="fw-5">Total</h6>
+                                <h6 class="total fw-5" id="totalDisplay">$@Model.Cart.TotalAmount.ToString("F2")</h6>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <p class="text_black-2">Your cart is empty</p>
+                                <a href="/" class="tf-btn btn-sm radius-3 btn-fill btn-icon animate-hover-btn mt-3">
+                                    Continue Shopping
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /page-shipping -->
 
 @section Scripts {
     <script>
-        document.querySelectorAll('input[name="ShippingMethod"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.getElementById('shippingCost').value = this.getAttribute('data-cost');
+        (function() {
+            var form = document.getElementById('shippingForm');
+            var submitBtn = document.getElementById('submitBtn');
+            var btnText = document.getElementById('btnText');
+            var btnSpinner = document.getElementById('btnSpinner');
+            var isSubmitting = false;
+            var baseTotal = @Model.Cart.TotalAmount;
+            var currentShipping = @Model.Cart.ShippingAmount;
+            
+            // Update shipping cost and total when selection changes
+            document.querySelectorAll('.shipping-radio').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    var cost = parseFloat(this.getAttribute('data-cost'));
+                    document.getElementById('shippingCost').value = cost;
+                    document.getElementById('shippingDisplay').textContent = '$' + cost.toFixed(2);
+                    
+                    // Update total: base total - old shipping + new shipping
+                    var newTotal = baseTotal - currentShipping + cost;
+                    document.getElementById('totalDisplay').textContent = '$' + newTotal.toFixed(2);
+                });
             });
-        });
+            
+            // Form submission handling
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Check if a shipping method is selected
+                    var selectedShipping = document.querySelector('.shipping-radio:checked');
+                    if (!selectedShipping) {
+                        e.preventDefault();
+                        alert('Please select a shipping method');
+                        return false;
+                    }
+                    
+                    // Prevent double submit
+                    if (isSubmitting) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    isSubmitting = true;
+                    submitBtn.disabled = true;
+                    btnText.style.display = 'none';
+                    btnSpinner.style.display = 'inline';
+                    
+                    return true;
+                });
+            }
+        })();
     </script>
 }
