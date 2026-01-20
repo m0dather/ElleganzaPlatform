@@ -87,10 +87,7 @@
         // Make AJAX request
         fetch('/checkout/save-address', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'RequestVerificationToken': formData.get('__RequestVerificationToken')
-            }
+            body: formData
         })
         .then(response => response.json())
         .then(data => {

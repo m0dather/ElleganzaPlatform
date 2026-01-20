@@ -37,10 +37,10 @@ public class CheckoutController : Controller
     /// All checkout steps are on a single page with progressive enable/disable
     /// </summary>
     [HttpGet("/checkout")]
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         // Redirect to one-page checkout
-        return await OnePageCheckout();
+        return RedirectToAction(nameof(OnePageCheckout));
     }
 
     /// <summary>
