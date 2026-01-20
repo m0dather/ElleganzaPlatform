@@ -1,6 +1,7 @@
 using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Domain.Enums;
 using ElleganzaPlatform.Infrastructure.Data;
+using ElleganzaPlatform.Infrastructure.Services.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -8,16 +9,6 @@ using Stripe;
 using Stripe.Checkout;
 
 namespace ElleganzaPlatform.Infrastructure.Services.Payment;
-
-/// <summary>
-/// Helper class for deserializing cart snapshot
-/// </summary>
-public class CartSnapshotData
-{
-    public decimal SubTotal { get; set; }
-    public decimal TaxAmount { get; set; }
-    public decimal TotalAmount { get; set; }
-}
 
 /// <summary>
 /// Phase 4: Stripe Payment Service Implementation

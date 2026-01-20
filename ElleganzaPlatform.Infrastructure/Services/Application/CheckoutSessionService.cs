@@ -462,12 +462,13 @@ public class CheckoutSessionService : ICheckoutSessionService
     private async Task<string> GenerateOrderNumberAsync()
     {
         var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var random = new Random().Next(1000, 9999);
+        var random = Guid.NewGuid().ToString("N").Substring(0, 4).ToUpper();
         var orderNumber = $"ORD-{timestamp}-{random}";
 
+        // Ensure uniqueness (very unlikely with GUID-based suffix)
         while (await _context.Orders.AnyAsync(o => o.OrderNumber == orderNumber))
         {
-            random = new Random().Next(1000, 9999);
+            random = Guid.NewGuid().ToString("N").Substring(0, 4).ToUpper();
             orderNumber = $"ORD-{timestamp}-{random}";
         }
 
