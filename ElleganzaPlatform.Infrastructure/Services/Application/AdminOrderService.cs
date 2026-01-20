@@ -39,7 +39,8 @@ public class AdminOrderService : IAdminOrderService
                 CustomerName = (o.User.FirstName ?? "") + " " + (o.User.LastName ?? ""),
                 Status = o.Status,
                 TotalAmount = o.TotalAmount,
-                ItemCount = o.OrderItems.Count
+                ItemCount = o.OrderItems.Count,
+                PaymentTransactionId = o.PaymentTransactionId  // Phase 4: Payment integration
             })
             .ToListAsync();
 
@@ -74,6 +75,7 @@ public class AdminOrderService : IAdminOrderService
                 ShippingAddress = o.ShippingAddress,
                 BillingAddress = o.BillingAddress,
                 CustomerNotes = o.CustomerNotes,
+                PaymentTransactionId = o.PaymentTransactionId,  // Phase 4: Payment integration
                 Items = o.OrderItems.Select(oi => new AdminOrderItemViewModel
                 {
                     ProductId = oi.ProductId,

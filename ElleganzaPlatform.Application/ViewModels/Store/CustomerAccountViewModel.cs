@@ -26,6 +26,9 @@ public class OrderSummaryViewModel
     public string Status { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
     public int ItemCount { get; set; }
+    
+    // Phase 4: Payment Integration
+    public bool CanBePaid { get; set; }
 }
 
 public class OrderDetailsViewModel
@@ -41,6 +44,10 @@ public class OrderDetailsViewModel
     public string ShippingAddress { get; set; } = string.Empty;
     public string BillingAddress { get; set; } = string.Empty;
     public IEnumerable<OrderItemViewModel> Items { get; set; } = new List<OrderItemViewModel>();
+    
+    // Phase 4: Payment Integration
+    public string? PaymentTransactionId { get; set; }
+    public bool CanBePaid { get; set; }
 }
 
 public class OrderItemViewModel

@@ -19,6 +19,9 @@ public class CustomerOrderItemViewModel
     public string StatusDisplay => Status.ToString();
     public decimal TotalAmount { get; set; }
     public int ItemCount { get; set; }
+    
+    // Phase 4: Payment Integration
+    public bool CanBePaid => Status == OrderStatus.Pending;
 }
 
 public class CustomerOrderDetailsViewModel
@@ -36,6 +39,10 @@ public class CustomerOrderDetailsViewModel
     public string BillingAddress { get; set; } = string.Empty;
     public string? CustomerNotes { get; set; }
     public List<CustomerOrderItemDetailsViewModel> Items { get; set; } = new();
+    
+    // Phase 4: Payment Integration
+    public string? PaymentTransactionId { get; set; }
+    public bool CanBePaid => Status == OrderStatus.Pending;
 }
 
 public class CustomerOrderItemDetailsViewModel

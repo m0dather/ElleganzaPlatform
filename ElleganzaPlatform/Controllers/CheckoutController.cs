@@ -114,7 +114,8 @@ public class CheckoutController : Controller
             OrderNumber = order.OrderNumber,
             OrderDate = order.OrderDate,
             TotalAmount = order.TotalAmount,
-            Status = order.StatusDisplay
+            Status = order.StatusDisplay,
+            CanBePaid = order.CanBePaid  // Phase 4: Payment integration
         };
 
         return View(confirmation);

@@ -40,14 +40,27 @@ public enum UserRole
     Customer = 4
 }
 
+/// <summary>
+/// Phase 4: Order status for payment integration
+/// Pending: Order created, awaiting payment
+/// Paid: Payment successful, ready for processing
+/// Processing: Order being prepared
+/// Shipped: Order dispatched to customer
+/// Delivered: Order received by customer
+/// Cancelled: Order cancelled
+/// Failed: Payment failed
+/// Refunded: Payment refunded
+/// </summary>
 public enum OrderStatus
 {
     Pending = 1,
-    Processing = 2,
-    Shipped = 3,
-    Delivered = 4,
-    Cancelled = 5,
-    Refunded = 6
+    Paid = 2,
+    Processing = 3,
+    Shipped = 4,
+    Delivered = 5,
+    Cancelled = 6,
+    Failed = 7,
+    Refunded = 8
 }
 
 public enum ProductStatus

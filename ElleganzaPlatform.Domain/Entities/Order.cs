@@ -17,6 +17,9 @@ public class Order : BaseEntity
     public string BillingAddress { get; set; } = string.Empty;
     public string? CustomerNotes { get; set; }
     
+    // Phase 4: Payment Integration
+    public string? PaymentTransactionId { get; set; }
+    
     // Navigation properties
     public Store Store { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
