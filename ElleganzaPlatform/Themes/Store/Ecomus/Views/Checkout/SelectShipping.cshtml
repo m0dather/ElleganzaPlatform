@@ -1,0 +1,58 @@
+@model ElleganzaPlatform.Application.ViewModels.Store.CheckoutSessionViewModel
+
+@{
+    ViewData["Title"] = "Select Shipping Method";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="mb-4">Select Shipping Method</h2>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <p>Total Items: @Model.Cart.TotalItems</p>
+                    <p>Subtotal: $@Model.Cart.SubTotal.ToString("F2")</p>
+                </div>
+            </div>
+
+            <form asp-action="UpdateShipping" asp-controller="Checkout" method="post">
+                <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
+                
+                <div class="mb-4">
+                    <h5>Choose Shipping Method</h5>
+                    @foreach (var method in ViewBag.ShippingMethods as List<ElleganzaPlatform.Application.ViewModels.Store.ShippingMethodOption>)
+                    {
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="ShippingMethod" 
+                                   id="shipping_@method.Name" value="@method.Name" 
+                                   data-cost="@method.Cost" required>
+                            <label class="form-check-label" for="shipping_@method.Name">
+                                <strong>@method.Name</strong> - $@method.Cost.ToString("F2")
+                                <br />
+                                <small class="text-muted">@method.Description</small>
+                            </label>
+                        </div>
+                    }
+                    <input type="hidden" name="ShippingCost" id="shippingCost" value="0" />
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" asp-controller="Checkout" class="btn btn-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">Continue to Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('input[name="ShippingMethod"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('shippingCost').value = this.getAttribute('data-cost');
+            });
+        });
+    </script>
+}

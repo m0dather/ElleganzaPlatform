@@ -1,6 +1,7 @@
 using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Domain.Enums;
 using ElleganzaPlatform.Infrastructure.Data;
+using ElleganzaPlatform.Infrastructure.Services.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ namespace ElleganzaPlatform.Infrastructure.Services.Payment;
 /// Handles payment processing via Stripe Checkout
 /// Implements secure webhook verification
 /// Ensures idempotent payment processing
+/// Updated to support CheckoutSession-based flow
 /// </summary>
 public class StripePaymentService : IPaymentService
 {
@@ -44,11 +46,161 @@ public class StripePaymentService : IPaymentService
     }
 
     /// <summary>
-    /// Phase 4: Creates Stripe Checkout session for order payment
-    /// Validates order exists and is eligible for payment (status = Pending)
+    /// Creates Stripe Checkout session for checkout session payment
+    /// Validates checkout session exists and is eligible for payment
     /// Returns checkout URL for customer redirect
     /// </summary>
-    public async Task<PaymentResult> CreatePaymentAsync(int orderId)
+    public async Task<PaymentResult> CreatePaymentAsync(int checkoutSessionId)
+    {
+        try
+        {
+            // Load checkout session with validation
+            var checkoutSession = await _context.CheckoutSessions
+                .Include(cs => cs.User)
+                .FirstOrDefaultAsync(cs => cs.Id == checkoutSessionId);
+
+            // Safety - Checkout session must exist
+            if (checkoutSession == null)
+            {
+                _logger.LogWarning("Payment creation failed: CheckoutSession {CheckoutSessionId} not found", checkoutSessionId);
+                return new PaymentResult
+                {
+                    IsSuccess = false,
+                    Provider = "Stripe",
+                    ErrorMessage = "Checkout session not found",
+                    CheckoutSessionId = checkoutSessionId
+                };
+            }
+
+            // Safety - Checkout session must be in Draft status and payment method must be Online
+            if (checkoutSession.Status != CheckoutSessionStatus.Draft || 
+                checkoutSession.PaymentMethod != Domain.Enums.PaymentMethod.Online)
+            {
+                _logger.LogWarning("Payment creation failed: CheckoutSession {CheckoutSessionId} status is {Status}, payment method is {PaymentMethod}", 
+                    checkoutSessionId, checkoutSession.Status, checkoutSession.PaymentMethod);
+                return new PaymentResult
+                {
+                    IsSuccess = false,
+                    Provider = "Stripe",
+                    ErrorMessage = $"Checkout session is not eligible for payment",
+                    CheckoutSessionId = checkoutSessionId
+                };
+            }
+
+            // Safety - Checkout session must not already have a payment intent
+            if (!string.IsNullOrEmpty(checkoutSession.PaymentIntentId))
+            {
+                _logger.LogWarning("Payment creation failed: CheckoutSession {CheckoutSessionId} already has payment intent {PaymentIntentId}", 
+                    checkoutSessionId, checkoutSession.PaymentIntentId);
+                return new PaymentResult
+                {
+                    IsSuccess = false,
+                    Provider = "Stripe",
+                    ErrorMessage = "Payment already exists for this checkout session",
+                    CheckoutSessionId = checkoutSessionId
+                };
+            }
+
+            // Parse cart snapshot to get total amount
+            var cartSnapshot = System.Text.Json.JsonSerializer.Deserialize<CartSnapshotData>(checkoutSession.CartSnapshot);
+            if (cartSnapshot == null)
+            {
+                _logger.LogWarning("Payment creation failed: CheckoutSession {CheckoutSessionId} has invalid cart snapshot", checkoutSessionId);
+                return new PaymentResult
+                {
+                    IsSuccess = false,
+                    Provider = "Stripe",
+                    ErrorMessage = "Invalid cart data",
+                    CheckoutSessionId = checkoutSessionId
+                };
+            }
+
+            var totalAmount = cartSnapshot.TotalAmount + checkoutSession.ShippingCost;
+
+            // Build base URL for redirects
+            var baseUrl = _configuration["App:BaseUrl"] ?? "https://localhost:7000";
+
+            // Create Stripe Checkout Session
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                Mode = "payment",
+                
+                LineItems = new List<SessionLineItemOptions>
+                {
+                    new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            Currency = "usd",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"Order from {checkoutSession.User.Email}",
+                                Description = $"Payment for checkout session"
+                            },
+                            UnitAmount = (long)Math.Round(totalAmount * 100, MidpointRounding.AwayFromZero)
+                        },
+                        Quantity = 1
+                    }
+                },
+                
+                SuccessUrl = $"{baseUrl}/checkout/payment-success?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{baseUrl}/checkout/payment-cancelled",
+                
+                Metadata = new Dictionary<string, string>
+                {
+                    { "checkout_session_id", checkoutSessionId.ToString() }
+                }
+            };
+
+            var service = new SessionService();
+            var session = await service.CreateAsync(options);
+
+            // Update checkout session with payment intent ID
+            checkoutSession.PaymentIntentId = session.Id;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Stripe Checkout session created: {SessionId} for CheckoutSession {CheckoutSessionId}", 
+                session.Id, checkoutSessionId);
+
+            return new PaymentResult
+            {
+                IsSuccess = true,
+                Provider = "Stripe",
+                CheckoutUrl = session.Url,
+                TransactionId = session.Id,
+                CheckoutSessionId = checkoutSessionId
+            };
+        }
+        catch (StripeException ex)
+        {
+            _logger.LogError(ex, "Stripe error creating payment for CheckoutSession {CheckoutSessionId}", checkoutSessionId);
+            return new PaymentResult
+            {
+                IsSuccess = false,
+                Provider = "Stripe",
+                ErrorMessage = $"Payment processing error: {ex.Message}",
+                CheckoutSessionId = checkoutSessionId
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating payment for CheckoutSession {CheckoutSessionId}", checkoutSessionId);
+            return new PaymentResult
+            {
+                IsSuccess = false,
+                Provider = "Stripe",
+                ErrorMessage = "An unexpected error occurred while processing payment",
+                CheckoutSessionId = checkoutSessionId
+            };
+        }
+    }
+
+    /// <summary>
+    /// Legacy method for backward compatibility
+    /// Creates Stripe Checkout session for order payment
+    /// </summary>
+    public async Task<PaymentResult> CreatePaymentForOrderAsync(int orderId)
     {
         try
         {
@@ -237,16 +389,89 @@ public class StripePaymentService : IPaymentService
                     };
                 }
 
-                // Phase 4: Extract order ID from session metadata
+                // Try to extract checkout session ID first (new flow)
+                if (session.Metadata.TryGetValue("checkout_session_id", out var checkoutSessionIdStr) &&
+                    int.TryParse(checkoutSessionIdStr, out var checkoutSessionId))
+                {
+                    // New flow: Update checkout session status
+                    var checkoutSession = await _context.CheckoutSessions.FindAsync(checkoutSessionId);
+                    if (checkoutSession == null)
+                    {
+                        _logger.LogWarning("Webhook references non-existent CheckoutSession {CheckoutSessionId}", checkoutSessionId);
+                        return new PaymentResult
+                        {
+                            IsSuccess = false,
+                            Provider = "Stripe",
+                            ErrorMessage = "Checkout session not found",
+                            CheckoutSessionId = checkoutSessionId
+                        };
+                    }
+
+                    // IDEMPOTENCY - Check if payment already processed
+                    if (checkoutSession.Status == CheckoutSessionStatus.Paid && 
+                        checkoutSession.PaymentIntentId == session.Id)
+                    {
+                        _logger.LogInformation("Duplicate webhook ignored for CheckoutSession {CheckoutSessionId}, already marked as Paid", 
+                            checkoutSessionId);
+                        return new PaymentResult
+                        {
+                            IsSuccess = true,
+                            Provider = "Stripe",
+                            TransactionId = session.PaymentIntentId,
+                            CheckoutSessionId = checkoutSessionId
+                        };
+                    }
+
+                    // Verify payment was actually successful
+                    if (session.PaymentStatus == "paid")
+                    {
+                        // Update checkout session status to Paid
+                        checkoutSession.Status = CheckoutSessionStatus.Paid;
+                        checkoutSession.PaymentIntentId = session.Id;
+                        
+                        await _context.SaveChangesAsync();
+                        
+                        _logger.LogInformation("CheckoutSession {CheckoutSessionId} marked as Paid with transaction {TransactionId}", 
+                            checkoutSessionId, session.PaymentIntentId);
+
+                        return new PaymentResult
+                        {
+                            IsSuccess = true,
+                            Provider = "Stripe",
+                            TransactionId = session.PaymentIntentId,
+                            CheckoutSessionId = checkoutSessionId
+                        };
+                    }
+                    else
+                    {
+                        // Payment failed or incomplete
+                        _logger.LogWarning("Payment failed for CheckoutSession {CheckoutSessionId}, status: {PaymentStatus}", 
+                            checkoutSessionId, session.PaymentStatus);
+                        
+                        // Mark session as expired
+                        checkoutSession.Status = CheckoutSessionStatus.Expired;
+                        await _context.SaveChangesAsync();
+
+                        return new PaymentResult
+                        {
+                            IsSuccess = false,
+                            Provider = "Stripe",
+                            ErrorMessage = $"Payment failed: {session.PaymentStatus}",
+                            CheckoutSessionId = checkoutSessionId
+                        };
+                    }
+                }
+
+                // Phase 4: Extract order ID from session metadata (legacy flow)
                 if (!session.Metadata.TryGetValue("order_id", out var orderIdStr) ||
                     !int.TryParse(orderIdStr, out var orderId))
                 {
-                    _logger.LogWarning("Webhook missing order_id in metadata");
+                    _logger.LogWarning("Webhook missing both checkout_session_id and order_id in metadata");
                     return new PaymentResult
                     {
                         IsSuccess = false,
                         Provider = "Stripe",
-                        ErrorMessage = "Order ID not found in payment metadata"
+                        ErrorMessage = "Session ID not found in payment metadata"
                     };
                 }
 
