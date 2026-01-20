@@ -32,11 +32,12 @@
                             <div class="box-checkbox">
                                 @foreach (var method in shippingMethods)
                                 {
+                                    var methodId = method.Name.Replace(" ", "_").Replace("-", "_");
                                     <div class="fieldset-radio mb_20">
-                                        <input type="radio" name="ShippingMethod" id="shipping_@method.Name.Replace(" ", "_")" 
+                                        <input type="radio" name="ShippingMethod" id="shipping_@methodId" 
                                                value="@method.Name" data-cost="@method.Cost" 
                                                class="tf-check shipping-radio" required>
-                                        <label for="shipping_@method.Name.Replace(" ", "_")" class="text_black-2">
+                                        <label for="shipping_@methodId" class="text_black-2">
                                             <div class="d-flex justify-content-between align-items-start w-100">
                                                 <div>
                                                     <span class="fw-6 d-block mb_5">@method.Name</span>
@@ -47,7 +48,7 @@
                                                         <small class="text-muted">Estimated delivery: @method.EstimatedDelivery</small>
                                                     }
                                                 </div>
-                                                <span class="fw-6 ms-3" id="cost_@method.Name.Replace(" ", "_")">$@method.Cost.ToString("F2")</span>
+                                                <span class="fw-6 ms-3" id="cost_@methodId">$@method.Cost.ToString("F2")</span>
                                             </div>
                                         </label>
                                     </div>

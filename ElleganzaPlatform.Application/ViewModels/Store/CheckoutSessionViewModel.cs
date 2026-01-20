@@ -19,6 +19,11 @@ public class CheckoutSessionViewModel
     public string ShippingAddress { get; set; } = string.Empty;
     public string BillingAddress { get; set; } = string.Empty;
     public string? CustomerNotes { get; set; }
+    
+    /// <summary>
+    /// Computed total amount including subtotal, shipping, and tax
+    /// </summary>
+    public decimal TotalAmount => Cart.SubTotal + ShippingCost + Cart.TaxAmount;
 }
 
 /// <summary>

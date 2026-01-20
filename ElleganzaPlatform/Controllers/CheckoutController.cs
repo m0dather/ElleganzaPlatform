@@ -178,7 +178,7 @@ public class CheckoutController : Controller
             return RedirectToAction(nameof(SelectPayment), new { sessionId = request.CheckoutSessionId });
         }
 
-        // Branch based on payment method - redirect to review step
+        // Redirect to review step for final confirmation
         return RedirectToAction(nameof(ReviewOrder), new { sessionId = request.CheckoutSessionId });
     }
 

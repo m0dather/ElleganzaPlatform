@@ -144,7 +144,7 @@
                             </div>
                             <div class="d-flex justify-content-between line pb_20">
                                 <h6 class="fw-5">Total</h6>
-                                <h6 class="total fw-5">$@((Model.Cart.SubTotal + Model.ShippingCost + Model.Cart.TaxAmount).ToString("F2"))</h6>
+                                <h6 class="total fw-5">$@Model.TotalAmount.ToString("F2")</h6>
                             </div>
                         }
                         else
