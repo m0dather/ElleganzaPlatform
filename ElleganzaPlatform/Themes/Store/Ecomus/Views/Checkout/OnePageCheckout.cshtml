@@ -1,0 +1,379 @@
+@model ElleganzaPlatform.Application.ViewModels.Store.CheckoutViewModel
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Checkout";
+}
+
+<!-- page-title -->
+<div class="tf-page-title">
+    <div class="container-full">
+        <div class="heading text-center">One-Page Checkout</div>
+        <p class="text-center text-2 text_black-2 mt_5">Complete your order in one place</p>
+    </div>
+</div>
+<!-- /page-title -->
+
+<!-- page-checkout -->
+<section class="flat-spacing-11">
+    <div class="container">
+        <div class="tf-page-cart-wrap layout-2">
+            <div class="tf-page-cart-item">
+                
+                <!-- SECTION 1: BILLING & ADDRESS -->
+                <div id="section-address" class="checkout-section active">
+                    <div class="d-flex align-items-center justify-content-between mb_20">
+                        <h5 class="fw-5 mb-0">
+                            <span class="section-number">1</span> Billing & Address
+                        </h5>
+                        <span class="badge bg-primary" id="address-status">Active</span>
+                    </div>
+                    
+                    <form id="addressForm" class="checkout-form">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="box grid-2">
+                            <fieldset class="fieldset">
+                                <label for="ShippingAddress_FirstName">First Name *</label>
+                                <input type="text" id="ShippingAddress_FirstName" name="ShippingAddress.FirstName" 
+                                       value="@Model.ShippingAddress.FirstName" required>
+                                <span class="text-danger" data-valmsg-for="ShippingAddress.FirstName"></span>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <label for="ShippingAddress_LastName">Last Name *</label>
+                                <input type="text" id="ShippingAddress_LastName" name="ShippingAddress.LastName" 
+                                       value="@Model.ShippingAddress.LastName" required>
+                                <span class="text-danger" data-valmsg-for="ShippingAddress.LastName"></span>
+                            </fieldset>
+                        </div>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_Email">Email *</label>
+                            <input type="email" id="ShippingAddress_Email" name="ShippingAddress.Email" 
+                                   value="@Model.ShippingAddress.Email" required>
+                            <span class="text-danger" data-valmsg-for="ShippingAddress.Email"></span>
+                        </fieldset>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_Phone">Phone Number *</label>
+                            <input type="tel" id="ShippingAddress_Phone" name="ShippingAddress.Phone" 
+                                   value="@Model.ShippingAddress.Phone" required>
+                            <span class="text-danger" data-valmsg-for="ShippingAddress.Phone"></span>
+                        </fieldset>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_Country">Country/Region *</label>
+                            <div class="select-custom">
+                                <select class="tf-select w-100" id="ShippingAddress_Country" name="ShippingAddress.Country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="United States">United States</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="France">France</option>
+                                    <option value="Italy">Italy</option>
+                                    <option value="Spain">Spain</option>
+                                    <option value="Netherlands">Netherlands</option>
+                                    <option value="Belgium">Belgium</option>
+                                    <option value="Sweden">Sweden</option>
+                                    <option value="Norway">Norway</option>
+                                    <option value="Denmark">Denmark</option>
+                                    <option value="Finland">Finland</option>
+                                    <option value="Japan">Japan</option>
+                                    <option value="South Korea">South Korea</option>
+                                    <option value="Singapore">Singapore</option>
+                                    <option value="New Zealand">New Zealand</option>
+                                </select>
+                            </div>
+                            <span class="text-danger" data-valmsg-for="ShippingAddress.Country"></span>
+                        </fieldset>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_AddressLine1">Address Line 1 *</label>
+                            <input type="text" id="ShippingAddress_AddressLine1" name="ShippingAddress.AddressLine1" 
+                                   value="@Model.ShippingAddress.AddressLine1" required>
+                            <span class="text-danger" data-valmsg-for="ShippingAddress.AddressLine1"></span>
+                        </fieldset>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_AddressLine2">Address Line 2</label>
+                            <input type="text" id="ShippingAddress_AddressLine2" name="ShippingAddress.AddressLine2" 
+                                   value="@Model.ShippingAddress.AddressLine2">
+                        </fieldset>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_City">Town/City *</label>
+                            <input type="text" id="ShippingAddress_City" name="ShippingAddress.City" 
+                                   value="@Model.ShippingAddress.City" required>
+                            <span class="text-danger" data-valmsg-for="ShippingAddress.City"></span>
+                        </fieldset>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_State">State/Province *</label>
+                            <input type="text" id="ShippingAddress_State" name="ShippingAddress.State" 
+                                   value="@Model.ShippingAddress.State" required>
+                            <span class="text-danger" data-valmsg-for="ShippingAddress.State"></span>
+                        </fieldset>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="ShippingAddress_PostalCode">Postal Code *</label>
+                            <input type="text" id="ShippingAddress_PostalCode" name="ShippingAddress.PostalCode" 
+                                   value="@Model.ShippingAddress.PostalCode" required>
+                            <span class="text-danger" data-valmsg-for="ShippingAddress.PostalCode"></span>
+                        </fieldset>
+                        
+                        <div class="box-checkbox fieldset-radio mb_20">
+                            <input type="checkbox" id="UseSameAddressForBilling" name="UseSameAddressForBilling" 
+                                   @(Model.UseSameAddressForBilling ? "checked" : "") class="tf-check">
+                            <label for="UseSameAddressForBilling" class="text_black-2">
+                                Billing address same as shipping address
+                            </label>
+                        </div>
+                        
+                        <fieldset class="box fieldset">
+                            <label for="CustomerNotes">Order notes (optional)</label>
+                            <textarea name="CustomerNotes" id="CustomerNotes" rows="4">@Model.CustomerNotes</textarea>
+                        </fieldset>
+                        
+                        <button type="button" id="saveAddressBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn justify-content-center">
+                            <span id="addressBtnText">Continue to Shipping</span>
+                            <span id="addressBtnSpinner" style="display:none;">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Saving...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- SECTION 2: SHIPPING METHOD -->
+                <div id="section-shipping" class="checkout-section disabled mt_40">
+                    <div class="d-flex align-items-center justify-content-between mb_20">
+                        <h5 class="fw-5 mb-0">
+                            <span class="section-number">2</span> Shipping Method
+                        </h5>
+                        <span class="badge bg-secondary" id="shipping-status">Locked</span>
+                    </div>
+                    
+                    <div id="shippingContent" class="section-content" style="display:none;">
+                        <form id="shippingForm">
+                            <input type="hidden" name="CheckoutSessionId" id="shippingSessionId" value="" />
+                            <input type="hidden" name="ShippingCost" id="shippingCost" value="0" />
+                            
+                            <div class="box-checkbox" id="shippingMethodsList">
+                                <!-- Shipping methods will be loaded via AJAX -->
+                            </div>
+                            
+                            <div id="shippingError" class="alert alert-danger mt_20" style="display:none;"></div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- SECTION 3: PAYMENT METHOD -->
+                <div id="section-payment" class="checkout-section disabled mt_40">
+                    <div class="d-flex align-items-center justify-content-between mb_20">
+                        <h5 class="fw-5 mb-0">
+                            <span class="section-number">3</span> Payment Method
+                        </h5>
+                        <span class="badge bg-secondary" id="payment-status">Locked</span>
+                    </div>
+                    
+                    <div id="paymentContent" class="section-content" style="display:none;">
+                        <form id="paymentForm">
+                            <input type="hidden" name="CheckoutSessionId" id="paymentSessionId" value="" />
+                            
+                            <div class="box-checkbox">
+                                <div class="fieldset-radio mb_20">
+                                    <input type="radio" name="PaymentMethod" id="payment_online" 
+                                           value="1" class="tf-check payment-radio" required checked>
+                                    <label for="payment_online" class="text_black-2">
+                                        <div class="d-flex align-items-start">
+                                            <div>
+                                                <span class="fw-6 d-block mb_5">Pay Online (Credit/Debit Card)</span>
+                                                <span class="text-muted">Pay securely with credit or debit card via Stripe</span>
+                                                <br />
+                                                <small class="text-muted">✓ Secure payment gateway</small>
+                                                <br />
+                                                <small class="text-muted">✓ Instant order confirmation</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="fieldset-radio mb_20">
+                                    <input type="radio" name="PaymentMethod" id="payment_cod" 
+                                           value="2" class="tf-check payment-radio" required>
+                                    <label for="payment_cod" class="text_black-2">
+                                        <div class="d-flex align-items-start">
+                                            <div>
+                                                <span class="fw-6 d-block mb_5">Cash on Delivery (COD)</span>
+                                                <span class="text-muted">Pay with cash when your order is delivered</span>
+                                                <br />
+                                                <small class="text-muted">✓ Pay when you receive</small>
+                                                <br />
+                                                <small class="text-muted">✓ No online payment required</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="paymentError" class="alert alert-danger mt_20" style="display:none;"></div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- SECTION 4: CONFIRM ORDER -->
+                <div id="section-confirm" class="checkout-section disabled mt_40">
+                    <div class="d-flex align-items-center justify-content-between mb_20">
+                        <h5 class="fw-5 mb-0">
+                            <span class="section-number">4</span> Confirm Order
+                        </h5>
+                        <span class="badge bg-secondary" id="confirm-status">Locked</span>
+                    </div>
+                    
+                    <div id="confirmContent" class="section-content" style="display:none;">
+                        <div class="alert alert-info mb_20">
+                            <strong>Review your order details on the right</strong> and click the button below to complete your order.
+                        </div>
+                        
+                        <form id="confirmForm" method="post" action="/checkout/confirm-order">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="checkoutSessionId" id="confirmSessionId" value="" />
+                            
+                            <button type="submit" id="confirmOrderBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn w-100">
+                                <span id="confirmBtnText">Proceed to Payment</span>
+                                <span id="confirmBtnSpinner" style="display:none;">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Processing...
+                                </span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- ORDER SUMMARY SIDEBAR -->
+            <div class="tf-page-cart-footer">
+                <div class="tf-cart-footer-inner">
+                    <h5 class="fw-5 mb_20">Order Summary</h5>
+                    <div class="tf-page-cart-checkout widget-wrap-checkout">
+                        @if (Model.Cart.Items != null && Model.Cart.Items.Any())
+                        {
+                            <ul class="wrap-checkout-product">
+                                @foreach (var item in Model.Cart.Items)
+                                {
+                                    <li class="checkout-product-item">
+                                        <figure class="img-product">
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.ProductName">
+                                            }
+                                            else
+                                            {
+                                                <img src="~/images/products/default.jpg" alt="@item.ProductName">
+                                            }
+                                            <span class="quantity">@item.Quantity</span>
+                                        </figure>
+                                        <div class="content">
+                                            <div class="info">
+                                                <p class="name">@item.ProductName</p>
+                                                @if (!string.IsNullOrEmpty(item.ProductSku))
+                                                {
+                                                    <span class="variant">SKU: @item.ProductSku</span>
+                                                }
+                                            </div>
+                                            <span class="price">$@item.TotalPrice.ToString("F2")</span>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Subtotal</span>
+                                <span class="text_black-2 fw-6" id="summary-subtotal">$@Model.Cart.SubTotal.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Shipping</span>
+                                <span class="text_black-2 fw-6" id="summary-shipping">Not selected</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Tax</span>
+                                <span class="text_black-2 fw-6" id="summary-tax">$@Model.Cart.TaxAmount.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_20">
+                                <h6 class="fw-5">Total</h6>
+                                <h6 class="total fw-5" id="summary-total">$@Model.Cart.TotalAmount.ToString("F2")</h6>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <p class="text_black-2">Your cart is empty</p>
+                                <a href="/" class="tf-btn btn-sm radius-3 btn-fill btn-icon animate-hover-btn mt-3">
+                                    Continue Shopping
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /page-checkout -->
+
+@section Styles {
+<style>
+    .checkout-section {
+        border: 2px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 24px;
+        transition: all 0.3s ease;
+    }
+    
+    .checkout-section.active {
+        border-color: #007bff;
+        background-color: #f8f9fa;
+    }
+    
+    .checkout-section.completed {
+        border-color: #28a745;
+        background-color: #f8fff9;
+    }
+    
+    .checkout-section.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    
+    .section-number {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        background: #007bff;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 32px;
+        margin-right: 10px;
+    }
+    
+    .checkout-section.completed .section-number {
+        background: #28a745;
+    }
+    
+    .checkout-section.disabled .section-number {
+        background: #6c757d;
+    }
+    
+    .section-content {
+        padding-top: 16px;
+    }
+</style>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/checkout-onepage.js" asp-append-version="true"></script>
+}

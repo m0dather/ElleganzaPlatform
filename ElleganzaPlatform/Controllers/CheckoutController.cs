@@ -33,11 +33,23 @@ public class CheckoutController : Controller
 
     /// <summary>
     /// GET /checkout
-    /// Displays checkout page with cart summary and address form
-    /// Step 1: Enter shipping/billing addresses
+    /// Displays one-page checkout (NEW: Redirects to one-page flow)
+    /// All checkout steps are on a single page with progressive enable/disable
     /// </summary>
     [HttpGet("/checkout")]
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
+    {
+        // Redirect to one-page checkout
+        return RedirectToAction(nameof(OnePageCheckout));
+    }
+
+    /// <summary>
+    /// GET /checkout/multi-step
+    /// Displays multi-step checkout page (Legacy flow - kept for compatibility)
+    /// Step 1: Enter shipping/billing addresses
+    /// </summary>
+    [HttpGet("/checkout/multi-step")]
+    public async Task<IActionResult> MultiStepCheckout()
     {
         // Load checkout data (cart + customer info)
         var checkoutData = await _checkoutService.GetCheckoutDataAsync();
@@ -51,7 +63,7 @@ public class CheckoutController : Controller
         // Load available shipping methods
         checkoutData.AvailableShippingMethods = await _checkoutSessionService.GetAvailableShippingMethodsAsync();
 
-        return View(checkoutData);
+        return View("Index", checkoutData);
     }
 
     /// <summary>
@@ -341,5 +353,145 @@ public class CheckoutController : Controller
         }
 
         return RedirectToAction(nameof(OrderSuccess), new { orderId = confirmation.OrderId });
+    }
+
+    // ========================================
+    // ONE-PAGE CHECKOUT AJAX ENDPOINTS
+    // ========================================
+
+    /// <summary>
+    /// POST /checkout/save-address
+    /// AJAX endpoint to save address and create/update checkout session
+    /// Returns JSON with session ID and available shipping methods
+    /// </summary>
+    [HttpPost("/checkout/save-address")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SaveAddress([FromForm] CreateCheckoutSessionRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+            
+            return Json(new { success = false, errors = errors });
+        }
+
+        var checkoutSession = await _checkoutSessionService.CreateCheckoutSessionAsync(request);
+        
+        if (checkoutSession == null)
+        {
+            return Json(new { success = false, errors = new[] { "Unable to create checkout session. Please try again." } });
+        }
+
+        var shippingMethods = await _checkoutSessionService.GetAvailableShippingMethodsAsync();
+
+        return Json(new 
+        { 
+            success = true, 
+            sessionId = checkoutSession.Id,
+            shippingMethods = shippingMethods.Select(m => new 
+            {
+                name = m.Name,
+                description = m.Description,
+                cost = m.Cost,
+                estimatedDelivery = m.EstimatedDelivery
+            }).ToList()
+        });
+    }
+
+    /// <summary>
+    /// POST /checkout/select-shipping-ajax
+    /// AJAX endpoint to update shipping method in checkout session
+    /// Returns JSON with updated totals
+    /// </summary>
+    [HttpPost("/checkout/select-shipping-ajax")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SelectShippingAjax([FromForm] SelectShippingMethodRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+            
+            return Json(new { success = false, errors = errors });
+        }
+
+        var success = await _checkoutSessionService.UpdateShippingMethodAsync(request);
+        
+        if (!success)
+        {
+            return Json(new { success = false, errors = new[] { "Unable to update shipping method." } });
+        }
+
+        var checkoutSession = await _checkoutSessionService.GetCheckoutSessionAsync(request.CheckoutSessionId);
+        
+        if (checkoutSession == null)
+        {
+            return Json(new { success = false, errors = new[] { "Checkout session not found." } });
+        }
+
+        return Json(new 
+        { 
+            success = true,
+            shippingCost = checkoutSession.ShippingCost,
+            taxAmount = checkoutSession.Cart.TaxAmount,
+            totalAmount = checkoutSession.TotalAmount
+        });
+    }
+
+    /// <summary>
+    /// POST /checkout/select-payment-ajax
+    /// AJAX endpoint to update payment method in checkout session
+    /// Returns JSON with success status
+    /// </summary>
+    [HttpPost("/checkout/select-payment-ajax")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SelectPaymentAjax([FromForm] SelectPaymentMethodRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+            
+            return Json(new { success = false, errors = errors });
+        }
+
+        var success = await _checkoutSessionService.UpdatePaymentMethodAsync(request);
+        
+        if (!success)
+        {
+            return Json(new { success = false, errors = new[] { "Unable to update payment method." } });
+        }
+
+        return Json(new { success = true });
+    }
+
+    /// <summary>
+    /// GET /checkout/one-page
+    /// Displays the one-page checkout view
+    /// All steps are on a single page with progressive enable/disable
+    /// </summary>
+    [HttpGet("/checkout/one-page")]
+    public async Task<IActionResult> OnePageCheckout()
+    {
+        // Load checkout data (cart + customer info)
+        var checkoutData = await _checkoutService.GetCheckoutDataAsync();
+        
+        // Validation - Redirect if cart is empty or user not found
+        if (checkoutData == null)
+        {
+            return RedirectToAction("Index", "Cart");
+        }
+
+        // Load available shipping methods
+        checkoutData.AvailableShippingMethods = await _checkoutSessionService.GetAvailableShippingMethodsAsync();
+
+        return View("OnePageCheckout", checkoutData);
     }
 }
