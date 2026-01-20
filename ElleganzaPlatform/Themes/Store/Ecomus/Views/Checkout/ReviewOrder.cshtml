@@ -1,73 +1,91 @@
 @model ElleganzaPlatform.Application.ViewModels.Store.CheckoutSessionViewModel
 @{
     Layout = "_Layout";
-    ViewBag.Title = "Shipping Method";
+    ViewBag.Title = "Review Order";
 }
 
 <!-- page-title -->
 <div class="tf-page-title">
     <div class="container-full">
-        <div class="heading text-center">Shipping Method</div>
-        <p class="text-center text-2 text_black-2 mt_5">Step 2 of 4</p>
+        <div class="heading text-center">Review Your Order</div>
+        <p class="text-center text-2 text_black-2 mt_5">Step 4 of 4</p>
     </div>
 </div>
 <!-- /page-title -->
 
-<!-- page-shipping -->
+<!-- page-review -->
 <section class="flat-spacing-11">
     <div class="container">
         <div class="tf-page-cart-wrap layout-2">
             <div class="tf-page-cart-item">
-                <h5 class="fw-5 mb_20">Choose Shipping Method</h5>
-                <form class="form-shipping-method" method="post" action="/checkout/update-shipping" id="shippingForm">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
-                    <input type="hidden" name="ShippingCost" id="shippingCost" value="0" />
-                    
-                    @if (ViewBag.ShippingMethods != null)
-                    {
-                        var shippingMethods = ViewBag.ShippingMethods as List<ElleganzaPlatform.Application.ViewModels.Store.ShippingMethodOption>;
-                        if (shippingMethods != null && shippingMethods.Any())
+                <h5 class="fw-5 mb_20">Order Details</h5>
+                
+                <!-- Shipping Address -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Shipping Address</h6>
+                    <p class="text_black-2 mb_0">@Model.ShippingAddress</p>
+                </div>
+                
+                <!-- Billing Address -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Billing Address</h6>
+                    <p class="text_black-2 mb_0">@Model.BillingAddress</p>
+                </div>
+                
+                <!-- Shipping Method -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Shipping Method</h6>
+                    <p class="text_black-2 mb_0">
+                        <strong>@Model.ShippingMethod</strong> - $@Model.ShippingCost.ToString("F2")
+                    </p>
+                </div>
+                
+                <!-- Payment Method -->
+                <div class="box-info-order mb_20">
+                    <h6 class="fw-5 mb_10">Payment Method</h6>
+                    <p class="text_black-2 mb_0">
+                        @if (Model.PaymentMethod == ElleganzaPlatform.Domain.Enums.PaymentMethod.Online)
                         {
-                            <div class="box-checkbox">
-                                @foreach (var method in shippingMethods)
-                                {
-                                    <div class="fieldset-radio mb_20">
-                                        <input type="radio" name="ShippingMethod" id="shipping_@method.Name.Replace(" ", "_")" 
-                                               value="@method.Name" data-cost="@method.Cost" 
-                                               class="tf-check shipping-radio" required>
-                                        <label for="shipping_@method.Name.Replace(" ", "_")" class="text_black-2">
-                                            <div class="d-flex justify-content-between align-items-start w-100">
-                                                <div>
-                                                    <span class="fw-6 d-block mb_5">@method.Name</span>
-                                                    <span class="text-muted">@method.Description</span>
-                                                    @if (!string.IsNullOrEmpty(method.EstimatedDelivery))
-                                                    {
-                                                        <br />
-                                                        <small class="text-muted">Estimated delivery: @method.EstimatedDelivery</small>
-                                                    }
-                                                </div>
-                                                <span class="fw-6 ms-3" id="cost_@method.Name.Replace(" ", "_")">$@method.Cost.ToString("F2")</span>
-                                            </div>
-                                        </label>
-                                    </div>
-                                }
-                            </div>
+                            <strong>Pay Online (Credit/Debit Card)</strong>
+                            <br />
+                            <small class="text-muted">You will be redirected to secure payment gateway</small>
                         }
                         else
                         {
-                            <div class="alert alert-warning">
-                                No shipping methods available at this time.
-                            </div>
+                            <strong>Cash on Delivery (COD)</strong>
+                            <br />
+                            <small class="text-muted">Pay with cash when your order is delivered</small>
                         }
-                    }
+                    </p>
+                </div>
+                
+                <!-- Customer Notes -->
+                @if (!string.IsNullOrEmpty(Model.CustomerNotes))
+                {
+                    <div class="box-info-order mb_20">
+                        <h6 class="fw-5 mb_10">Order Notes</h6>
+                        <p class="text_black-2 mb_0">@Model.CustomerNotes</p>
+                    </div>
+                }
+                
+                <!-- Confirmation Form -->
+                <form class="form-confirm-order" method="post" action="/checkout/confirm-order" id="confirmForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="checkoutSessionId" value="@Model.Id" />
                     
                     <div class="d-flex gap-3 justify-content-between mt_30">
-                        <a href="/checkout" class="tf-btn btn-outline-dark radius-3 btn-icon animate-hover-btn">
-                            <i class="icon icon-arrow-left"></i> Back to Address
+                        <a href="/checkout/select-payment/@Model.Id" class="tf-btn btn-outline-dark radius-3 btn-icon animate-hover-btn">
+                            <i class="icon icon-arrow-left"></i> Back to Payment
                         </a>
                         <button type="submit" id="submitBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn">
-                            <span id="btnText">Continue to Payment</span>
+                            @if (Model.PaymentMethod == ElleganzaPlatform.Domain.Enums.PaymentMethod.Online)
+                            {
+                                <span id="btnText">Proceed to Payment</span>
+                            }
+                            else
+                            {
+                                <span id="btnText">Confirm Order</span>
+                            }
                             <span id="btnSpinner" style="display:none;">
                                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                 Processing...
@@ -117,8 +135,8 @@
                                 <span class="text_black-2 fw-6">$@Model.Cart.SubTotal.ToString("F2")</span>
                             </div>
                             <div class="d-flex justify-content-between line pb_8">
-                                <span class="text_black-2">Shipping</span>
-                                <span class="text_black-2 fw-6" id="shippingDisplay">Select method</span>
+                                <span class="text_black-2">Shipping (@Model.ShippingMethod)</span>
+                                <span class="text_black-2 fw-6">$@Model.ShippingCost.ToString("F2")</span>
                             </div>
                             <div class="d-flex justify-content-between line pb_8">
                                 <span class="text_black-2">Tax</span>
@@ -126,7 +144,7 @@
                             </div>
                             <div class="d-flex justify-content-between line pb_20">
                                 <h6 class="fw-5">Total</h6>
-                                <h6 class="total fw-5" id="totalDisplay">$@Model.Cart.TotalAmount.ToString("F2")</h6>
+                                <h6 class="total fw-5">$@((Model.Cart.SubTotal + Model.ShippingCost + Model.Cart.TaxAmount).ToString("F2"))</h6>
                             </div>
                         }
                         else
@@ -144,43 +162,20 @@
         </div>
     </div>
 </section>
-<!-- /page-shipping -->
+<!-- /page-review -->
 
 @section Scripts {
     <script>
         (function() {
-            var form = document.getElementById('shippingForm');
+            var form = document.getElementById('confirmForm');
             var submitBtn = document.getElementById('submitBtn');
             var btnText = document.getElementById('btnText');
             var btnSpinner = document.getElementById('btnSpinner');
             var isSubmitting = false;
-            var baseTotal = @Model.Cart.TotalAmount;
-            var currentShipping = @Model.Cart.ShippingAmount;
-            
-            // Update shipping cost and total when selection changes
-            document.querySelectorAll('.shipping-radio').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    var cost = parseFloat(this.getAttribute('data-cost'));
-                    document.getElementById('shippingCost').value = cost;
-                    document.getElementById('shippingDisplay').textContent = '$' + cost.toFixed(2);
-                    
-                    // Update total: base total - old shipping + new shipping
-                    var newTotal = baseTotal - currentShipping + cost;
-                    document.getElementById('totalDisplay').textContent = '$' + newTotal.toFixed(2);
-                });
-            });
             
             // Form submission handling
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    // Check if a shipping method is selected
-                    var selectedShipping = document.querySelector('.shipping-radio:checked');
-                    if (!selectedShipping) {
-                        e.preventDefault();
-                        alert('Please select a shipping method');
-                        return false;
-                    }
-                    
                     // Prevent double submit
                     if (isSubmitting) {
                         e.preventDefault();

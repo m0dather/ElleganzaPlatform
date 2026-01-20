@@ -109,7 +109,10 @@ public class CheckoutSessionService : ICheckoutSessionService
             ShippingMethod = checkoutSession.ShippingMethod,
             ShippingCost = checkoutSession.ShippingCost,
             ExpiresAt = checkoutSession.ExpiresAt,
-            Cart = cart
+            Cart = cart,
+            ShippingAddress = checkoutSession.ShippingAddress,
+            BillingAddress = checkoutSession.BillingAddress,
+            CustomerNotes = checkoutSession.CustomerNotes
         };
     }
 
@@ -159,7 +162,10 @@ public class CheckoutSessionService : ICheckoutSessionService
             ShippingMethod = checkoutSession.ShippingMethod,
             ShippingCost = checkoutSession.ShippingCost,
             ExpiresAt = checkoutSession.ExpiresAt,
-            Cart = cart
+            Cart = cart,
+            ShippingAddress = checkoutSession.ShippingAddress,
+            BillingAddress = checkoutSession.BillingAddress,
+            CustomerNotes = checkoutSession.CustomerNotes
         };
     }
 

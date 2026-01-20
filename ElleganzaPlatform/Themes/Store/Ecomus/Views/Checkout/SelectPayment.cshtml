@@ -1,59 +1,184 @@
 @model ElleganzaPlatform.Application.ViewModels.Store.CheckoutSessionViewModel
-
 @{
-    ViewData["Title"] = "Select Payment Method";
+    Layout = "_Layout";
+    ViewBag.Title = "Payment Method";
 }
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h2 class="mb-4">Select Payment Method</h2>
-            
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Order Summary</h5>
-                    <p>Subtotal: $@Model.Cart.SubTotal.ToString("F2")</p>
-                    <p>Tax: $@Model.Cart.TaxAmount.ToString("F2")</p>
-                    <p>Shipping (@Model.ShippingMethod): $@Model.ShippingCost.ToString("F2")</p>
-                    <hr />
-                    <h5>Total: $@Model.Cart.TotalAmount.ToString("F2")</h5>
-                </div>
-            </div>
-
-            <form asp-action="UpdatePayment" asp-controller="Checkout" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
-                
-                <div class="mb-4">
-                    <h5>Choose Payment Method</h5>
-                    
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="radio" name="PaymentMethod" 
-                               id="payment_online" value="@((int)ElleganzaPlatform.Domain.Enums.PaymentMethod.Online)" required checked>
-                        <label class="form-check-label" for="payment_online">
-                            <strong>Pay Online</strong>
-                            <br />
-                            <small class="text-muted">Pay securely with credit/debit card via Stripe</small>
-                        </label>
-                    </div>
-                    
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="radio" name="PaymentMethod" 
-                               id="payment_cod" value="@((int)ElleganzaPlatform.Domain.Enums.PaymentMethod.CashOnDelivery)" required>
-                        <label class="form-check-label" for="payment_cod">
-                            <strong>Cash on Delivery (COD)</strong>
-                            <br />
-                            <small class="text-muted">Pay with cash when your order is delivered</small>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <a asp-action="SelectShipping" asp-controller="Checkout" 
-                       asp-route-sessionId="@Model.Id" class="btn btn-secondary">Back</a>
-                    <button type="submit" class="btn btn-primary">Place Order</button>
-                </div>
-            </form>
-        </div>
+<!-- page-title -->
+<div class="tf-page-title">
+    <div class="container-full">
+        <div class="heading text-center">Payment Method</div>
+        <p class="text-center text-2 text_black-2 mt_5">Step 3 of 4</p>
     </div>
 </div>
+<!-- /page-title -->
+
+<!-- page-payment -->
+<section class="flat-spacing-11">
+    <div class="container">
+        <div class="tf-page-cart-wrap layout-2">
+            <div class="tf-page-cart-item">
+                <h5 class="fw-5 mb_20">Choose Payment Method</h5>
+                <form class="form-payment-method" method="post" action="/checkout/update-payment" id="paymentForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
+                    
+                    <div class="box-checkbox">
+                        <div class="fieldset-radio mb_20">
+                            <input type="radio" name="PaymentMethod" id="payment_online" 
+                                   value="@((int)ElleganzaPlatform.Domain.Enums.PaymentMethod.Online)" 
+                                   class="tf-check payment-radio" required checked>
+                            <label for="payment_online" class="text_black-2">
+                                <div class="d-flex align-items-start">
+                                    <div>
+                                        <span class="fw-6 d-block mb_5">Pay Online (Credit/Debit Card)</span>
+                                        <span class="text-muted">Pay securely with credit or debit card via Stripe</span>
+                                        <br />
+                                        <small class="text-muted">✓ Secure payment gateway</small>
+                                        <br />
+                                        <small class="text-muted">✓ Instant order confirmation</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="fieldset-radio mb_20">
+                            <input type="radio" name="PaymentMethod" id="payment_cod" 
+                                   value="@((int)ElleganzaPlatform.Domain.Enums.PaymentMethod.CashOnDelivery)" 
+                                   class="tf-check payment-radio" required>
+                            <label for="payment_cod" class="text_black-2">
+                                <div class="d-flex align-items-start">
+                                    <div>
+                                        <span class="fw-6 d-block mb_5">Cash on Delivery (COD)</span>
+                                        <span class="text-muted">Pay with cash when your order is delivered</span>
+                                        <br />
+                                        <small class="text-muted">✓ Pay when you receive</small>
+                                        <br />
+                                        <small class="text-muted">✓ No online payment required</small>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 justify-content-between mt_30">
+                        <a href="/checkout/select-shipping/@Model.Id" class="tf-btn btn-outline-dark radius-3 btn-icon animate-hover-btn">
+                            <i class="icon icon-arrow-left"></i> Back to Shipping
+                        </a>
+                        <button type="submit" id="submitBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn">
+                            <span id="btnText">Continue to Review</span>
+                            <span id="btnSpinner" style="display:none;">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="tf-page-cart-footer">
+                <div class="tf-cart-footer-inner">
+                    <h5 class="fw-5 mb_20">Order Summary</h5>
+                    <div class="tf-page-cart-checkout widget-wrap-checkout">
+                        @if (Model.Cart.Items != null && Model.Cart.Items.Any())
+                        {
+                            <ul class="wrap-checkout-product">
+                                @foreach (var item in Model.Cart.Items)
+                                {
+                                    <li class="checkout-product-item">
+                                        <figure class="img-product">
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.ProductName">
+                                            }
+                                            else
+                                            {
+                                                <img src="~/images/products/default.jpg" alt="@item.ProductName">
+                                            }
+                                            <span class="quantity">@item.Quantity</span>
+                                        </figure>
+                                        <div class="content">
+                                            <div class="info">
+                                                <p class="name">@item.ProductName</p>
+                                                @if (!string.IsNullOrEmpty(item.ProductSku))
+                                                {
+                                                    <span class="variant">SKU: @item.ProductSku</span>
+                                                }
+                                            </div>
+                                            <span class="price">$@item.TotalPrice.ToString("F2")</span>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Subtotal</span>
+                                <span class="text_black-2 fw-6">$@Model.Cart.SubTotal.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Shipping (@Model.ShippingMethod)</span>
+                                <span class="text_black-2 fw-6">$@Model.ShippingCost.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_8">
+                                <span class="text_black-2">Tax</span>
+                                <span class="text_black-2 fw-6">$@Model.Cart.TaxAmount.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between line pb_20">
+                                <h6 class="fw-5">Total</h6>
+                                <h6 class="total fw-5">$@((Model.Cart.SubTotal + Model.ShippingCost + Model.Cart.TaxAmount).ToString("F2"))</h6>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <p class="text_black-2">Your cart is empty</p>
+                                <a href="/" class="tf-btn btn-sm radius-3 btn-fill btn-icon animate-hover-btn mt-3">
+                                    Continue Shopping
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /page-payment -->
+
+@section Scripts {
+    <script>
+        (function() {
+            var form = document.getElementById('paymentForm');
+            var submitBtn = document.getElementById('submitBtn');
+            var btnText = document.getElementById('btnText');
+            var btnSpinner = document.getElementById('btnSpinner');
+            var isSubmitting = false;
+            
+            // Form submission handling
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Check if a payment method is selected
+                    var selectedPayment = document.querySelector('.payment-radio:checked');
+                    if (!selectedPayment) {
+                        e.preventDefault();
+                        alert('Please select a payment method');
+                        return false;
+                    }
+                    
+                    // Prevent double submit
+                    if (isSubmitting) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    isSubmitting = true;
+                    submitBtn.disabled = true;
+                    btnText.style.display = 'none';
+                    btnSpinner.style.display = 'inline';
+                    
+                    return true;
+                });
+            }
+        })();
+    </script>
+}

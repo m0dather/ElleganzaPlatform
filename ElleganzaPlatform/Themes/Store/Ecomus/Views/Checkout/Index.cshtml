@@ -8,6 +8,7 @@
 <div class="tf-page-title">
     <div class="container-full">
         <div class="heading text-center">Check Out</div>
+        <p class="text-center text-2 text_black-2 mt_5">Step 1 of 4</p>
     </div>
 </div>
 <!-- /page-title -->
@@ -18,7 +19,7 @@
         <div class="tf-page-cart-wrap layout-2">
             <div class="tf-page-cart-item">
                 <h5 class="fw-5 mb_20">Billing details</h5>
-                <form class="form-checkout" method="post" action="/checkout/place-order" id="checkoutForm">
+                <form class="form-checkout" method="post" action="/checkout/create-session" id="checkoutForm">
                     @Html.AntiForgeryToken()
                     
                     <div class="box grid-2">
@@ -134,7 +135,7 @@
                     </fieldset>
                     
                     <button type="submit" id="submitBtn" class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn justify-content-center">
-                        <span id="btnText">Continue to Payment</span>
+                        <span id="btnText">Continue to Shipping</span>
                         <span id="btnSpinner" style="display:none;">
                             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                             Processing...

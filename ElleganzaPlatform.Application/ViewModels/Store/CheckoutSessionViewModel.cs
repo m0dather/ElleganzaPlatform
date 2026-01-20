@@ -16,6 +16,9 @@ public class CheckoutSessionViewModel
     public decimal ShippingCost { get; set; }
     public DateTime ExpiresAt { get; set; }
     public CartViewModel Cart { get; set; } = new();
+    public string ShippingAddress { get; set; } = string.Empty;
+    public string BillingAddress { get; set; } = string.Empty;
+    public string? CustomerNotes { get; set; }
 }
 
 /// <summary>
