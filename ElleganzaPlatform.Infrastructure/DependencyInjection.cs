@@ -6,6 +6,7 @@ using ElleganzaPlatform.Infrastructure.Data;
 using ElleganzaPlatform.Infrastructure.Repositories;
 using ElleganzaPlatform.Infrastructure.Services;
 using ElleganzaPlatform.Infrastructure.Services.Application;
+using ElleganzaPlatform.Infrastructure.Services.Payment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -47,6 +48,9 @@ public static class DependencyInjection
         services.AddScoped<ICheckoutService, CheckoutService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IVendorOrderService, VendorOrderService>();
+
+        // Phase 4: Payment Services
+        services.AddScoped<IPaymentService, StripePaymentService>();
 
         // Authorization Handlers
         services.AddScoped<IAuthorizationHandler, SuperAdminAuthorizationHandler>();
