@@ -80,10 +80,21 @@
                     </div>
                     
                     <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        @if (Model.CanBePaid)
+                        {
+                            <!-- Phase 4: Pay Now button - only visible for Pending orders -->
+                            <form asp-controller="Payment" asp-action="CreatePayment" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="orderId" value="@Model.OrderId" />
+                                <button type="submit" class="tf-btn btn-fill radius-3 animate-hover-btn" style="background-color: #28a745; border-color: #28a745;">
+                                    <i class="icon-payment me-2"></i>Pay Now
+                                </button>
+                            </form>
+                        }
                         <a href="/account/orders/@Model.OrderId" class="tf-btn btn-outline-dark radius-3 btn-fill animate-hover-btn">
                             View Order Details
                         </a>
-                        <a href="/shop" class="tf-btn btn-fill radius-3 animate-hover-btn">
+                        <a href="/shop" class="tf-btn btn-outline-dark radius-3 animate-hover-btn">
                             Continue Shopping
                         </a>
                     </div>

@@ -105,6 +105,7 @@ public class OrderService : IOrderService
                 ShippingAddress = o.ShippingAddress,
                 BillingAddress = o.BillingAddress,
                 CustomerNotes = o.CustomerNotes,
+                PaymentTransactionId = o.PaymentTransactionId,  // Phase 4: Include payment transaction ID
                 Items = o.OrderItems.Select(oi => new CustomerOrderItemDetailsViewModel
                 {
                     ProductId = oi.ProductId,

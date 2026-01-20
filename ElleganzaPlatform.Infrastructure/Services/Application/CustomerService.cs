@@ -1,5 +1,6 @@
 using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Application.ViewModels.Store;
+using ElleganzaPlatform.Domain.Enums;
 using ElleganzaPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,7 +55,8 @@ public class CustomerService : ICustomerService
                 CreatedAt = o.CreatedAt,
                 Status = o.Status.ToString(),
                 TotalAmount = o.TotalAmount,
-                ItemCount = o.OrderItems.Count
+                ItemCount = o.OrderItems.Count,
+                CanBePaid = o.Status == OrderStatus.Pending  // Phase 4: Payment integration
             })
             .ToListAsync();
 
@@ -84,6 +86,8 @@ public class CustomerService : ICustomerService
                 TotalAmount = o.TotalAmount,
                 ShippingAddress = o.ShippingAddress,
                 BillingAddress = o.BillingAddress,
+                PaymentTransactionId = o.PaymentTransactionId,  // Phase 4: Payment integration
+                CanBePaid = o.Status == OrderStatus.Pending,  // Phase 4: Payment integration
                 Items = o.OrderItems.Select(oi => new OrderItemViewModel
                 {
                     ProductId = oi.ProductId,

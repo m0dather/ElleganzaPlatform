@@ -55,10 +55,12 @@
                                     var badgeClass = Model.Status switch
                                     {
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Pending => "badge-light-warning",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Paid => "badge-light-success",  // Phase 4: Payment integration
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Processing => "badge-light-info",
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Shipped => "badge-light-primary",
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Delivered => "badge-light-success",
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Cancelled => "badge-light-danger",
+                                        ElleganzaPlatform.Domain.Enums.OrderStatus.Failed => "badge-light-danger",  // Phase 4: Payment integration
                                         ElleganzaPlatform.Domain.Enums.OrderStatus.Refunded => "badge-light-secondary",
                                         _ => "badge-light-secondary"
                                     };
@@ -148,6 +150,16 @@
                                 <div class="fw-bold text-gray-600 mb-1">Order Date</div>
                                 <div class="text-gray-800">@Model.CreatedAt.ToString("MMMM dd, yyyy HH:mm")</div>
                             </div>
+                            @if (!string.IsNullOrEmpty(Model.PaymentTransactionId))
+                            {
+                                <!-- Phase 4: Payment Transaction ID -->
+                                <div class="mt-4">
+                                    <div class="fw-bold text-gray-600 mb-1">Payment Transaction</div>
+                                    <div class="text-gray-800">
+                                        <code class="text-muted">@Model.PaymentTransactionId</code>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                     <!--end::Customer Details-->

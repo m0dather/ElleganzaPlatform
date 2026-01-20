@@ -21,6 +21,9 @@ public class OrderListItemViewModel
     public string StatusDisplay => Status.ToString();
     public decimal TotalAmount { get; set; }
     public int ItemCount { get; set; }
+    
+    // Phase 4: Payment Integration
+    public string? PaymentTransactionId { get; set; }
 }
 
 public class AdminOrderDetailsViewModel
@@ -40,6 +43,9 @@ public class AdminOrderDetailsViewModel
     public string BillingAddress { get; set; } = string.Empty;
     public string? CustomerNotes { get; set; }
     public IEnumerable<AdminOrderItemViewModel> Items { get; set; } = new List<AdminOrderItemViewModel>();
+    
+    // Phase 4: Payment Integration
+    public string? PaymentTransactionId { get; set; }
 }
 
 public class AdminOrderItemViewModel

@@ -93,4 +93,7 @@ public class OrderConfirmationViewModel
     public DateTime OrderDate { get; set; }
     public decimal TotalAmount { get; set; }
     public string Status { get; set; } = string.Empty;
+    
+    // Phase 4: Payment Integration
+    public bool CanBePaid { get; set; }
 }

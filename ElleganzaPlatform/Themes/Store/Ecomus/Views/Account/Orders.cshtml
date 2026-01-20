@@ -36,7 +36,7 @@
                                 @if (Model.Orders.Any())
                                 {
                                     <table>
-                                        <thead>
+                                            <thead>
                                             <tr>
                                                 <th class="fw-6">Order</th>
                                                 <th class="fw-6">Date</th>
@@ -62,10 +62,23 @@
                                                         $@order.TotalAmount.ToString("F2") for @order.ItemCount item@(order.ItemCount != 1 ? "s" : "")
                                                     </td>
                                                     <td>
-                                                        <a href="/account/orders/@order.Id"
-                                                            class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
-                                                            <span>View</span>
-                                                        </a>
+                                                        <div class="d-flex gap-2">
+                                                            <a href="/account/orders/@order.Id"
+                                                                class="tf-btn btn-outline-dark animate-hover-btn rounded-0 justify-content-center">
+                                                                <span>View</span>
+                                                            </a>
+                                                            @if (order.CanBePaid)
+                                                            {
+                                                                <!-- Phase 4: Pay Now button - only for Pending orders -->
+                                                                <form asp-controller="Payment" asp-action="CreatePayment" method="post" class="d-inline">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                                                    <button type="submit" class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center" style="background-color: #28a745; border-color: #28a745;">
+                                                                        <span>Pay Now</span>
+                                                                    </button>
+                                                                </form>
+                                                            }
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             }
