@@ -63,7 +63,14 @@ public class WebhookController : ControllerBase
 
         // Phase 4: Success - Return 200 OK to Stripe
         // This tells Stripe we successfully processed the webhook
-        _logger.LogInformation("Webhook processed successfully for Order {OrderId}", result.OrderId);
+        if (result.OrderId > 0)
+        {
+            _logger.LogInformation("Webhook processed successfully for Order {OrderId}", result.OrderId);
+        }
+        else
+        {
+            _logger.LogInformation("Webhook processed successfully (no order associated)");
+        }
         return Ok();
     }
 }

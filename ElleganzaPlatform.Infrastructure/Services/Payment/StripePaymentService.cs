@@ -124,7 +124,8 @@ public class StripePaymentService : IPaymentService
                                 Description = $"Payment for {order.OrderItems.Count} item(s)"
                             },
                             // Phase 4: Stripe expects amount in cents
-                            UnitAmount = (long)(order.TotalAmount * 100)
+                            // Use Math.Round to ensure proper conversion and avoid precision loss
+                            UnitAmount = (long)Math.Round(order.TotalAmount * 100, MidpointRounding.AwayFromZero)
                         },
                         Quantity = 1
                     }
@@ -132,8 +133,9 @@ public class StripePaymentService : IPaymentService
                 
                 // Phase 4: Success/Cancel URLs
                 // Customer is redirected here after payment
+                // Note: Webhook is source of truth, these URLs are for UX only
                 SuccessUrl = $"{baseUrl}/checkout/success/{orderId}?session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = $"{baseUrl}/checkout/success/{orderId}",
+                CancelUrl = $"{baseUrl}/checkout/success/{orderId}?cancelled=true",
                 
                 // Phase 4: Metadata for order tracking
                 // This helps identify the order in webhook

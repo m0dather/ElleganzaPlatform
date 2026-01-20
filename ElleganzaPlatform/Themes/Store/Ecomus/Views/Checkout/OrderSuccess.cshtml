@@ -25,6 +25,14 @@
                         </svg>
                         <h3 class="mb_16">Thank you for your order!</h3>
                         <p class="text_black-2">Your order has been successfully placed and is being processed.</p>
+                        @if (Context.Request.Query.ContainsKey("cancelled"))
+                        {
+                            <!-- Phase 4: Show message if payment was cancelled -->
+                            <div class="alert alert-warning mt-3" role="alert">
+                                <i class="icon-info-circle me-2"></i>
+                                Payment was cancelled. You can complete payment by clicking the "Pay Now" button below.
+                            </div>
+                        }
                     </div>
                     
                     <div class="order-details-card mb_40">
