@@ -4,22 +4,31 @@ namespace ElleganzaPlatform.Application.Services;
 /// Phase 4: Payment Service Interface
 /// Provides abstraction for payment processing to support multiple payment providers
 /// Enables secure payment processing and webhook verification
+/// Updated to support CheckoutSession-based flow
 /// </summary>
 public interface IPaymentService
 {
     /// <summary>
-    /// Phase 4: Creates a payment session for an order
-    /// Validates order is eligible for payment (status = Pending)
+    /// Creates a payment session for a checkout session
+    /// Validates checkout session is eligible for payment
     /// Returns checkout URL for customer to complete payment
+    /// </summary>
+    /// <param name="checkoutSessionId">The checkout session ID to create payment for</param>
+    /// <returns>PaymentResult with checkout URL or error</returns>
+    Task<PaymentResult> CreatePaymentAsync(int checkoutSessionId);
+    
+    /// <summary>
+    /// Legacy method for backward compatibility
+    /// Creates a payment session for an order (deprecated - use checkout session instead)
     /// </summary>
     /// <param name="orderId">The order ID to create payment for</param>
     /// <returns>PaymentResult with checkout URL or error</returns>
-    Task<PaymentResult> CreatePaymentAsync(int orderId);
+    Task<PaymentResult> CreatePaymentForOrderAsync(int orderId);
 
     /// <summary>
     /// Phase 4: Verifies payment webhook callback from payment provider
     /// Validates webhook signature for security
-    /// Updates order status based on payment outcome
+    /// Updates checkout session status based on payment outcome
     /// Implements idempotent processing to handle duplicate webhooks
     /// </summary>
     /// <param name="payload">Raw webhook payload from payment provider</param>
@@ -64,7 +73,12 @@ public class PaymentResult
     public string? CheckoutUrl { get; set; }
 
     /// <summary>
-    /// Order ID associated with this payment
+    /// Order ID associated with this payment (optional, used for legacy flow)
     /// </summary>
-    public int OrderId { get; set; }
+    public int? OrderId { get; set; }
+    
+    /// <summary>
+    /// Checkout session ID associated with this payment
+    /// </summary>
+    public int? CheckoutSessionId { get; set; }
 }

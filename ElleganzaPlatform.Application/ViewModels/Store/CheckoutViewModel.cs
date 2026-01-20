@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ElleganzaPlatform.Domain.Enums;
 
 namespace ElleganzaPlatform.Application.ViewModels.Store;
 
@@ -13,6 +14,13 @@ public class CheckoutViewModel
     public AddressViewModel BillingAddress { get; set; } = new();
     public bool UseSameAddressForBilling { get; set; } = true;
     public string? CustomerNotes { get; set; }
+    
+    // New checkout flow properties
+    public List<ShippingMethodOption> AvailableShippingMethods { get; set; } = new();
+    public string? SelectedShippingMethod { get; set; }
+    public decimal ShippingCost { get; set; }
+    public PaymentMethod? SelectedPaymentMethod { get; set; }
+    public int? CheckoutSessionId { get; set; }
 }
 
 /// <summary>
