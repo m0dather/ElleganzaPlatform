@@ -1,6 +1,13 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@using System.Globalization
+@{
+    var currentCulture = CultureInfo.CurrentUICulture;
+    var isRtl = currentCulture.TextInfo.IsRightToLeft;
+    var langCode = currentCulture.TwoLetterISOLanguageName;
+}
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="@langCode" lang="@langCode" dir="@(isRtl ? "rtl" : "ltr")">
 
 <head>
     <meta charset="utf-8">
@@ -12,7 +19,17 @@
    <!-- font -->
    <link rel="stylesheet" href="~/fonts/fonts.css">
    <link rel="stylesheet" href="~/fonts/font-icons.css">
-   <link rel="stylesheet" href="~/css/bootstrap.min.css">
+   
+   @* Load RTL or LTR Bootstrap based on current language *@
+   @if (isRtl)
+   {
+       <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css">
+   }
+   else
+   {
+       <link rel="stylesheet" href="~/css/bootstrap.min.css">
+   }
+   
    <link rel="stylesheet" href="~/css/swiper-bundle.min.css">
    <link rel="stylesheet" href="~/css/animate.css">
    <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
@@ -22,16 +39,15 @@
     <link rel="shortcut icon" href="~/images/logo/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="~/images/logo/favicon.png">
 
-</head>
+    @* Allow views to inject additional styles *@
+    @RenderSection("Styles", required: false)
 
-@* Anti-Forgery Token for AJAX requests (Phase 3.1.1: Cart Hardening) *@
-@Html.AntiForgeryToken()
+</head>
 
 <body class="preload-wrapper popup-loader">
 
-    <!-- RTL -->
-    <a href="#" id="toggle-rtl" class="tf-btn animate-hover-btn btn-fill">RTL</a>
-    <!-- /RTL  -->
+@* Anti-Forgery Token for AJAX requests (Phase 3.1.1: Cart Hardening) *@
+@Html.AntiForgeryToken()
 
     <!-- preload -->
     @*<div class="preload preload-container">
@@ -62,7 +78,7 @@
                             data-speed="1000" data-delay="2000">
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide">
-                                    <p class="top-bar-text fw-5">Spring Fashion Sale <a href="@Url.Action("Index", "Shop")"
+                                    <p class="top-bar-text fw-5">Spring Fashion Sale <a asp-controller="Shop" asp-action="Index"
                                             title="all collection" class="tf-btn btn-line">Shop now<i
                                                 class="icon icon-arrow1-top-left"></i></a></p>
                                 </div>
@@ -77,8 +93,8 @@
                     </div>
 
                     <div class="top-bar-language tf-cur justify-content-end">
-
-
+                        @* Language and Currency selectors will be implemented in future phases *@
+                        @* 
                         <div class="tf-currencies">
                             <select class="image-select center style-default type-currencies">
                                 <option data-thumbnail="images/country/fr.svg">EUR € | France</option>
@@ -95,7 +111,7 @@
                                 <option>اردو</option>
                             </select>
                         </div>
-
+                        *@
                     </div>
                 </div>
             </div>
