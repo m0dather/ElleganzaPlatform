@@ -22,8 +22,10 @@ public static class DashboardRoutes
     public const string Vendor = "/vendor";
 
     /// <summary>
-    /// Customer redirect route: / (storefront home)
-    /// Customers are shoppers, not admin users - they live in the storefront
+    /// Customer post-login redirect: / (storefront home)
+    /// Note: This is the landing page after login, NOT the account area route.
+    /// Customers are shoppers, not admin users - they live in the storefront.
+    /// Account pages are accessed via /account/* routes but login redirects here.
     /// </summary>
     public const string Customer = "/";
 
