@@ -61,7 +61,7 @@ namespace ElleganzaPlatform.Controllers
                     IsEssential = true,
                     Path = "/",
                     SameSite = SameSiteMode.Lax,
-                    Secure = true // Ensure cookie is only sent over HTTPS
+                    Secure = Request.IsHttps // Set Secure flag based on request scheme
                 }
             );
 
