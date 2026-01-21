@@ -98,8 +98,16 @@
                             <form id="languageForm" asp-controller="Home" asp-action="SetLanguage" method="post" class="d-inline">
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
                                 <select name="culture" class="image-select center style-default type-languages" onchange="this.form.submit()">
-                                    <option value="en" @(langCode == "en" ? "selected" : "")>English</option>
-                                    <option value="ar" @(langCode == "ar" ? "selected" : "")>العربية</option>
+                                    @if (langCode == "en")
+                                    {
+                                        <option value="en" selected>English</option>
+                                        <option value="ar">العربية</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="en">English</option>
+                                        <option value="ar" selected>العربية</option>
+                                    }
                                 </select>
                             </form>
                         </div>
