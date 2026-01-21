@@ -1,10 +1,12 @@
 @{
-    var path = Context.Request.Path.Value?.ToLower() ?? "";
-    var isDashboard = path == "/account" || path == "/account/";
-    var isOrders = path.StartsWith("/account/orders");
-    var isAddresses = path.StartsWith("/account/addresses");
-    var isEditProfile = path.StartsWith("/account/edit-profile");
-    var isWishlist = path.StartsWith("/account/wishlist");
+    // Use ViewContext.RouteData for more reliable menu highlighting
+    var actionName = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var isDashboard = actionName.Equals("Index", StringComparison.OrdinalIgnoreCase);
+    var isOrders = actionName.Equals("Orders", StringComparison.OrdinalIgnoreCase) || 
+                   actionName.Equals("OrderDetails", StringComparison.OrdinalIgnoreCase);
+    var isAddresses = actionName.Equals("Addresses", StringComparison.OrdinalIgnoreCase);
+    var isEditProfile = actionName.Equals("EditProfile", StringComparison.OrdinalIgnoreCase);
+    var isWishlist = actionName.Equals("Wishlist", StringComparison.OrdinalIgnoreCase);
 }
 
 <div class="wrap-sidebar-account">
