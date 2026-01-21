@@ -22,9 +22,10 @@ public static class DashboardRoutes
     public const string Vendor = "/vendor";
 
     /// <summary>
-    /// Customer account route: /account
+    /// Customer redirect route: / (storefront home)
+    /// Customers are shoppers, not admin users - they live in the storefront
     /// </summary>
-    public const string Customer = "/account";
+    public const string Customer = "/";
 
     /// <summary>
     /// Default fallback route for unauthenticated or no-role users
