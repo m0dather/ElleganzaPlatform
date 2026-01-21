@@ -15989,6 +15989,11 @@ html:not([dir=rtl]) .noUi-horizontal .noUi-handle {
   line-height: 20px;
   position: relative;
 }
+.my-account-nav button.my-account-nav-item {
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
 .my-account-nav .my-account-nav-item::before {
   position: absolute;
   content: "";

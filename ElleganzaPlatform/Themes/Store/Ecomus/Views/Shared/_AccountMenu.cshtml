@@ -59,6 +59,11 @@
                 <a href="@Url.Action("Wishlist", "Account", new { area = "Customer" })" class="my-account-nav-item">Wishlist</a>
             }
         </li>
-        <li><a href="@Url.Action("Login", "Auth")" class="my-account-nav-item">Logout</a></li>
+        <li>
+            <form method="post" action="/logout" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="my-account-nav-item">Logout</button>
+            </form>
+        </li>
     </ul>
 </div>

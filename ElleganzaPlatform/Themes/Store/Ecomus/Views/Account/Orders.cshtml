@@ -36,7 +36,7 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex gap-2">
-                                                            <a href="/account/orders/@order.Id"
+                                                            <a href="@Url.Action("OrderDetails", "Account", new { area = "Customer", id = order.Id })"
                                                                 class="tf-btn btn-outline-dark animate-hover-btn rounded-0 justify-content-center">
                                                                 <span>View</span>
                                                             </a>

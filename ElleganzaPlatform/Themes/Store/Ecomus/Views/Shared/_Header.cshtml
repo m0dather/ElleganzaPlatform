@@ -936,7 +936,7 @@
                             {
                                 <!-- Guest: Show Login/Register -->
                                 <li class="nav-account">
-                                    <a href="/login" class="nav-icon-item" title="Login" aria-label="Login to your account">
+                                    <a href="@Url.Action("Login", "Account", new { area = "Identity" })" class="nav-icon-item" title="Login" aria-label="Login to your account">
                                         <i class="icon icon-account" aria-hidden="true"></i>
                                     </a>
                                 </li>
@@ -949,8 +949,8 @@
                                         <i class="icon icon-account" aria-hidden="true"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="/account">My Account</a></li>
-                                        <li><a class="dropdown-item" href="/account/orders">My Orders</a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Account", new { area = "Customer" })">My Account</a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Orders", "Account", new { area = "Customer" })">My Orders</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form method="post" action="/logout" class="d-inline">
@@ -969,7 +969,7 @@
                                         <i class="icon icon-account" aria-hidden="true"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="/vendor">Vendor Dashboard</a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Dashboard", new { area = "Vendor" })">Vendor Dashboard</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form method="post" action="/logout" class="d-inline">
@@ -988,7 +988,7 @@
                                         <i class="icon icon-account" aria-hidden="true"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Dashboard", new { area = "Admin" })">Admin Dashboard</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form method="post" action="/logout" class="d-inline">

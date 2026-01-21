@@ -88,7 +88,7 @@
                                         <a asp-controller="Home" asp-action="Contact" class="footer-menu_item">Contact Us</a>
                                     </li>
                                     <li>
-                                        <a href="/account" class="footer-menu_item">Account</a>
+                                        <a href="@Url.Action("Index", "Account", new { area = "Customer" })" class="footer-menu_item">Account</a>
                                     </li>
                                 </ul>
                             </div>

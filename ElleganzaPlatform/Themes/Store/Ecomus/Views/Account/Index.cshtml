@@ -1,3 +1,4 @@
+@model ElleganzaPlatform.Application.ViewModels.Store.CustomerAccountViewModel
 @{
     Layout = "_AccountLayout";
     ViewBag.Title = "My Account";
@@ -5,12 +6,12 @@
 
 <div class="my-account-content account-dashboard">
     <div class="mb_60">
-        <h5 class="fw-5 mb_20">Hello Themesflat</h5>
+        <h5 class="fw-5 mb_20">Hello @(Model.FirstName ?? "Customer")</h5>
         <p>
             From your account dashboard you can view your <a class="text_primary"
-                href="@Url.Action("Orders", "Account")">recent orders</a>, manage your <a
-                class="text_primary" href="@Url.Action("Addresses", "Account")">shipping and billing
-                address</a>, and <a class="text_primary" href="@Url.Action("EditProfile", "Account")">edit your
+                href="@Url.Action("Orders", "Account", new { area = "Customer" })">recent orders</a>, manage your <a
+                class="text_primary" href="@Url.Action("Addresses", "Account", new { area = "Customer" })">shipping and billing
+                address</a>, and <a class="text_primary" href="@Url.Action("EditProfile", "Account", new { area = "Customer" })">edit your
                 password and account details</a>.
         </p>
     </div>
