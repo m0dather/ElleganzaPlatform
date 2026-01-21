@@ -1,5 +1,8 @@
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- jQuery must be loaded first -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
+    <!-- Bootstrap requires jQuery -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- Theme scripts -->
     <script type="text/javascript" src="js/swiper-bundle.min.js"></script>
     <script type="text/javascript" src="js/carousel.js"></script>
     <script type="text/javascript" src="js/bootstrap-select.min.js"></script>
@@ -8,6 +11,7 @@
     <script type="text/javascript" src="js/wow.min.js"></script>
     <script type="text/javascript" src="js/multiple-modal.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
+    <!-- App-specific scripts -->
     <script type="text/javascript" src="~/js/ui-notify.js"></script>
     <script type="text/javascript" src="~/js/cart.js"></script>
     <script type="text/javascript" src="~/js/wishlist.js"></script>
@@ -15,6 +19,9 @@
     <script src="js/sibforms.html" defer></script>
 
     <script>
+        // Initialize Cart UI Configuration
+        window.CartUIConfig = window.CartUIConfig || { openMiniCartOnAdd: false };
+        
         window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
         window.LOCALE = 'en';
         window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "The information provided is invalid. Please review the field format and try again.";

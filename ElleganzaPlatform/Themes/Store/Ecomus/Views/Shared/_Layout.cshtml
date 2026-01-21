@@ -93,26 +93,24 @@
                         </div>
                     </div>
 
-                    <div class="top-bar-language tf-cur justify-content-end">
-                        @* Language and Currency selectors will be implemented in future phases *@
-                        @* 
-                        <div class="tf-currencies">
-                            <select class="image-select center style-default type-currencies">
-                                <option data-thumbnail="images/country/fr.svg">EUR € | France</option>
-                                <option data-thumbnail="images/country/de.svg">EUR € | Germany</option>
-                                <option selected data-thumbnail="images/country/us.svg">USD $ | United States</option>
-                                <option data-thumbnail="images/country/vn.svg">VND ₫ | Vietnam</option>
-                            </select>
-                        </div>
+                    <div class="top-bar-language tf-cur justify-content-end" id="top-bar-language">
                         <div class="tf-languages">
-                            <select class="image-select center style-default type-languages">
-                                <option>English</option>
-                                <option>العربية</option>
-                                <option>简体中文</option>
-                                <option>اردو</option>
-                            </select>
+                            <form id="languageForm" asp-controller="Home" asp-action="SetLanguage" method="post" class="d-inline">
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                <select name="culture" class="image-select center style-default type-languages" onchange="this.form.submit()">
+                                    @if (langCode == "en")
+                                    {
+                                        <option value="en" selected>English</option>
+                                        <option value="ar">العربية</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="en">English</option>
+                                        <option value="ar" selected>العربية</option>
+                                    }
+                                </select>
+                            </form>
                         </div>
-                        *@
                     </div>
                 </div>
             </div>
