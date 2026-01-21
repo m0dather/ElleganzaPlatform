@@ -1,0 +1,309 @@
+@model ElleganzaPlatform.Application.ViewModels.Store.AddressListViewModel
+@{
+    Layout = "~/Themes/Store/Ecomus/Views/Shared/_AccountLayout.cshtml";
+    ViewBag.Title = "Address";
+}
+
+<!-- Success/Error Messages -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="my-account-content account-address">
+    <div class="text-center widget-inner-address">
+        <!-- Add New Address Button -->
+        <button type="button" class="tf-btn btn-fill animate-hover-btn btn-address mb_20" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+            Add a new address
+        </button>
+
+        <!-- Address List -->
+        @if (Model.HasAddresses)
+        {
+            <div class="list-account-address">
+                @foreach (var address in Model.Addresses)
+                {
+                    <div class="account-address-item">
+                        @if (address.IsDefaultShipping || address.IsDefaultBilling)
+                        {
+                            <h6 class="mb_20">
+                                @if (address.IsDefaultShipping && address.IsDefaultBilling)
+                                {
+                                    <span>Default Shipping & Billing</span>
+                                }
+                                else if (address.IsDefaultShipping)
+                                {
+                                    <span>Default Shipping</span>
+                                }
+                                else
+                                {
+                                    <span>Default Billing</span>
+                                }
+                            </h6>
+                        }
+                        <p><strong>@address.FirstName @address.LastName</strong></p>
+                        <p>@address.AddressLine1</p>
+                        @if (!string.IsNullOrEmpty(address.AddressLine2))
+                        {
+                            <p>@address.AddressLine2</p>
+                        }
+                        <p>@address.City, @address.State @address.PostalCode</p>
+                        <p>@address.Country</p>
+                        <p class="mb_10">@address.Phone</p>
+                        <div class="d-flex gap-10 justify-content-center">
+                            <button type="button" class="tf-btn btn-fill animate-hover-btn justify-content-center btn-edit-address" 
+                                    data-address-id="@address.Id" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editAddressModal">
+                                <span>Edit</span>
+                            </button>
+                            @if (Model.CanDeleteAddresses)
+                            {
+                                <form method="post" asp-action="DeleteAddress" asp-route-id="@address.Id" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="tf-btn btn-outline animate-hover-btn justify-content-center">
+                                        <span>Delete</span>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center my-5">
+                <p class="text-muted">You don't have any saved addresses yet. Add your first address to get started.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add a new address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-action="CreateAddress" id="addAddressForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="FirstName" name="FirstName" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="FirstName">First name*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="LastName" name="LastName" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="LastName">Last name*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="tel" id="Phone" name="Phone" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="Phone">Phone*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="AddressLine1" name="AddressLine1" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="AddressLine1">Address Line 1*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="AddressLine2" name="AddressLine2">
+                                <label class="tf-field-label fw-4 text_black-2" for="AddressLine2">Address Line 2</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="City" name="City" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="City">City*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="State" name="State" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="State">State/Province*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="PostalCode" name="PostalCode" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="PostalCode">Postal Code*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="Country" name="Country" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="Country">Country*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="box-checkbox fieldset-radio d-flex align-items-center gap-8">
+                                <input type="checkbox" id="IsDefaultShipping" name="IsDefaultShipping" class="tf-check" value="true">
+                                <label for="IsDefaultShipping" class="text_black-2 fw-4">Set as default shipping address</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="box-checkbox fieldset-radio d-flex align-items-center gap-8">
+                                <input type="checkbox" id="IsDefaultBilling" name="IsDefaultBilling" class="tf-check" value="true">
+                                <label for="IsDefaultBilling" class="text_black-2 fw-4">Set as default billing address</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="tf-btn btn-outline animate-hover-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="tf-btn btn-fill animate-hover-btn">Add address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Address Modal -->
+<div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAddressModalLabel">Edit address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="editAddressForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="EditId" name="Id">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditFirstName" name="FirstName" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditFirstName">First name*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditLastName" name="LastName" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditLastName">Last name*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="tel" id="EditPhone" name="Phone" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditPhone">Phone*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditAddressLine1" name="AddressLine1" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditAddressLine1">Address Line 1*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditAddressLine2" name="AddressLine2">
+                                <label class="tf-field-label fw-4 text_black-2" for="EditAddressLine2">Address Line 2</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditCity" name="City" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditCity">City*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditState" name="State" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditState">State/Province*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditPostalCode" name="PostalCode" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditPostalCode">Postal Code*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="EditCountry" name="Country" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="EditCountry">Country*</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="box-checkbox fieldset-radio d-flex align-items-center gap-8">
+                                <input type="checkbox" id="EditIsDefaultShipping" name="IsDefaultShipping" class="tf-check" value="true">
+                                <label for="EditIsDefaultShipping" class="text_black-2 fw-4">Set as default shipping address</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="box-checkbox fieldset-radio d-flex align-items-center gap-8">
+                                <input type="checkbox" id="EditIsDefaultBilling" name="IsDefaultBilling" class="tf-check" value="true">
+                                <label for="EditIsDefaultBilling" class="text_black-2 fw-4">Set as default billing address</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="tf-btn btn-outline animate-hover-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="tf-btn btn-fill animate-hover-btn">Update address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Handle Edit button click
+        document.querySelectorAll('.btn-edit-address').forEach(button => {
+            button.addEventListener('click', async function() {
+                const addressId = this.getAttribute('data-address-id');
+                
+                // Fetch address data
+                try {
+                    const response = await fetch(`/account/addresses/${addressId}`);
+                    if (response.ok) {
+                        const address = await response.json();
+                        
+                        // Populate edit form
+                        document.getElementById('EditId').value = address.id;
+                        document.getElementById('EditFirstName').value = address.firstName;
+                        document.getElementById('EditLastName').value = address.lastName;
+                        document.getElementById('EditPhone').value = address.phone;
+                        document.getElementById('EditAddressLine1').value = address.addressLine1;
+                        document.getElementById('EditAddressLine2').value = address.addressLine2 || '';
+                        document.getElementById('EditCity').value = address.city;
+                        document.getElementById('EditState').value = address.state;
+                        document.getElementById('EditPostalCode').value = address.postalCode;
+                        document.getElementById('EditCountry').value = address.country;
+                        document.getElementById('EditIsDefaultShipping').checked = address.isDefaultShipping;
+                        document.getElementById('EditIsDefaultBilling').checked = address.isDefaultBilling;
+                        
+                        // Update form action
+                        document.getElementById('editAddressForm').action = `/account/addresses/${addressId}`;
+                    }
+                } catch (error) {
+                    console.error('Error fetching address:', error);
+                    alert('Failed to load address data');
+                }
+            });
+        });
+    </script>
+}
