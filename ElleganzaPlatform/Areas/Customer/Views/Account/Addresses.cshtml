@@ -276,9 +276,10 @@
             button.addEventListener('click', async function() {
                 const addressId = this.getAttribute('data-address-id');
                 
-                // Fetch address data
+                // Fetch address data using proper URL construction
                 try {
-                    const response = await fetch(`/account/addresses/${addressId}`);
+                    const fetchUrl = '@Url.Action("GetAddress", "Account", new { area = "Customer" })'.replace(/0$/, addressId);
+                    const response = await fetch(fetchUrl);
                     if (response.ok) {
                         const address = await response.json();
                         
@@ -296,8 +297,9 @@
                         document.getElementById('EditIsDefaultShipping').checked = address.isDefaultShipping;
                         document.getElementById('EditIsDefaultBilling').checked = address.isDefaultBilling;
                         
-                        // Update form action
-                        document.getElementById('editAddressForm').action = `/account/addresses/${addressId}`;
+                        // Update form action using proper URL construction
+                        const actionUrl = '@Url.Action("UpdateAddress", "Account", new { area = "Customer" })'.replace(/0$/, addressId);
+                        document.getElementById('editAddressForm').action = actionUrl;
                     }
                 } catch (error) {
                     console.error('Error fetching address:', error);
