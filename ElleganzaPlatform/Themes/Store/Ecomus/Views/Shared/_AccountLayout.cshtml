@@ -1,0 +1,31 @@
+@{
+    Layout = "_Layout";
+}
+
+<!-- page-title -->
+<div class="tf-page-title">
+    <div class="container-full">
+        <div class="heading text-center">@ViewBag.Title</div>
+    </div>
+</div>
+<!-- /page-title -->
+
+<!-- page-cart -->
+<section class="flat-spacing-11">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <partial name="_AccountMenu" />
+            </div>
+            <div class="col-lg-9">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</section>
+<!-- page-cart -->
+
+<div class="btn-sidebar-account">
+    <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas"><i
+            class="icon icon-sidebar-2"></i></button>
+</div>

@@ -1,37 +1,10 @@
 @{
-    Layout = "_Layout";
-    ViewBag.Title = "My Wishlist";
+    Layout = "_AccountLayout";
+    ViewBag.Title = "Wishlist";
 }
 
-        <!-- /header -->
-
-        <!-- page-title -->
-        <div class="tf-page-title">
-            <div class="container-full">
-                <div class="heading text-center">Wishlist</div>
-            </div>
-        </div>
-        <!-- /page-title -->
-
-        <!-- page-cart -->
-        <section class="flat-spacing-11">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-3">
-                        <div class="wrap-sidebar-account">
-                            <ul class="my-account-nav">
-                                <li><a href="@Url.Action("Index", "Account")" class="my-account-nav-item ">Dashboard</a></li>
-                                <li><a href="@Url.Action("Orders", "Account")" class="my-account-nav-item">Orders</a></li>
-                                <li><a href="@Url.Action("Addresses", "Account")" class="my-account-nav-item">Address</a></li>
-                                <li><a href="@Url.Action("EditProfile", "Account")" class="my-account-nav-item">Account Details</a></li>
-                                <li><span class="my-account-nav-item active">Wishlist</span></li>
-                                <li><a href="@Url.Action("Login", "Auth")" class="my-account-nav-item">Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="my-account-content account-wishlist">
-                            <div class="grid-layout wrapper-shop" data-grid="grid-3">
+<div class="my-account-content account-wishlist">
+    <div class="grid-layout wrapper-shop" data-grid="grid-3">
                                 <!-- card product 1 -->
                                 <div class="card-product">
                                     <div class="card-product-wrapper">
@@ -197,18 +170,7 @@
                                         <a href="@Url.Action("Product", "Shop")" class="title link">Oversized Printed T-shirt</a>
                                         <span class="price">$10.00</span>
                                     </div>
-                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-        <!-- page-cart -->
 
-        <div class="btn-sidebar-account">
-            <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas"><i
-                    class="icon icon-sidebar-2"></i></button>
-        </div>
-
-        <!-- footer -->
