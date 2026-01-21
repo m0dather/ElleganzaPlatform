@@ -1,0 +1,64 @@
+@{
+    var path = Context.Request.Path.Value?.ToLower() ?? "";
+    var isDashboard = path == "/account" || path == "/account/";
+    var isOrders = path.StartsWith("/account/orders");
+    var isAddresses = path.StartsWith("/account/addresses");
+    var isEditProfile = path.StartsWith("/account/edit-profile");
+    var isWishlist = path.StartsWith("/account/wishlist");
+}
+
+<div class="wrap-sidebar-account">
+    <ul class="my-account-nav">
+        <li>
+            @if (isDashboard)
+            {
+                <span class="my-account-nav-item active">Dashboard</span>
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Account", new { area = "Customer" })" class="my-account-nav-item">Dashboard</a>
+            }
+        </li>
+        <li>
+            @if (isOrders)
+            {
+                <span class="my-account-nav-item active">Orders</span>
+            }
+            else
+            {
+                <a href="@Url.Action("Orders", "Account", new { area = "Customer" })" class="my-account-nav-item">Orders</a>
+            }
+        </li>
+        <li>
+            @if (isAddresses)
+            {
+                <span class="my-account-nav-item active">Address</span>
+            }
+            else
+            {
+                <a href="@Url.Action("Addresses", "Account", new { area = "Customer" })" class="my-account-nav-item">Address</a>
+            }
+        </li>
+        <li>
+            @if (isEditProfile)
+            {
+                <span class="my-account-nav-item active">Account Details</span>
+            }
+            else
+            {
+                <a href="@Url.Action("EditProfile", "Account", new { area = "Customer" })" class="my-account-nav-item">Account Details</a>
+            }
+        </li>
+        <li>
+            @if (isWishlist)
+            {
+                <span class="my-account-nav-item active">Wishlist</span>
+            }
+            else
+            {
+                <a href="@Url.Action("Wishlist", "Account", new { area = "Customer" })" class="my-account-nav-item">Wishlist</a>
+            }
+        </li>
+        <li><a href="@Url.Action("Login", "Auth")" class="my-account-nav-item">Logout</a></li>
+    </ul>
+</div>
