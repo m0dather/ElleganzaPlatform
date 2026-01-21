@@ -271,6 +271,10 @@
 
 @section Scripts {
     <script>
+        // Constants for notification timing
+        const NOTIFICATION_AUTO_DISMISS_MS = 5000;
+        const NOTIFICATION_FADE_OUT_MS = 150;
+
         // Handle Edit button click
         document.querySelectorAll('.btn-edit-address').forEach(button => {
             button.addEventListener('click', async function() {
@@ -278,7 +282,9 @@
                 
                 // Fetch address data using proper route construction
                 try {
-                    const fetchUrl = `/account/addresses/${addressId}`;
+                    // Use ASP.NET Core routing with proper base URL
+                    const baseUrl = '@Url.Action("GetAddress", "Account", new { area = "Customer", id = "__ID__" })';
+                    const fetchUrl = baseUrl.replace('__ID__', addressId);
                     const response = await fetch(fetchUrl);
                     if (response.ok) {
                         const address = await response.json();
@@ -298,7 +304,8 @@
                         document.getElementById('EditIsDefaultBilling').checked = address.isDefaultBilling;
                         
                         // Update form action using proper route construction
-                        const actionUrl = `/account/addresses/${addressId}`;
+                        const actionBaseUrl = '@Url.Action("UpdateAddress", "Account", new { area = "Customer", id = "__ID__" })';
+                        const actionUrl = actionBaseUrl.replace('__ID__', addressId);
                         document.getElementById('editAddressForm').action = actionUrl;
                     } else {
                         // Use themed notification instead of alert
@@ -335,14 +342,14 @@
             const container = document.querySelector('.my-account-content');
             if (container) {
                 container.insertAdjacentHTML('afterbegin', alertHtml);
-                // Auto-dismiss after 5 seconds
+                // Auto-dismiss after configured timeout
                 setTimeout(() => {
                     const alert = container.querySelector('.alert');
                     if (alert) {
                         alert.classList.remove('show');
-                        setTimeout(() => alert.remove(), 150);
+                        setTimeout(() => alert.remove(), NOTIFICATION_FADE_OUT_MS);
                     }
-                }, 5000);
+                }, NOTIFICATION_AUTO_DISMISS_MS);
             }
         }
     </script>
