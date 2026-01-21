@@ -33,6 +33,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<CheckoutSession> CheckoutSessions => Set<CheckoutSession>();
+    public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -84,6 +85,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
              _currentUserService.IsSuperAdmin || 
              _currentUserService.StoreId == null || 
              e.StoreId == _currentUserService.StoreId));
+
+        builder.Entity<CustomerAddress>().HasQueryFilter(e => !e.IsDeleted);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
