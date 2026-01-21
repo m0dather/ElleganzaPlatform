@@ -60,7 +60,8 @@ namespace ElleganzaPlatform.Controllers
                     Expires = DateTimeOffset.UtcNow.AddYears(1),
                     IsEssential = true,
                     Path = "/",
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    Secure = true // Ensure cookie is only sent over HTTPS
                 }
             );
 
