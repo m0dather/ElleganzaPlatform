@@ -46,9 +46,9 @@ namespace ElleganzaPlatform.Controllers
         {
             // Validate the culture
             var supportedCultures = new[] { "en", "ar" };
-            if (!supportedCultures.Contains(culture))
+            if (string.IsNullOrEmpty(culture) || !supportedCultures.Contains(culture))
             {
-                culture = "en"; // Default to English if invalid
+                culture = "en"; // Default to English if invalid or null
             }
 
             // Set the culture cookie
