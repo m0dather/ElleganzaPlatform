@@ -99,10 +99,10 @@
                                 </button>
                             </form>
                         }
-                        <a href="/account/orders/@Model.OrderId" class="tf-btn btn-outline-dark radius-3 btn-fill animate-hover-btn">
+                        <a href="@Url.Action("OrderDetails", "Account", new { area = "Customer", id = Model.OrderId })" class="tf-btn btn-outline-dark radius-3 btn-fill animate-hover-btn">
                             View Order Details
                         </a>
-                        <a href="/shop" class="tf-btn btn-outline-dark radius-3 animate-hover-btn">
+                        <a href="@Url.Action("Index", "Shop")" class="tf-btn btn-outline-dark radius-3 animate-hover-btn">
                             Continue Shopping
                         </a>
                     </div>
