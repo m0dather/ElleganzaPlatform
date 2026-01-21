@@ -107,7 +107,7 @@ public class CustomerService : ICustomerService
     public async Task<AddressListViewModel> GetCustomerAddressesAsync(string userId)
     {
         var addresses = await _context.CustomerAddresses
-            .Where(a => a.UserId == userId)
+            .Where(a => a.UserId == userId && !a.IsDeleted)
             .OrderByDescending(a => a.IsDefaultShipping)
             .ThenByDescending(a => a.IsDefaultBilling)
             .ThenByDescending(a => a.CreatedAt)
@@ -137,7 +137,7 @@ public class CustomerService : ICustomerService
     public async Task<CustomerAddressViewModel?> GetCustomerAddressAsync(int addressId, string userId)
     {
         var address = await _context.CustomerAddresses
-            .Where(a => a.Id == addressId && a.UserId == userId)
+            .Where(a => a.Id == addressId && a.UserId == userId && !a.IsDeleted)
             .Select(a => new CustomerAddressViewModel
             {
                 Id = a.Id,
@@ -164,7 +164,7 @@ public class CustomerService : ICustomerService
         if (model.IsDefaultShipping)
         {
             var existingDefaultShipping = await _context.CustomerAddresses
-                .Where(a => a.UserId == userId && a.IsDefaultShipping)
+                .Where(a => a.UserId == userId && a.IsDefaultShipping && !a.IsDeleted)
                 .ToListAsync();
             
             foreach (var addr in existingDefaultShipping)
@@ -177,7 +177,7 @@ public class CustomerService : ICustomerService
         if (model.IsDefaultBilling)
         {
             var existingDefaultBilling = await _context.CustomerAddresses
-                .Where(a => a.UserId == userId && a.IsDefaultBilling)
+                .Where(a => a.UserId == userId && a.IsDefaultBilling && !a.IsDeleted)
                 .ToListAsync();
             
             foreach (var addr in existingDefaultBilling)
@@ -211,7 +211,7 @@ public class CustomerService : ICustomerService
     public async Task<bool> UpdateCustomerAddressAsync(CustomerAddressViewModel model, string userId)
     {
         var address = await _context.CustomerAddresses
-            .FirstOrDefaultAsync(a => a.Id == model.Id && a.UserId == userId);
+            .FirstOrDefaultAsync(a => a.Id == model.Id && a.UserId == userId && !a.IsDeleted);
 
         if (address == null)
             return false;
@@ -220,7 +220,7 @@ public class CustomerService : ICustomerService
         if (model.IsDefaultShipping && !address.IsDefaultShipping)
         {
             var existingDefaultShipping = await _context.CustomerAddresses
-                .Where(a => a.UserId == userId && a.Id != model.Id && a.IsDefaultShipping)
+                .Where(a => a.UserId == userId && a.Id != model.Id && a.IsDefaultShipping && !a.IsDeleted)
                 .ToListAsync();
             
             foreach (var addr in existingDefaultShipping)
@@ -233,7 +233,7 @@ public class CustomerService : ICustomerService
         if (model.IsDefaultBilling && !address.IsDefaultBilling)
         {
             var existingDefaultBilling = await _context.CustomerAddresses
-                .Where(a => a.UserId == userId && a.Id != model.Id && a.IsDefaultBilling)
+                .Where(a => a.UserId == userId && a.Id != model.Id && a.IsDefaultBilling && !a.IsDeleted)
                 .ToListAsync();
             
             foreach (var addr in existingDefaultBilling)
@@ -261,15 +261,15 @@ public class CustomerService : ICustomerService
 
     public async Task<bool> DeleteCustomerAddressAsync(int addressId, string userId)
     {
-        // Check if user has at least 2 addresses (cannot delete the last one)
+        // Check if user has at least 2 active addresses (cannot delete the last one)
         var addressCount = await _context.CustomerAddresses
-            .CountAsync(a => a.UserId == userId);
+            .CountAsync(a => a.UserId == userId && !a.IsDeleted);
 
         if (addressCount <= 1)
             return false;
 
         var address = await _context.CustomerAddresses
-            .FirstOrDefaultAsync(a => a.Id == addressId && a.UserId == userId);
+            .FirstOrDefaultAsync(a => a.Id == addressId && a.UserId == userId && !a.IsDeleted);
 
         if (address == null)
             return false;
@@ -281,7 +281,7 @@ public class CustomerService : ICustomerService
         if (address.IsDefaultShipping || address.IsDefaultBilling)
         {
             var nextAddress = await _context.CustomerAddresses
-                .Where(a => a.UserId == userId && a.Id != addressId)
+                .Where(a => a.UserId == userId && a.Id != addressId && !a.IsDeleted)
                 .OrderByDescending(a => a.CreatedAt)
                 .FirstOrDefaultAsync();
 
