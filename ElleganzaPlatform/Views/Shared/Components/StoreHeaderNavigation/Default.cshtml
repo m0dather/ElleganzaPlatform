@@ -1,0 +1,33 @@
+@model ElleganzaPlatform.ViewComponents.StoreHeaderNavigationModel
+
+@if (Model.IsAuthenticated)
+{
+    @if (!string.IsNullOrEmpty(Model.DashboardUrl))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="@Model.DashboardUrl">
+                <i class="@Model.DashboardIcon"></i> @Model.DashboardText
+            </a>
+        </li>
+    }
+    <li class="nav-item">
+        <form asp-area="Identity" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+            <button type="submit" class="nav-link btn btn-link text-dark">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-controller="Account" asp-action="Login">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-controller="Account" asp-action="RegisterCustomer">
+            <i class="bi bi-person-plus"></i> Register
+        </a>
+    </li>
+}
