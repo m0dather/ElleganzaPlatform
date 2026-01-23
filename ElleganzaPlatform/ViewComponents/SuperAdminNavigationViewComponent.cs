@@ -41,14 +41,3 @@ public class SuperAdminNavigationViewComponent : ViewComponent
         return HttpContext.Request.Path.StartsWithSegments(path, StringComparison.OrdinalIgnoreCase);
     }
 }
-
-/// <summary>
-/// Navigation item model
-/// </summary>
-public class NavigationItem
-{
-    public string Text { get; set; } = string.Empty;
-    public string Icon { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
-    public bool IsActive { get; set; }
-}

@@ -26,7 +26,7 @@ public class VendorNavigationViewComponent : ViewComponent
 
         var menuItems = new List<NavigationItem>
         {
-            new NavigationItem { Text = "Dashboard", Icon = "bi-speedometer2", Url = "/vendor", IsActive = IsActive("/vendor/dashboard") || IsActive("/vendor") && HttpContext.Request.Path == "/vendor" },
+            new NavigationItem { Text = "Dashboard", Icon = "bi-speedometer2", Url = "/vendor", IsActive = IsActive("/vendor") },
             new NavigationItem { Text = "Products", Icon = "bi-box-seam", Url = "/vendor/Products", IsActive = IsActive("/vendor/products") },
             new NavigationItem { Text = "Orders", Icon = "bi-cart-check", Url = "/vendor/Orders", IsActive = IsActive("/vendor/orders") },
             new NavigationItem { Text = "Reports", Icon = "bi-graph-up", Url = "/vendor/Reports", IsActive = IsActive("/vendor/reports") }
