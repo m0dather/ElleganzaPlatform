@@ -30,7 +30,8 @@ public class CustomerNavigationViewComponent : ViewComponent
             new NavigationItem { Text = "Orders", Icon = "bi-cart-check", Url = "/account/orders", IsActive = IsActive("/account/orders") },
             new NavigationItem { Text = "Addresses", Icon = "bi-geo-alt", Url = "/account/addresses", IsActive = IsActive("/account/addresses") },
             new NavigationItem { Text = "Wishlist", Icon = "bi-heart", Url = "/account/wishlist", IsActive = IsActive("/account/wishlist") },
-            new NavigationItem { Text = "Profile", Icon = "bi-person", Url = "/account/edit-profile", IsActive = IsActive("/account/edit-profile") }
+            new NavigationItem { Text = "Profile", Icon = "bi-person", Url = "/account/edit-profile", IsActive = IsActive("/account/edit-profile") },
+            new NavigationItem { Text = "Logout", Icon = "bi-box-arrow-right", Url = "/logout", IsActive = false }
         };
 
         return View(menuItems);
