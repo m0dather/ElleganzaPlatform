@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<ICheckoutSessionService, CheckoutSessionService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IVendorOrderService, VendorOrderService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
 
         // Phase 4: Payment Services
         services.AddScoped<IPaymentService, StripePaymentService>();

@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "My Wishlist";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-heart me-2"></i>
+                My Wishlist
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Empty State -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-heart display-1 text-muted mb-3"></i>
+                    <h3 class="text-muted mb-3">Your wishlist is empty</h3>
+                    <p class="text-muted mb-4">
+                        Browse our products and add items to your wishlist to save them for later.
+                    </p>
+                    <a href="@Url.Action("Index", "Shop", new { area = "" })" class="btn btn-primary">
+                        <i class="bi bi-shop me-2"></i>
+                        Start Shopping
+                    </a>
+                </div>
+            </div>
+
+            <!-- Future: Wishlist items will be displayed here -->
+            @* 
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <!-- Wishlist item cards will go here -->
+            </div>
+            *@
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Future: Add AJAX functionality for adding/removing wishlist items
+    </script>
+}

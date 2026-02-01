@@ -34,6 +34,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<CheckoutSession> CheckoutSessions => Set<CheckoutSession>();
     public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
