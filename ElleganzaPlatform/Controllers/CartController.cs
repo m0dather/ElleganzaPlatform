@@ -221,7 +221,7 @@ public class CartController : Controller
     public async Task<IActionResult> GetCartCount()
     {
         if (!CanAccessCart())
-            return Ok(new { count = 0 });
+            return Forbid();
 
         try
         {
@@ -244,7 +244,7 @@ public class CartController : Controller
     public async Task<IActionResult> GetMiniCart()
     {
         if (!CanAccessCart())
-            return Ok(new { success = false, message = "Cart access denied for your role" });
+            return Forbid();
 
         try
         {
