@@ -55,13 +55,29 @@
                                             <td>
                                                 <strong>#@order.OrderNumber</strong>
                                             </td>
-                                            <td>@order.CustomerName</td>
+                                            <td>
+                                                @if (order.User != null)
+                                                {
+                                                    @order.User.UserName
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Unknown</span>
+                                                }
+                                            </td>
                                             <td>@order.TotalAmount.ToString("C2")</td>
                                             <td>
                                                 <span class="badge bg-info">@order.Status</span>
                                             </td>
                                             <td>
-                                                <span class="badge bg-success">@order.PaymentStatus</span>
+                                                @if (!string.IsNullOrEmpty(order.PaymentTransactionId))
+                                                {
+                                                    <span class="badge bg-success">Paid</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Pending</span>
+                                                }
                                             </td>
                                             <td>@order.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
                                         </tr>

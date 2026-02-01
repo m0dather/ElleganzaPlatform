@@ -160,9 +160,10 @@
                             @foreach (var admin in Model.VendorAdmins)
                             {
                                 <li class="mb-2">
-                                    <i class="bi bi-person-circle me-2"></i>
-                                    <strong>@admin.User?.UserName</strong><br />
-                                    <small class="text-muted">@admin.User?.Email</small>
+                                    <i class="bi bi-person-circle me-2" aria-hidden="true"></i>
+                                    <strong>@admin.User?.UserName</strong>
+                                    <span class="visually-hidden">Username</span><br />
+                                    <small class="text-muted" aria-label="Email address">@admin.User?.Email</small>
                                 </li>
                             }
                         </ul>

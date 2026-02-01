@@ -207,6 +207,7 @@ public class VendorsController : Controller
 
         var orders = await _context.OrderItems
             .Include(oi => oi.Order)
+                .ThenInclude(o => o.User)
             .Include(oi => oi.Product)
             .Where(oi => oi.VendorId == id)
             .Select(oi => oi.Order)
