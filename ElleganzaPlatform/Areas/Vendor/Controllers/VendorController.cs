@@ -28,6 +28,16 @@ public class VendorController : Controller
         return View();
     }
 
+    /// <summary>
+    /// Pending approval page for vendors awaiting activation
+    /// Stage 4.1: Added to handle vendors with IsActive = false
+    /// </summary>
+    [HttpGet("Pending")]
+    public IActionResult Pending()
+    {
+        return View();
+    }
+
     [HttpGet("Products")]
     public IActionResult Products()
     {

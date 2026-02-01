@@ -1,5 +1,6 @@
 using ElleganzaPlatform.Application.Services;
 using ElleganzaPlatform.Application.ViewModels.Store;
+using ElleganzaPlatform.Application.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ElleganzaPlatform.Controllers;
@@ -8,26 +9,65 @@ namespace ElleganzaPlatform.Controllers;
 /// Cart controller for shopping cart operations
 /// Uses Store theme (Ecomus)
 /// Phase 3.1.1: Hardened with CSRF protection, validation, and error handling
+/// Stage 4.1: Added role-based access control - only Guest and Customer can access cart
 /// </summary>
 public class CartController : Controller
 {
     private readonly ILogger<CartController> _logger;
     private readonly ICartService _cartService;
+    private readonly ICurrentUserService _currentUserService;
 
     public CartController(
         ILogger<CartController> logger,
-        ICartService cartService)
+        ICartService cartService,
+        ICurrentUserService currentUserService)
     {
         _logger = logger;
         _cartService = cartService;
+        _currentUserService = currentUserService;
+    }
+
+    /// <summary>
+    /// Validates that the current user can access the cart.
+    /// Cart is only accessible to Guest (unauthenticated) and Customer roles.
+    /// Vendor, Admin, and SuperAdmin roles are blocked.
+    /// </summary>
+    private bool CanAccessCart()
+    {
+        // Allow unauthenticated users (Guest)
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return true;
+
+        // Block Vendor, StoreAdmin, and SuperAdmin roles
+        if (_currentUserService.IsVendorAdmin || 
+            _currentUserService.IsStoreAdmin || 
+            _currentUserService.IsSuperAdmin)
+            return false;
+
+        // Allow Customer and other authenticated users
+        return true;
+    }
+
+    /// <summary>
+    /// Returns AccessDenied view for unauthorized cart access attempts
+    /// </summary>
+    private IActionResult CartAccessDenied()
+    {
+        _logger.LogWarning("Cart access denied for user {UserId} with role(s)", 
+            _currentUserService.UserId ?? "Unknown");
+        return RedirectToAction("AccessDenied", "Error");
     }
 
     /// <summary>
     /// View cart page
+    /// Stage 4.1: Added role-based access control
     /// </summary>
     [HttpGet("/cart")]
     public async Task<IActionResult> Index()
     {
+        if (!CanAccessCart())
+            return CartAccessDenied();
+
         var cart = await _cartService.GetCartAsync();
         return View(cart);
     }
@@ -35,11 +75,15 @@ public class CartController : Controller
     /// <summary>
     /// Add item to cart (AJAX)
     /// Phase 3.1.1: Protected with anti-forgery token validation
+    /// Stage 4.1: Added role-based access control
     /// </summary>
     [HttpPost("/cart/add")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart([FromBody] AddToCartRequest request)
     {
+        if (!CanAccessCart())
+            return Forbid();
+
         if (!ModelState.IsValid)
         {
             var errors = string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
@@ -77,11 +121,15 @@ public class CartController : Controller
     /// <summary>
     /// Update cart item quantity (AJAX)
     /// Phase 3.1.1: Protected with anti-forgery token validation
+    /// Stage 4.1: Added role-based access control
     /// </summary>
     [HttpPost("/cart/update")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateCartItem([FromBody] UpdateCartItemRequest request)
     {
+        if (!CanAccessCart())
+            return Forbid();
+
         if (!ModelState.IsValid)
         {
             var errors = string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
@@ -128,11 +176,15 @@ public class CartController : Controller
     /// <summary>
     /// Remove item from cart (AJAX)
     /// Phase 3.1.1: Protected with anti-forgery token validation
+    /// Stage 4.1: Added role-based access control
     /// </summary>
     [HttpPost("/cart/remove/{productId}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveFromCart(int productId)
     {
+        if (!CanAccessCart())
+            return Forbid();
+
         try
         {
             var success = await _cartService.RemoveFromCartAsync(productId);
@@ -163,10 +215,14 @@ public class CartController : Controller
 
     /// <summary>
     /// Get cart count (AJAX)
+    /// Stage 4.1: Added role-based access control
     /// </summary>
     [HttpGet("/cart/count")]
     public async Task<IActionResult> GetCartCount()
     {
+        if (!CanAccessCart())
+            return Ok(new { count = 0 });
+
         try
         {
             var count = await _cartService.GetCartItemCountAsync();
@@ -182,10 +238,14 @@ public class CartController : Controller
     /// <summary>
     /// Get mini cart data (AJAX)
     /// Returns cart items and summary for off-canvas mini cart
+    /// Stage 4.1: Added role-based access control
     /// </summary>
     [HttpGet("/cart/mini")]
     public async Task<IActionResult> GetMiniCart()
     {
+        if (!CanAccessCart())
+            return Ok(new { success = false, message = "Cart access denied for your role" });
+
         try
         {
             var cart = await _cartService.GetCartAsync();
@@ -220,11 +280,15 @@ public class CartController : Controller
     /// Clear cart
     /// Phase 3.1.1: Protected with anti-forgery token validation
     /// Supports both page redirect (form submit) and AJAX (mini cart)
+    /// Stage 4.1: Added role-based access control
     /// </summary>
     [HttpPost("/cart/clear")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ClearCart()
     {
+        if (!CanAccessCart())
+            return CartAccessDenied();
+
         try
         {
             await _cartService.ClearCartAsync();

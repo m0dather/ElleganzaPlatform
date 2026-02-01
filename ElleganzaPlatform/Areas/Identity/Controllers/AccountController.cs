@@ -282,7 +282,7 @@ public class AccountController : Controller
                 DescriptionAr = model.DescriptionAr ?? string.Empty,
                 ContactEmail = model.ContactEmail,
                 ContactPhone = model.ContactPhone,
-                IsActive = true, // Activated immediately as per requirements
+                IsActive = false, // Stage 4.1: Vendors require admin approval before activation
                 CommissionRate = 0.15m, // Default 15% commission
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = user.Id
