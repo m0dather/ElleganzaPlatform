@@ -33,7 +33,7 @@ public class StoreAdminNavigationViewComponent : ViewComponent
             new NavigationItem { Text = "Customers", Icon = "bi-people", Url = "/admin/Customers", IsActive = IsActive("/admin/customers") },
             new NavigationItem { Text = "Reports", Icon = "bi-graph-up", Url = "/admin/Reports", IsActive = IsActive("/admin/reports") },
             new NavigationItem { Text = "Settings", Icon = "bi-gear", Url = "/admin/Settings", IsActive = IsActive("/admin/settings") },
-            new NavigationItem { Text = "Logout", Icon = "bi-box-arrow-right", Url = "/logout", IsActive = false }
+            new NavigationItem { Text = "Logout", Icon = "bi-box-arrow-right", Url = "/logout", IsActive = false, IsPostAction = true }
         };
 
         return View(menuItems);

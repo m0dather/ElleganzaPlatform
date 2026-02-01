@@ -1,0 +1,78 @@
+@model ElleganzaPlatform.Domain.Entities.Vendor
+@{
+    ViewData["Title"] = $"Preview: {Model.Name} Dashboard";
+    var isPreviewMode = ViewData["IsPreviewMode"] as bool? ?? false;
+}
+
+<div class="container-fluid">
+    @if (isPreviewMode)
+    {
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-eye me-2"></i>
+            <strong>Preview Mode:</strong> You are viewing <strong>@Model.Name</strong>'s dashboard in read-only mode.
+            <a href="@Url.Action("Details", new { id = Model.Id })" class="alert-link float-end">
+                <i class="bi bi-arrow-left"></i> Back to Vendor Details
+            </a>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="bi bi-shop me-2"></i>
+                @Model.Name - Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <p class="card-text display-6">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Orders</h5>
+                    <p class="card-text display-6">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Orders</h5>
+                    <p class="card-text display-6">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <p class="card-text display-6">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Vendor Dashboard Preview</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        This is a read-only preview of the vendor's dashboard. 
+                        Statistics and detailed data would be displayed here in the actual vendor view.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -31,7 +31,7 @@ public class SuperAdminNavigationViewComponent : ViewComponent
             new NavigationItem { Text = "Vendors", Icon = "bi-people", Url = "/super-admin/Vendors", IsActive = IsActive("/super-admin/vendors") },
             new NavigationItem { Text = "Users", Icon = "bi-person-badge", Url = "/super-admin/Users", IsActive = IsActive("/super-admin/users") },
             new NavigationItem { Text = "Reports", Icon = "bi-graph-up", Url = "/super-admin/Reports", IsActive = IsActive("/super-admin/reports") },
-            new NavigationItem { Text = "Logout", Icon = "bi-box-arrow-right", Url = "/logout", IsActive = false }
+            new NavigationItem { Text = "Logout", Icon = "bi-box-arrow-right", Url = "/logout", IsActive = false, IsPostAction = true }
         };
 
         return View(menuItems);

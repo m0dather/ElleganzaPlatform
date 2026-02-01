@@ -1,0 +1,174 @@
+@model ElleganzaPlatform.Domain.Entities.Vendor
+@{
+    ViewData["Title"] = $"Vendor Details - {Model.Name}";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="bi bi-shop me-2"></i>
+                Vendor Details
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Vendors</a></li>
+                    <li class="breadcrumb-item active">@Model.Name</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["Warning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Vendor Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Name (English):</strong></div>
+                        <div class="col-md-8">@Model.Name</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Name (Arabic):</strong></div>
+                        <div class="col-md-8">@Model.NameAr</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Description:</strong></div>
+                        <div class="col-md-8">@(string.IsNullOrWhiteSpace(Model.Description) ? "N/A" : Model.Description)</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Contact Email:</strong></div>
+                        <div class="col-md-8">@Model.ContactEmail</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Contact Phone:</strong></div>
+                        <div class="col-md-8">@(string.IsNullOrWhiteSpace(Model.ContactPhone) ? "N/A" : Model.ContactPhone)</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Commission Rate:</strong></div>
+                        <div class="col-md-8">@Model.CommissionRate.ToString("P2")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Status:</strong></div>
+                        <div class="col-md-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Created At:</strong></div>
+                        <div class="col-md-8">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Read-Only Preview Access</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Preview vendor's dashboard, products, and orders without edit permissions.
+                    </p>
+                    <div class="btn-group" role="group">
+                        <a href="@Url.Action("PreviewDashboard", new { id = Model.Id })" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                        <a href="@Url.Action("PreviewProducts", new { id = Model.Id })" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-box-seam me-1"></i> Products
+                        </a>
+                        <a href="@Url.Action("PreviewOrders", new { id = Model.Id })" 
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-cart-check me-1"></i> Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.IsActive)
+                    {
+                        <form method="post" action="@Url.Action("Reject", new { id = Model.Id })" 
+                              onsubmit="return confirm('Are you sure you want to reject/deactivate this vendor?');">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Rejection Reason (Optional):</label>
+                                <textarea name="reason" class="form-control" rows="3" 
+                                          placeholder="Enter reason for rejection..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-x-circle me-2"></i> Reject Vendor
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" action="@Url.Action("Approve", new { id = Model.Id })"
+                              onsubmit="return confirm('Are you sure you want to approve this vendor?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-circle me-2"></i> Approve Vendor
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            @if (Model.VendorAdmins != null && Model.VendorAdmins.Any())
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Vendor Administrators</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var admin in Model.VendorAdmins)
+                            {
+                                <li class="mb-2">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    <strong>@admin.User?.UserName</strong><br />
+                                    <small class="text-muted">@admin.User?.Email</small>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
