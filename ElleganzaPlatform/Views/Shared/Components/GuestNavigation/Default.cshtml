@@ -1,0 +1,16 @@
+@model List<ElleganzaPlatform.ViewComponents.NavigationItem>
+
+@if (Model != null && Model.Any())
+{
+    <ul class="nav flex-column">
+        @foreach (var item in Model)
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="@item.Url">
+                    <i class="@item.Icon me-2"></i>
+                    @item.Text
+                </a>
+            </li>
+        }
+    </ul>
+}

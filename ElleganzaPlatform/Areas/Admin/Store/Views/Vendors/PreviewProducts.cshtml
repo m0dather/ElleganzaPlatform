@@ -1,0 +1,102 @@
+@model List<ElleganzaPlatform.Domain.Entities.Product>
+@{
+    var vendorName = ViewData["VendorName"]?.ToString() ?? "Vendor";
+    var vendorId = ViewData["VendorId"] as int? ?? 0;
+    ViewData["Title"] = $"Preview: {vendorName} Products";
+    var isPreviewMode = ViewData["IsPreviewMode"] as bool? ?? false;
+}
+
+<div class="container-fluid">
+    @if (isPreviewMode)
+    {
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-eye me-2"></i>
+            <strong>Preview Mode:</strong> You are viewing <strong>@vendorName</strong>'s products in read-only mode.
+            <a href="@Url.Action("Details", new { id = vendorId })" class="alert-link float-end">
+                <i class="bi bi-arrow-left"></i> Back to Vendor Details
+            </a>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="bi bi-box-seam me-2"></i>
+                @vendorName - Products
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Product List (Read-Only)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>SKU</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Created At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model)
+                                    {
+                                        <tr>
+                                            <td>@product.Id</td>
+                                            <td>
+                                                <strong>@product.Name</strong><br />
+                                                <small class="text-muted">@product.NameAr</small>
+                                            </td>
+                                            <td>@product.Sku</td>
+                                            <td>@product.Price.ToString("C2")</td>
+                                            <td>@product.StockQuantity</td>
+                                            <td>
+                                                @switch (product.Status)
+                                                {
+                                                    case ElleganzaPlatform.Domain.Enums.ProductStatus.Active:
+                                                        <span class="badge bg-success">Active</span>
+                                                        break;
+                                                    case ElleganzaPlatform.Domain.Enums.ProductStatus.Draft:
+                                                        <span class="badge bg-secondary">Draft</span>
+                                                        break;
+                                                    case ElleganzaPlatform.Domain.Enums.ProductStatus.PendingApproval:
+                                                        <span class="badge bg-warning">Pending Approval</span>
+                                                        break;
+                                                    case ElleganzaPlatform.Domain.Enums.ProductStatus.Inactive:
+                                                        <span class="badge bg-secondary">Inactive</span>
+                                                        break;
+                                                    case ElleganzaPlatform.Domain.Enums.ProductStatus.OutOfStock:
+                                                        <span class="badge bg-danger">Out of Stock</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>@product.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            This vendor has no products yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+@model List<ElleganzaPlatform.Domain.Entities.Order>
+@{
+    var vendorName = ViewData["VendorName"]?.ToString() ?? "Vendor";
+    var vendorId = ViewData["VendorId"] as int? ?? 0;
+    ViewData["Title"] = $"Preview: {vendorName} Orders";
+    var isPreviewMode = ViewData["IsPreviewMode"] as bool? ?? false;
+}
+
+<div class="container-fluid">
+    @if (isPreviewMode)
+    {
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-eye me-2"></i>
+            <strong>Preview Mode:</strong> You are viewing <strong>@vendorName</strong>'s orders in read-only mode.
+            <a href="@Url.Action("Details", new { id = vendorId })" class="alert-link float-end">
+                <i class="bi bi-arrow-left"></i> Back to Vendor Details
+            </a>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3">
+                <i class="bi bi-cart-check me-2"></i>
+                @vendorName - Orders
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Order List (Read-Only)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order #</th>
+                                        <th>Customer</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
+                                        <th>Payment Status</th>
+                                        <th>Created At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>#@order.OrderNumber</strong>
+                                            </td>
+                                            <td>
+                                                @if (order.User != null)
+                                                {
+                                                    @order.User.UserName
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Unknown</span>
+                                                }
+                                            </td>
+                                            <td>@order.TotalAmount.ToString("C2")</td>
+                                            <td>
+                                                <span class="badge bg-info">@order.Status</span>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(order.PaymentTransactionId))
+                                                {
+                                                    <span class="badge bg-success">Paid</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Pending</span>
+                                                }
+                                            </td>
+                                            <td>@order.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            This vendor has no orders yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

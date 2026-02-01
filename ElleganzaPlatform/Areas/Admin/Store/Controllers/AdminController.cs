@@ -26,12 +26,6 @@ public class AdminController : Controller
         return View();
     }
 
-    [HttpGet("Vendors")]
-    public IActionResult Vendors()
-    {
-        return View();
-    }
-
     [HttpGet("Products")]
     public IActionResult Products()
     {
