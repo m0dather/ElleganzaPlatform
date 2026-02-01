@@ -22,6 +22,12 @@ public static class DashboardRoutes
     public const string Vendor = "/vendor";
 
     /// <summary>
+    /// Vendor pending approval route: /vendor/pending
+    /// Stage 4.1: Added for vendors awaiting admin approval
+    /// </summary>
+    public const string VendorPending = "/vendor/pending";
+
+    /// <summary>
     /// Customer post-login redirect: / (storefront home)
     /// Note: This is the landing page after login, NOT the account area route.
     /// Customers are shoppers, not admin users - they live in the storefront.

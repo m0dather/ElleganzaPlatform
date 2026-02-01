@@ -118,9 +118,10 @@ public class PostLoginRedirectService : IPostLoginRedirectService
 
             if (!vendorAdmin.Vendor.IsActive)
             {
-                _logger.LogWarning("User {UserId} belongs to inactive vendor {VendorId}", user.Id, vendorAdmin.VendorId);
-                // Redirect to a pending approval page or access denied
-                return DashboardRoutes.AccessDenied;
+                _logger.LogWarning("User {UserId} belongs to inactive vendor {VendorId}, redirecting to pending approval page", 
+                    user.Id, vendorAdmin.VendorId);
+                // Stage 4.1: Redirect to pending approval page instead of access denied
+                return DashboardRoutes.VendorPending;
             }
         }
 
