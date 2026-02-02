@@ -1,6 +1,8 @@
 @model List<ElleganzaPlatform.Domain.Entities.Vendor>
+@using ElleganzaPlatform.Domain.Enums
 @{
     ViewData["Title"] = "Vendor Management";
+    var currentFilter = ViewData["CurrentFilter"] as VendorStatus?;
 }
 
 <div class="container-fluid">
@@ -13,11 +15,48 @@
         </div>
     </div>
 
+    <!-- Stage 4.2: Status Filter Buttons -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="btn-group" role="group" aria-label="Vendor status filter">
+                <a href="@Url.Action("Index")" 
+                   class="btn @(currentFilter == null ? "btn-primary" : "btn-outline-primary")">
+                    <i class="bi bi-grid-3x3-gap me-1"></i> All Vendors
+                </a>
+                <a href="@Url.Action("Index", new { status = VendorStatus.Pending })" 
+                   class="btn @(currentFilter == VendorStatus.Pending ? "btn-warning" : "btn-outline-warning")">
+                    <i class="bi bi-clock me-1"></i> Pending
+                </a>
+                <a href="@Url.Action("Index", new { status = VendorStatus.Approved })" 
+                   class="btn @(currentFilter == VendorStatus.Approved ? "btn-success" : "btn-outline-success")">
+                    <i class="bi bi-check-circle me-1"></i> Approved
+                </a>
+                <a href="@Url.Action("Index", new { status = VendorStatus.Rejected })" 
+                   class="btn @(currentFilter == VendorStatus.Rejected ? "btn-danger" : "btn-outline-danger")">
+                    <i class="bi bi-x-circle me-1"></i> Rejected
+                </a>
+                <a href="@Url.Action("Index", new { status = VendorStatus.Suspended })" 
+                   class="btn @(currentFilter == VendorStatus.Suspended ? "btn-secondary" : "btn-outline-secondary")">
+                    <i class="bi bi-pause-circle me-1"></i> Suspended
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">All Vendors</h5>
+                    <h5 class="card-title mb-0">
+                        @if (currentFilter == null)
+                        {
+                            <text>All Vendors</text>
+                        }
+                        else
+                        {
+                            @currentFilter.ToString() <text> Vendors</text>
+                        }
+                    </h5>
                 </div>
                 <div class="card-body">
                     @if (Model != null && Model.Any())
@@ -46,13 +85,29 @@
                                             </td>
                                             <td>@vendor.ContactEmail</td>
                                             <td>
-                                                @if (vendor.IsActive)
+                                                @* Stage 4.2: Enhanced status badges *@
+                                                @switch (vendor.Status)
                                                 {
-                                                    <span class="badge bg-success">Active</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-danger">Inactive</span>
+                                                    case VendorStatus.Pending:
+                                                        <span class="badge bg-warning text-dark">
+                                                            <i class="bi bi-clock me-1"></i> Pending
+                                                        </span>
+                                                        break;
+                                                    case VendorStatus.Approved:
+                                                        <span class="badge bg-success">
+                                                            <i class="bi bi-check-circle me-1"></i> Approved
+                                                        </span>
+                                                        break;
+                                                    case VendorStatus.Rejected:
+                                                        <span class="badge bg-danger">
+                                                            <i class="bi bi-x-circle me-1"></i> Rejected
+                                                        </span>
+                                                        break;
+                                                    case VendorStatus.Suspended:
+                                                        <span class="badge bg-secondary">
+                                                            <i class="bi bi-pause-circle me-1"></i> Suspended
+                                                        </span>
+                                                        break;
                                                 }
                                             </td>
                                             <td>@vendor.CommissionRate.ToString("P2")</td>
@@ -73,7 +128,12 @@
                     {
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            No vendors found in the system.
+                            No vendors found
+                            @if (currentFilter != null)
+                            {
+                                <text> with status "@currentFilter"</text>
+                            }
+                            .
                         </div>
                     }
                 </div>

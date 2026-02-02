@@ -57,3 +57,20 @@ public static class ClaimTypes
     public const string StoreId = "StoreId";
     public const string VendorId = "VendorId";
 }
+
+/// <summary>
+/// Permission constants for fine-grained authorization.
+/// Stage 4.2: Admin permissions for vendor and product management.
+/// </summary>
+public static class Permissions
+{
+    // Vendor Management Permissions
+    public const string CanViewVendors = "CanViewVendors";
+    public const string CanApproveVendors = "CanApproveVendors";
+    public const string CanSuspendVendors = "CanSuspendVendors";
+    
+    // Product Management Permissions
+    public const string CanViewProducts = "CanViewProducts";
+    public const string CanApproveProducts = "CanApproveProducts";
+    public const string CanDisableProducts = "CanDisableProducts";
+}

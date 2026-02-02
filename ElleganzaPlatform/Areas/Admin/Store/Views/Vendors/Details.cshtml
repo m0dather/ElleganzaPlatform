@@ -1,4 +1,5 @@
 @model ElleganzaPlatform.Domain.Entities.Vendor
+@using ElleganzaPlatform.Domain.Enums
 @{
     ViewData["Title"] = $"Vendor Details - {Model.Name}";
 }
@@ -33,6 +34,14 @@
         <div class="alert alert-warning alert-dismissible fade show">
             <i class="bi bi-exclamation-triangle me-2"></i>
             @TempData["Warning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-x-circle me-2"></i>
+            @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
@@ -71,13 +80,61 @@
                     <div class="row mb-3">
                         <div class="col-md-4"><strong>Status:</strong></div>
                         <div class="col-md-8">
-                            @if (Model.IsActive)
+                            @* Stage 4.2: Enhanced status display *@
+                            @switch (Model.Status)
                             {
-                                <span class="badge bg-success">Active</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">Inactive</span>
+                                case VendorStatus.Pending:
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-clock me-1"></i> Pending Approval
+                                    </span>
+                                    break;
+                                case VendorStatus.Approved:
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i> Approved
+                                    </span>
+                                    if (Model.ApprovedAt.HasValue)
+                                    {
+                                        <div class="text-muted small mt-1">
+                                            Approved on @Model.ApprovedAt.Value.ToString("yyyy-MM-dd HH:mm")
+                                            @if (!string.IsNullOrEmpty(Model.ApprovedBy))
+                                            {
+                                                <text> by @Model.ApprovedBy</text>
+                                            }
+                                        </div>
+                                    }
+                                    break;
+                                case VendorStatus.Rejected:
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i> Rejected
+                                    </span>
+                                    if (!string.IsNullOrEmpty(Model.RejectionReason))
+                                    {
+                                        <div class="text-muted small mt-1">
+                                            <strong>Reason:</strong> @Model.RejectionReason
+                                        </div>
+                                    }
+                                    break;
+                                case VendorStatus.Suspended:
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-pause-circle me-1"></i> Suspended
+                                    </span>
+                                    if (Model.SuspendedAt.HasValue)
+                                    {
+                                        <div class="text-muted small mt-1">
+                                            Suspended on @Model.SuspendedAt.Value.ToString("yyyy-MM-dd HH:mm")
+                                            @if (!string.IsNullOrEmpty(Model.SuspendedBy))
+                                            {
+                                                <text> by @Model.SuspendedBy</text>
+                                            }
+                                        </div>
+                                    }
+                                    if (!string.IsNullOrEmpty(Model.SuspensionReason))
+                                    {
+                                        <div class="text-muted small mt-1">
+                                            <strong>Reason:</strong> @Model.SuspensionReason
+                                        </div>
+                                    }
+                                    break;
                             }
                         </div>
                     </div>
@@ -85,8 +142,34 @@
                         <div class="col-md-4"><strong>Created At:</strong></div>
                         <div class="col-md-8">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
                     </div>
+                    @if (Model.UpdatedAt.HasValue)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Last Updated:</strong></div>
+                            <div class="col-md-8">@Model.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm")</div>
+                        </div>
+                    }
                 </div>
             </div>
+
+            @if (Model.Products != null && Model.Products.Any())
+            {
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Products Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            <strong>Total Products:</strong> @Model.Products.Count<br />
+                            <strong>Active Products:</strong> @Model.Products.Count(p => p.Status == ProductStatus.Active)<br />
+                            <strong>Pending Approval:</strong> @Model.Products.Count(p => p.Status == ProductStatus.PendingApproval)
+                        </p>
+                        <a href="@Url.Action("PreviewProducts", new { id = Model.Id })" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-box-seam me-1"></i> View All Products
+                        </a>
+                    </div>
+                </div>
+            }
 
             <div class="card">
                 <div class="card-header">
@@ -121,30 +204,63 @@
                     <h5 class="card-title mb-0">Actions</h5>
                 </div>
                 <div class="card-body">
-                    @if (Model.IsActive)
+                    @* Stage 4.2: Status-based action buttons *@
+                    @if (Model.Status == VendorStatus.Pending)
                     {
-                        <form method="post" action="@Url.Action("Reject", new { id = Model.Id })" 
-                              onsubmit="return confirm('Are you sure you want to reject/deactivate this vendor?');">
-                            @Html.AntiForgeryToken()
-                            <div class="mb-3">
-                                <label class="form-label">Rejection Reason (Optional):</label>
-                                <textarea name="reason" class="form-control" rows="3" 
-                                          placeholder="Enter reason for rejection..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-danger w-100">
-                                <i class="bi bi-x-circle me-2"></i> Reject Vendor
-                            </button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" action="@Url.Action("Approve", new { id = Model.Id })"
-                              onsubmit="return confirm('Are you sure you want to approve this vendor?');">
+                        <form method="post" action="@Url.Action("Approve", new { id = Model.Id })" 
+                              class="mb-3"
+                              onsubmit="return confirm('Are you sure you want to approve this vendor? They will be able to access their dashboard and publish products.');">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-success w-100">
                                 <i class="bi bi-check-circle me-2"></i> Approve Vendor
                             </button>
                         </form>
+                        
+                        <form method="post" action="@Url.Action("Reject", new { id = Model.Id })">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Rejection Reason:</label>
+                                <textarea name="reason" class="form-control" rows="3" 
+                                          placeholder="Enter reason for rejection..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100"
+                                    onclick="return confirm('Are you sure you want to reject this vendor?');">
+                                <i class="bi bi-x-circle me-2"></i> Reject Vendor
+                            </button>
+                        </form>
+                    }
+                    else if (Model.Status == VendorStatus.Approved)
+                    {
+                        <form method="post" action="@Url.Action("Suspend", new { id = Model.Id })" class="mb-3">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Suspension Reason:</label>
+                                <textarea name="reason" class="form-control" rows="3" 
+                                          placeholder="Enter reason for suspension..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100"
+                                    onclick="return confirm('Are you sure you want to suspend this vendor? They will lose access to their dashboard.');">
+                                <i class="bi bi-pause-circle me-2"></i> Suspend Vendor
+                            </button>
+                        </form>
+                    }
+                    else if (Model.Status == VendorStatus.Rejected || Model.Status == VendorStatus.Suspended)
+                    {
+                        <form method="post" action="@Url.Action("Reactivate", new { id = Model.Id })" class="mb-3">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success w-100"
+                                    onclick="return confirm('Are you sure you want to reactivate this vendor?');">
+                                <i class="bi bi-check-circle me-2"></i> Reactivate Vendor
+                            </button>
+                        </form>
+                        
+                        @if (Model.Status == VendorStatus.Rejected)
+                        {
+                            <p class="text-muted small">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Reactivating will change status to Approved.
+                            </p>
+                        }
                     }
                 </div>
             </div>
