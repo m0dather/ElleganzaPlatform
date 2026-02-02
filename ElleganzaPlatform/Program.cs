@@ -148,6 +148,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Add status code pages middleware for proper error handling (404, 403, etc.)
+app.UseStatusCodePagesWithReExecute("/error/{0}");
+
 app.UseHttpsRedirection();
 
 // Configure static files from default wwwroot

@@ -26,4 +26,22 @@ public class ErrorController : Controller
         Response.StatusCode = 404;
         return View();
     }
+
+    /// <summary>
+    /// Generic error handler for status codes (called by UseStatusCodePagesWithReExecute)
+    /// </summary>
+    [HttpGet("/error/{statusCode}")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult HandleStatusCode(int statusCode)
+    {
+        Response.StatusCode = statusCode;
+        
+        // Route specific status codes to appropriate views
+        return statusCode switch
+        {
+            404 => View("NotFound"),
+            403 => RedirectToAction("AccessDenied", "Account", new { area = "Identity" }),
+            _ => View("Error") // Generic error view
+        };
+    }
 }

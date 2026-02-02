@@ -19,7 +19,7 @@
         <div class="tf-page-cart-wrap layout-2">
             <div class="tf-page-cart-item">
                 <h5 class="fw-5 mb_20">Choose Shipping Method</h5>
-                <form class="form-shipping-method" method="post" action="/checkout/update-shipping" id="shippingForm">
+                <form class="form-shipping-method" method="post" asp-action="UpdateShipping" asp-controller="Checkout" id="shippingForm">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
                     <input type="hidden" name="ShippingCost" id="shippingCost" value="0" />

@@ -19,7 +19,7 @@
         <div class="tf-page-cart-wrap layout-2">
             <div class="tf-page-cart-item">
                 <h5 class="fw-5 mb_20">Choose Payment Method</h5>
-                <form class="form-payment-method" method="post" action="/checkout/update-payment" id="paymentForm">
+                <form class="form-payment-method" method="post" asp-action="UpdatePayment" asp-controller="Checkout" id="paymentForm">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="CheckoutSessionId" value="@Model.Id" />
                     
