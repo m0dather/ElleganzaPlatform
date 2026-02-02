@@ -69,7 +69,7 @@
                 }
                 
                 <!-- Confirmation Form -->
-                <form class="form-confirm-order" method="post" action="/checkout/confirm-order" id="confirmForm">
+                <form class="form-confirm-order" method="post" asp-action="ConfirmOrder" asp-controller="Checkout" id="confirmForm">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="checkoutSessionId" value="@Model.Id" />
                     

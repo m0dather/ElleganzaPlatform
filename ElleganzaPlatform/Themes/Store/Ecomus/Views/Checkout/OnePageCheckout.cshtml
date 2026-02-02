@@ -236,7 +236,7 @@
                             <strong>Review your order details on the right</strong> and click the button below to complete your order.
                         </div>
                         
-                        <form id="confirmForm" method="post" action="/checkout/confirm-order">
+                        <form id="confirmForm" method="post" asp-action="ConfirmOrder" asp-controller="Checkout">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="checkoutSessionId" id="confirmSessionId" value="" />
                             

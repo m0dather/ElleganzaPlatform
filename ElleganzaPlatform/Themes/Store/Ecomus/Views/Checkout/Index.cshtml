@@ -19,7 +19,7 @@
         <div class="tf-page-cart-wrap layout-2">
             <div class="tf-page-cart-item">
                 <h5 class="fw-5 mb_20">Billing details</h5>
-                <form class="form-checkout" method="post" action="/checkout/create-session" id="checkoutForm">
+                <form class="form-checkout" method="post" asp-action="CreateSession" asp-controller="Checkout" id="checkoutForm">
                     @Html.AntiForgeryToken()
                     
                     <div class="box grid-2">
