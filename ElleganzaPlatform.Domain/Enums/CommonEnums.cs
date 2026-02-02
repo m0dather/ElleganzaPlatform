@@ -99,5 +99,22 @@ public enum ProductStatus
     PendingApproval = 2,
     Active = 3,
     Inactive = 4,
-    OutOfStock = 5
+    OutOfStock = 5,
+    Rejected = 6,
+    Disabled = 7
+}
+
+/// <summary>
+/// Vendor approval status for marketplace control
+/// Pending: Awaiting admin approval
+/// Approved: Active and can publish products
+/// Rejected: Rejected by admin
+/// Suspended: Temporarily suspended by admin
+/// </summary>
+public enum VendorStatus
+{
+    Pending = 1,
+    Approved = 2,
+    Rejected = 3,
+    Suspended = 4
 }

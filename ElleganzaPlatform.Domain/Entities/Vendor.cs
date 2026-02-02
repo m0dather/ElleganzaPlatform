@@ -1,4 +1,5 @@
 using ElleganzaPlatform.Domain.Common;
+using ElleganzaPlatform.Domain.Enums;
 
 namespace ElleganzaPlatform.Domain.Entities;
 
@@ -11,6 +12,13 @@ public class Vendor : BaseEntity
     public string DescriptionAr { get; set; } = string.Empty;
     public string? Logo { get; set; }
     public bool IsActive { get; set; }
+    public VendorStatus Status { get; set; } = VendorStatus.Pending;
+    public string? RejectionReason { get; set; }
+    public DateTime? ApprovedAt { get; set; }
+    public string? ApprovedBy { get; set; }
+    public DateTime? SuspendedAt { get; set; }
+    public string? SuspendedBy { get; set; }
+    public string? SuspensionReason { get; set; }
     public decimal CommissionRate { get; set; }
     public string? ContactEmail { get; set; }
     public string? ContactPhone { get; set; }

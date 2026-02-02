@@ -20,6 +20,9 @@ public class Product : BaseEntity
     public bool RequiresApproval { get; set; }
     public DateTime? ApprovedAt { get; set; }
     public string? ApprovedBy { get; set; }
+    public string? RejectionReason { get; set; }
+    public DateTime? RejectedAt { get; set; }
+    public string? RejectedBy { get; set; }
     
     // Navigation properties
     public Store Store { get; set; } = null!;
