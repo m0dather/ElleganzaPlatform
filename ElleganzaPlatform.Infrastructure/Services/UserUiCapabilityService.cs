@@ -14,28 +14,32 @@ namespace ElleganzaPlatform.Infrastructure.Services;
 public class UserUiCapabilityService : IUserUiCapabilityService
 {
     private readonly ICurrentUserService _currentUserService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly Lazy<bool> _isAuthenticated;
+    private readonly Lazy<bool> _isAdmin;
 
     public UserUiCapabilityService(
         ICurrentUserService currentUserService,
         IHttpContextAccessor httpContextAccessor)
     {
         _currentUserService = currentUserService;
-        _httpContextAccessor = httpContextAccessor;
+        
+        // Cache expensive checks using Lazy<T> for thread-safety and single evaluation
+        _isAuthenticated = new Lazy<bool>(() => 
+            httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false);
+        _isAdmin = new Lazy<bool>(() => 
+            _currentUserService.IsSuperAdmin || _currentUserService.IsStoreAdmin);
     }
 
     /// <summary>
-    /// Determines if user is authenticated.
+    /// Determines if user is authenticated (cached).
     /// </summary>
-    private bool IsAuthenticated => 
-        _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+    private bool IsAuthenticated => _isAuthenticated.Value;
 
     /// <summary>
-    /// Determines if user is an Admin (StoreAdmin or SuperAdmin).
+    /// Determines if user is an Admin (StoreAdmin or SuperAdmin) (cached).
     /// Admins do NOT have access to shopping features - they focus on administration.
     /// </summary>
-    private bool IsAdmin => 
-        _currentUserService.IsSuperAdmin || _currentUserService.IsStoreAdmin;
+    private bool IsAdmin => _isAdmin.Value;
 
     /// <inheritdoc/>
     public bool CanAccessStore

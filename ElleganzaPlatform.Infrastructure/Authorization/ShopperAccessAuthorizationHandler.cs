@@ -13,16 +13,16 @@ public class ShopperAccessRequirement : IAuthorizationRequirement
 
 /// <summary>
 /// Handles authorization for ShopperAccess policy.
-/// Validates that the user is authenticated and has either Customer or Vendor role.
-/// Admins are explicitly excluded as they don't have shopping privileges.
+/// Validates that the user has shopping capabilities (Customer or Vendor role).
+/// Delegates capability determination to IUserUiCapabilityService for consistency.
 /// </summary>
 public class ShopperAccessAuthorizationHandler : AuthorizationHandler<ShopperAccessRequirement>
 {
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IUserUiCapabilityService _uiCapabilityService;
 
-    public ShopperAccessAuthorizationHandler(ICurrentUserService currentUserService)
+    public ShopperAccessAuthorizationHandler(IUserUiCapabilityService uiCapabilityService)
     {
-        _currentUserService = currentUserService;
+        _uiCapabilityService = uiCapabilityService;
     }
 
     protected override Task HandleRequirementAsync(
@@ -35,9 +35,9 @@ public class ShopperAccessAuthorizationHandler : AuthorizationHandler<ShopperAcc
             return Task.CompletedTask;
         }
 
-        // Allow if user is Customer or Vendor
-        // Admins are explicitly excluded - they don't shop
-        if (_currentUserService.IsCustomer || _currentUserService.IsVendorAdmin)
+        // Use capability service to determine shopper access
+        // This ensures single source of truth for shopping access logic
+        if (_uiCapabilityService.CanUseWishlist)
         {
             context.Succeed(requirement);
         }
