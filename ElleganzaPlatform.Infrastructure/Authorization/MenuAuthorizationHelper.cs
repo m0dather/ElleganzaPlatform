@@ -1,3 +1,4 @@
+using ElleganzaPlatform.Application.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
@@ -16,6 +17,7 @@ public class MenuAuthorizationHelper
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUserUiCapabilityService _uiCapabilityService;
     private readonly Lazy<bool> _isAuthenticated;
     private readonly Lazy<bool> _canShowCustomerMenu;
     private readonly Lazy<bool> _canShowVendorDashboard;
@@ -26,10 +28,12 @@ public class MenuAuthorizationHelper
 
     public MenuAuthorizationHelper(
         IAuthorizationService authorizationService,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IUserUiCapabilityService uiCapabilityService)
     {
         _authorizationService = authorizationService;
         _httpContextAccessor = httpContextAccessor;
+        _uiCapabilityService = uiCapabilityService;
 
         // Lazy initialization to compute values only once when accessed
         _isAuthenticated = new Lazy<bool>(CheckIsAuthenticated);
@@ -95,6 +99,31 @@ public class MenuAuthorizationHelper
     /// This encapsulates the logic for showing vendor-specific menus in isolation.
     /// </summary>
     public bool CanShowVendorOnlyDashboard => _canShowVendorOnlyDashboard.Value;
+
+    // ===============================================================
+    // UI Capability Properties (Capability-based, not role-based)
+    // ===============================================================
+
+    /// <summary>
+    /// Determines if the current user can access the store and browse products.
+    /// Returns true for: Guest, Customer, Vendor
+    /// Returns false for: Admin, SuperAdmin
+    /// </summary>
+    public bool CanAccessStore => _uiCapabilityService.CanAccessStore;
+
+    /// <summary>
+    /// Determines if the current user can use the shopping cart.
+    /// Returns true for: Guest, Customer, Vendor
+    /// Returns false for: Admin, SuperAdmin
+    /// </summary>
+    public bool CanUseCart => _uiCapabilityService.CanUseCart;
+
+    /// <summary>
+    /// Determines if the current user can use the wishlist.
+    /// Returns true for: Customer, Vendor (authenticated non-admin users)
+    /// Returns false for: Guest, Admin, SuperAdmin
+    /// </summary>
+    public bool CanUseWishlist => _uiCapabilityService.CanUseWishlist;
 
     private bool CheckIsAuthenticated()
     {
