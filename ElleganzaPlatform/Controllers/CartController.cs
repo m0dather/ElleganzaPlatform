@@ -9,43 +9,35 @@ namespace ElleganzaPlatform.Controllers;
 /// Cart controller for shopping cart operations
 /// Uses Store theme (Ecomus)
 /// Phase 3.1.1: Hardened with CSRF protection, validation, and error handling
-/// Stage 4.1: Added role-based access control - only Guest and Customer can access cart
+/// Stage 4.1: Updated to use capability-based access control - Guest, Customer, and Vendor can access cart
 /// </summary>
 public class CartController : Controller
 {
     private readonly ILogger<CartController> _logger;
     private readonly ICartService _cartService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IUserUiCapabilityService _uiCapabilityService;
 
     public CartController(
         ILogger<CartController> logger,
         ICartService cartService,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IUserUiCapabilityService uiCapabilityService)
     {
         _logger = logger;
         _cartService = cartService;
         _currentUserService = currentUserService;
+        _uiCapabilityService = uiCapabilityService;
     }
 
     /// <summary>
     /// Validates that the current user can access the cart.
-    /// Cart is only accessible to Guest (unauthenticated) and Customer roles.
-    /// Vendor, Admin, and SuperAdmin roles are blocked.
+    /// Cart is accessible to Guest (unauthenticated), Customer, and Vendor.
+    /// Admin and SuperAdmin roles are blocked (they don't shop).
     /// </summary>
     private bool CanAccessCart()
     {
-        // Allow unauthenticated users (Guest)
-        if (!User.Identity?.IsAuthenticated ?? true)
-            return true;
-
-        // Block Vendor, StoreAdmin, and SuperAdmin roles
-        if (_currentUserService.IsVendorAdmin || 
-            _currentUserService.IsStoreAdmin || 
-            _currentUserService.IsSuperAdmin)
-            return false;
-
-        // Allow Customer and other authenticated users
-        return true;
+        return _uiCapabilityService.CanUseCart;
     }
 
     /// <summary>

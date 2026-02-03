@@ -32,6 +32,13 @@ public static class AuthorizationPolicies
     public const string RequireCustomer = "RequireCustomer";
 
     /// <summary>
+    /// Requires user to have shopping access (Customer or Vendor).
+    /// This policy allows both Customers and Vendors to access shopping features
+    /// like Wishlist, as Vendors can also shop in the store.
+    /// </summary>
+    public const string RequireShopperAccess = "RequireShopperAccess";
+
+    /// <summary>
     /// Requires user's StoreId to match the current store context.
     /// SuperAdmin bypass is allowed.
     /// </summary>
