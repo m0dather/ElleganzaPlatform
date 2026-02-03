@@ -1000,11 +1000,17 @@
                                 </li>
                             }
                             
-                            @* Cart and Wishlist icons - visible only to Guest and Customer *@
-                            @if (!MenuAuth.IsAuthenticated || MenuAuth.CanShowCustomerMenu)
+                            @* Cart and Wishlist icons - visible based on capability, not role *@
+                            @* Wishlist requires authentication (Customer, Vendor) *@
+                            @if (MenuAuth.CanUseWishlist)
                             {
                                 <li class="nav-wishlist"><a href="@Url.Action("Wishlist", "Account", new { area = "Customer" })" class="nav-icon-item"><i
                                             class="icon icon-heart"></i><span class="count-box">0</span></a></li>
+                            }
+                            
+                            @* Cart is available to all shoppers (Guest, Customer, Vendor) *@
+                            @if (MenuAuth.CanUseCart)
+                            {
                                 <li class="nav-cart"><a href="#miniCart" data-bs-toggle="offcanvas" data-bs-target="#miniCart" aria-controls="miniCart" class="nav-icon-item"><i
                                             class="icon icon-bag"></i><span class="count-box">0</span></a></li>
                             }

@@ -200,9 +200,11 @@ public class AccountController : Controller
     }
 
     /// <summary>
-    /// Customer wishlist
+    /// Customer wishlist - accessible to both Customer and Vendor roles.
+    /// Vendors can shop and maintain wishlists just like customers.
     /// </summary>
     [HttpGet("wishlist")]
+    [Authorize(Policy = AuthorizationPolicies.RequireShopperAccess)]
     public IActionResult Wishlist()
     {
         return View();

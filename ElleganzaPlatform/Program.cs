@@ -100,6 +100,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(AuthorizationPolicies.RequireCustomer, policy =>
         policy.AddRequirements(new CustomerRequirement()));
 
+    // Shopper Access policy - requires Customer OR Vendor role (for shopping features)
+    options.AddPolicy(AuthorizationPolicies.RequireShopperAccess, policy =>
+        policy.AddRequirements(new ShopperAccessRequirement()));
+
     // Same Store policy - requires user's StoreId to match current store context
     options.AddPolicy(AuthorizationPolicies.RequireSameStore, policy =>
         policy.AddRequirements(new SameStoreRequirement()));

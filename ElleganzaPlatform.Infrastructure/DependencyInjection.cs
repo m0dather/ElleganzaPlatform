@@ -32,6 +32,7 @@ public static class DependencyInjection
 
         // Services
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IUserUiCapabilityService, UserUiCapabilityService>();
         services.AddScoped<IStoreContextService, StoreContextService>();
         services.AddScoped<IRolePriorityResolver, RolePriorityResolver>();
         services.AddScoped<IPostLoginRedirectService, PostLoginRedirectService>();
@@ -59,6 +60,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationHandler, StoreAdminAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, VendorAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, CustomerAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, ShopperAccessAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, SameStoreAuthorizationHandler>();
 
         // Authorization Helpers (for Razor views)
